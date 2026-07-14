@@ -356,7 +356,7 @@ export default function Home() {
       {/* ── FOOTER ── */}
       <footer style={{ background: "#0F1B2A", padding: "24px 40px", textAlign: "center" }}>
         <p style={{ color: "#8A9BB0", fontSize: 13, margin: 0 }}>
-          © {new Date().getFullYear()} SENA CONSULTING — Cabinet de conseil en performance business pour PME/TPE
+          © {new Date().getFullYear()} — SENA CONSULTING — Cabinet de conseil en performance business pour PME/TPE
           &nbsp;·&nbsp;
           <a href="/mentions-legales" style={{ color: "#C9A84C", textDecoration: "none" }}>Mentions légales</a>
           &nbsp;·&nbsp;
