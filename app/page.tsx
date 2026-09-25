@@ -176,16 +176,36 @@ export default function Home() {
 
         /* METHODE */
         .methode { background: #fff; }
-        .actes { display: flex; flex-direction: column; gap: 0; }
-        .acte { display: flex; align-items: flex-start; border-bottom: 1px solid #F4F5F7; padding: 32px 0; }
-        .acte:last-child { border-bottom: none; }
-        .acte-left { width: 200px; min-width: 200px; flex-shrink: 0; padding: 32px 16px 32px 12px; }
+        .actes { display: flex; flex-direction: column; gap: 12px; }
+        .acte { display: flex; align-items: stretch; border-radius: 10px; overflow: hidden; }
+        .acte-left { width: 200px; min-width: 200px; flex-shrink: 0; padding: 28px 20px; }
         .acte-num { font-size: 11px; letter-spacing: 2px; color: #C9A84C; text-transform: uppercase; margin-bottom: 8px; }
-        .acte-name { font-size: 18px; font-weight: 700; color: #1B2A3E; }
-        .acte-right { flex: 1; }
-        .acte-right p { color: #2E4A6B; font-size: 15px; line-height: 1.7; margin: 0 0 16px; }
+        .acte-name { font-size: 17px; font-weight: 700; color: #1B2A3E; }
+        .acte-right { flex: 1; padding: 28px 28px; }
+        .acte-right p { font-size: 15px; line-height: 1.7; margin: 0 0 14px; }
         .acte-right ul { margin: 0; padding-left: 20px; }
-        .acte-right li { color: #8A9BB0; font-size: 14px; line-height: 1.8; }
+        .acte-right li { font-size: 14px; line-height: 1.8; }
+
+        /* Couleurs par acte — dégradé cohérent bleu marine → bleu ciel */
+        .acte:nth-child(1) .acte-left { background: #dce8f0; }
+        .acte:nth-child(1) .acte-right { background: #eef4f8; }
+        .acte:nth-child(1) .acte-right p { color: #1B2A3E; }
+        .acte:nth-child(1) .acte-right li { color: #2E4A6B; }
+
+        .acte:nth-child(2) .acte-left { background: #d5e3ef; }
+        .acte:nth-child(2) .acte-right { background: #e8f0f7; }
+        .acte:nth-child(2) .acte-right p { color: #1B2A3E; }
+        .acte:nth-child(2) .acte-right li { color: #2E4A6B; }
+
+        .acte:nth-child(3) .acte-left { background: #cddded; }
+        .acte:nth-child(3) .acte-right { background: #e1ecf5; }
+        .acte:nth-child(3) .acte-right p { color: #1B2A3E; }
+        .acte:nth-child(3) .acte-right li { color: #2E4A6B; }
+
+        .acte:nth-child(4) .acte-left { background: #c5d7eb; }
+        .acte:nth-child(4) .acte-right { background: #dae7f3; }
+        .acte:nth-child(4) .acte-right p { color: #1B2A3E; }
+        .acte:nth-child(4) .acte-right li { color: #2E4A6B; }
 
         /* CREDIBILITE */
         .credibilite { background: #1B2A3E; }
@@ -368,8 +388,9 @@ export default function Home() {
           .hero-title { font-size: 28px; }
           .hero-subtitle { font-size: 16px; }
           .diag-grid { grid-template-columns: 1fr; }
-          .acte { flex-direction: column; gap: 12px; }
-          .acte-left { width: 100%; min-width: unset; padding: 0; }
+          .acte { flex-direction: column; gap: 0; border-radius: 8px; }
+          .acte-left { width: 100%; min-width: unset; padding: 16px 20px 12px; }
+          .acte-right { padding: 16px 20px 20px; }
           .cred-grid { grid-template-columns: 1fr; gap: 24px; }
           .offre-grid { grid-template-columns: 1fr; }
           .contact-grid { grid-template-columns: 1fr; gap: 32px; }
@@ -435,7 +456,7 @@ export default function Home() {
       <section className="diagnostic" id="diagnostic">
         <div className="section-inner">
           <div className="section-tag">Le constat</div>
-          <h2 className="section-title">Ce que les autres cabinets font mal</h2>
+          <h2 className="section-title">Ce que les autres cabinets...</h2>
           <div className="diag-grid">
             <div className="diag-card">
               <h3>Surfer sur les buzzwords</h3>
