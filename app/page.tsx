@@ -13,7 +13,7 @@ export default function Home() {
   });
   const [formStatus, setFormStatus] = useState("idle"); // 'idle' | 'sending' | 'success' | 'error'
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormStatus("sending");
     try {
@@ -34,7 +34,7 @@ export default function Home() {
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
