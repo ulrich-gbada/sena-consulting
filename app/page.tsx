@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // ─── Icônes SVG chics ───────────────────────────────────────────────────────
 const IconAudit = () => (
@@ -37,26 +37,41 @@ const IconTransform = () => (
   </svg>
 );
 
+// ─── Icône recherche ─────────────────────────────────────────────────────────
+const IconSearch = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+    <circle cx="8.5" cy="8.5" r="5.5" stroke="#F4F5F7" strokeWidth="1.8"/>
+    <line x1="12.5" y1="12.5" x2="17" y2="17" stroke="#F4F5F7" strokeWidth="1.8" strokeLinecap="round"/>
+  </svg>
+);
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Fermer la recherche avec Echap
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
 
   // ─── Formulaire multi-étapes ─────────────────────────────────────────────
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    // Étape 1
-    name: "",
-    email: "",
-    company: "",
-    phone: "",
-    address: "",
-    taille: "",
-    ca: "",
-    // Étape 2
-    secteur: "",
-    secteurAutre: "",
-    // Étape 3
-    attentes: [] as string[],
-    attenteAutre: "",
+    name: "", email: "", company: "", phone: "", address: "", taille: "", ca: "",
+    secteur: "", secteurAutre: "",
+    attentes: [] as string[], attenteAutre: "",
   });
   const [formStatus, setFormStatus] = useState("idle");
 
@@ -68,9 +83,7 @@ export default function Home() {
     const current = formData.attentes;
     setFormData({
       ...formData,
-      attentes: current.includes(val)
-        ? current.filter((v) => v !== val)
-        : [...current, val],
+      attentes: current.includes(val) ? current.filter((v) => v !== val) : [...current, val],
     });
   };
 
@@ -88,26 +101,12 @@ export default function Home() {
         body: JSON.stringify(body),
       });
       const data = await res.json();
-      if (data.success) {
-        setFormStatus("success");
-        setStep(4);
-      } else {
-        setFormStatus("error");
-      }
-    } catch {
-      setFormStatus("error");
-    }
+      if (data.success) { setFormStatus("success"); setStep(4); }
+      else { setFormStatus("error"); }
+    } catch { setFormStatus("error"); }
   };
 
-  const secteurs = [
-    "Agences immobilières",
-    "BTP",
-    "Carrossier / Garagiste",
-    "École de conduite",
-    "Organisme de formation",
-    "Autre",
-  ];
-
+  const secteurs = ["Agences immobilières", "BTP", "Carrossier / Garagiste", "École de conduite", "Organisme de formation", "Autre"];
   const attentesList = [
     "Augmenter mon chiffre d'affaires",
     "Améliorer ma rentabilité / Vendre au meilleur prix",
@@ -123,58 +122,156 @@ export default function Home() {
     <>
       <style>{`
         * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
 
-        /* NAV */
+        /* ── NAV ── */
         .navbar {
           position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
           background: #1B2A3E;
           display: flex; align-items: center; justify-content: space-between;
-          padding: 0 40px; height: 72px;
+          padding: 0 32px; height: 72px;
           box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+          transition: box-shadow 0.3s;
         }
-        .nav-logo { height: 40px; width: auto; }
-        .nav-links { display: flex; gap: 32px; list-style: none; margin: 0; padding: 0; }
-        .nav-links a { color: #F4F5F7; text-decoration: none; font-size: 14px; letter-spacing: 0.5px; transition: color 0.2s; }
-        .nav-links a:hover { color: #C9A84C; }
-        .nav-cta { background: #C9A84C; color: #1B2A3E !important; padding: 10px 20px; border-radius: 4px; font-weight: bold !important; font-size: 13px !important; }
+        .navbar.scrolled { box-shadow: 0 4px 24px rgba(0,0,0,0.5); }
+
+        /* Logo x2 */
+        .nav-logo { height: 80px; width: auto; }
+
+        /* Liens centrés */
+        .nav-center { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; position: absolute; left: 50%; transform: translateX(-50%); }
+        .nav-center a { color: #F4F5F7; text-decoration: none; font-size: 13px; letter-spacing: 0.5px; transition: color 0.2s; white-space: nowrap; }
+        .nav-center a:hover { color: #C9A84C; }
+
+        /* Actions droite */
+        .nav-actions { display: flex; align-items: center; gap: 12px; }
+        .nav-search-btn {
+          background: none; border: none; cursor: pointer; padding: 8px;
+          display: flex; align-items: center; justify-content: center;
+          border-radius: 6px; transition: background 0.2s;
+        }
+        .nav-search-btn:hover { background: rgba(255,255,255,0.08); }
+        .nav-cta { background: #C9A84C; color: #1B2A3E !important; padding: 10px 18px; border-radius: 4px; font-weight: bold !important; font-size: 13px !important; text-decoration: none; white-space: nowrap; transition: background 0.2s; }
         .nav-cta:hover { background: #b8913d !important; }
+
         .burger { display: none; flex-direction: column; cursor: pointer; gap: 5px; background: none; border: none; padding: 4px; }
         .burger span { display: block; width: 24px; height: 2px; background: #F4F5F7; }
-        .mobile-menu { display: none; flex-direction: column; background: #1B2A3E; padding: 16px 24px 24px; gap: 16px; }
+        .mobile-menu { display: none; flex-direction: column; background: #1B2A3E; padding: 16px 24px 24px; gap: 16px; position: relative; z-index: 999; }
         .mobile-menu.open { display: flex; }
-        .mobile-menu a { color: #F4F5F7; text-decoration: none; font-size: 15px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .mobile-menu a { color: #F4F5F7; text-decoration: none; font-size: 15px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); display: block; }
         .mobile-menu a:hover { color: #C9A84C; }
 
-        /* HERO */
-        .hero { background: linear-gradient(135deg, #1B2A3E 0%, #2E4A6B 100%); padding-top: 72px; min-height: 100vh; display: flex; align-items: center; }
-        .hero-inner { max-width: 1100px; margin: 0 auto; padding: 80px 40px; display: flex; align-items: center; gap: 60px; }
-        .hero-text { flex: 1; }
+        /* ── OVERLAY RECHERCHE ── */
+        .search-overlay {
+          position: fixed; inset: 0; z-index: 2000;
+          background: rgba(20, 30, 50, 0.92);
+          backdrop-filter: blur(6px);
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          opacity: 0; pointer-events: none; transition: opacity 0.25s;
+        }
+        .search-overlay.open { opacity: 1; pointer-events: auto; }
+        .search-box {
+          width: 90%; max-width: 600px;
+          background: #fff; border-radius: 12px;
+          display: flex; align-items: center; gap: 12px;
+          padding: 16px 20px;
+          border: 2px solid #C9A84C;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .search-box svg circle, .search-box svg line { stroke: #8A9BB0; }
+        .search-box input {
+          flex: 1; border: none; outline: none; font-size: 17px;
+          color: #1B2A3E; background: transparent; font-family: inherit;
+        }
+        .search-box input::placeholder { color: #8A9BB0; }
+        .search-close {
+          position: absolute; top: 24px; right: 24px;
+          width: 40px; height: 40px; border-radius: 50%;
+          background: rgba(255,255,255,0.1); border: none; cursor: pointer;
+          color: #fff; font-size: 18px; display: flex; align-items: center; justify-content: center;
+          transition: background 0.2s;
+        }
+        .search-close:hover { background: rgba(255,255,255,0.2); }
+        .search-hint { color: rgba(255,255,255,0.4); font-size: 13px; margin-top: 16px; letter-spacing: 0.5px; }
+
+        /* ── BANNER PLEIN ÉCRAN ── */
+        .banner {
+          position: relative; width: 100%; height: 100vh;
+          overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
+        .banner-img {
+          position: absolute; inset: 0; width: 100%; height: 100%;
+          object-fit: cover; object-position: center;
+          filter: brightness(0.45);
+        }
+        .banner-overlay {
+          position: absolute; inset: 0;
+          background: linear-gradient(160deg, rgba(27,42,62,0.7) 0%, rgba(46,74,107,0.4) 60%, transparent 100%);
+        }
+        .banner-content {
+          position: relative; z-index: 2; text-align: center; padding: 0 24px;
+          max-width: 860px;
+        }
+        .banner-tag {
+          display: inline-block;
+          background: rgba(201,168,76,0.18); color: #C9A84C;
+          border: 1px solid rgba(201,168,76,0.4);
+          padding: 7px 20px; border-radius: 24px;
+          font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+          margin-bottom: 24px;
+        }
+        .banner-title {
+          font-size: 56px; font-weight: 800; color: #F4F5F7;
+          line-height: 1.1; margin: 0 0 20px; text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+        }
+        .banner-title span { color: #C9A84C; }
+        .banner-subtitle {
+          font-size: 19px; color: rgba(244,245,247,0.8);
+          line-height: 1.7; margin: 0 0 40px;
+        }
+        .banner-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+        /* Flèche scroll animée */
+        .scroll-arrow {
+          position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+          z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 6px;
+          cursor: pointer; animation: arrowBounce 2s ease-in-out infinite;
+        }
+        .scroll-arrow span { display: block; width: 1px; height: 48px; background: linear-gradient(to bottom, rgba(201,168,76,0), #C9A84C); }
+        .scroll-arrow svg { display: block; }
+        @keyframes arrowBounce {
+          0%, 100% { transform: translateX(-50%) translateY(0); }
+          50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* ── HERO (texte only, sans photo) ── */
+        .hero { background: linear-gradient(135deg, #1B2A3E 0%, #2E4A6B 100%); padding-top: 72px; display: flex; align-items: center; }
+        .hero-inner { max-width: 1100px; margin: 0 auto; padding: 80px 40px; }
+        .hero-text { max-width: 680px; }
         .hero-tag { display: inline-block; background: rgba(201,168,76,0.15); color: #C9A84C; border: 1px solid rgba(201,168,76,0.3); padding: 6px 16px; border-radius: 20px; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; }
         .hero-title { font-size: 42px; font-weight: 800; color: #F4F5F7; line-height: 1.2; margin: 0 0 16px; }
         .hero-title span { color: #C9A84C; }
         .hero-subtitle { font-size: 18px; color: #8A9BB0; line-height: 1.7; margin: 0 0 36px; }
         .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
-        .btn-primary { background: #C9A84C; color: #1B2A3E; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 15px; transition: background 0.2s; }
+        .btn-primary { background: #C9A84C; color: #1B2A3E; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 15px; transition: background 0.2s; display: inline-block; }
         .btn-primary:hover { background: #b8913d; }
-        .btn-secondary { background: transparent; color: #F4F5F7; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 15px; border: 1px solid rgba(255,255,255,0.25); transition: all 0.2s; }
+        .btn-secondary { background: transparent; color: #F4F5F7; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 15px; border: 1px solid rgba(255,255,255,0.25); transition: all 0.2s; display: inline-block; }
         .btn-secondary:hover { border-color: #C9A84C; color: #C9A84C; }
-        .hero-photo { flex-shrink: 0; }
-        .hero-photo img { width: 300px; height: 380px; object-fit: cover; border-radius: 12px; border: 3px solid rgba(201,168,76,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
 
-        /* SECTIONS */
+        /* ── SECTIONS ── */
         section { padding: 80px 40px; }
         .section-inner { max-width: 1100px; margin: 0 auto; }
         .section-tag { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #C9A84C; margin-bottom: 12px; }
         .section-title { font-size: 32px; font-weight: 700; color: #1B2A3E; margin: 0 0 48px; }
 
-        /* DIAGNOSTIC */
+        /* ── DIAGNOSTIC ── */
         .diagnostic { background: #F4F5F7; }
         .diag-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
         .diag-card { background: #fff; border-radius: 10px; padding: 28px; border-left: 4px solid #C9A84C; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
         .diag-card h3 { color: #1B2A3E; font-size: 16px; margin: 0 0 10px; }
         .diag-card p { color: #8A9BB0; font-size: 14px; line-height: 1.6; margin: 0; }
 
-        /* METHODE */
+        /* ── METHODE ── */
         .methode { background: #fff; }
         .actes { display: flex; flex-direction: column; gap: 12px; }
         .acte { display: flex; align-items: stretch; border-radius: 10px; overflow: hidden; }
@@ -185,80 +282,65 @@ export default function Home() {
         .acte-right p { font-size: 15px; line-height: 1.7; margin: 0 0 14px; }
         .acte-right ul { margin: 0; padding-left: 20px; }
         .acte-right li { font-size: 14px; line-height: 1.8; }
-
-        /* Couleurs par acte — dégradé cohérent bleu marine → bleu ciel */
         .acte:nth-child(1) .acte-left { background: #dce8f0; }
         .acte:nth-child(1) .acte-right { background: #eef4f8; }
         .acte:nth-child(1) .acte-right p { color: #1B2A3E; }
         .acte:nth-child(1) .acte-right li { color: #2E4A6B; }
-
         .acte:nth-child(2) .acte-left { background: #d5e3ef; }
         .acte:nth-child(2) .acte-right { background: #e8f0f7; }
         .acte:nth-child(2) .acte-right p { color: #1B2A3E; }
         .acte:nth-child(2) .acte-right li { color: #2E4A6B; }
-
         .acte:nth-child(3) .acte-left { background: #cddded; }
         .acte:nth-child(3) .acte-right { background: #e1ecf5; }
         .acte:nth-child(3) .acte-right p { color: #1B2A3E; }
         .acte:nth-child(3) .acte-right li { color: #2E4A6B; }
-
         .acte:nth-child(4) .acte-left { background: #c5d7eb; }
         .acte:nth-child(4) .acte-right { background: #dae7f3; }
         .acte:nth-child(4) .acte-right p { color: #1B2A3E; }
         .acte:nth-child(4) .acte-right li { color: #2E4A6B; }
 
-        /* CREDIBILITE */
+        /* ── CREDIBILITE ── */
         .credibilite { background: #1B2A3E; }
         .credibilite .section-title { color: #F4F5F7; }
-        .cred-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 48px; }
+        .cred-layout { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px; align-items: start; }
         .cred-block h3 { color: #C9A84C; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px; }
         .cred-list { list-style: none; padding: 0; margin: 0; }
         .cred-list li { color: #F4F5F7; font-size: 15px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
         .cred-list li:last-child { border-bottom: none; }
+
+        /* Photo Ulrich dans crédibilité */
+        .cred-photo-block { display: flex; flex-direction: column; align-items: center; }
+        .cred-photo { width: 180px; height: 220px; object-fit: cover; border-radius: 10px; border: 2px solid rgba(201,168,76,0.4); box-shadow: 0 12px 40px rgba(0,0,0,0.5); margin-bottom: 16px; }
+        .cred-photo-name { color: #F4F5F7; font-size: 16px; font-weight: 700; text-align: center; margin-bottom: 4px; }
+        .cred-photo-title { color: #C9A84C; font-size: 13px; text-align: center; letter-spacing: 0.5px; }
+
         .kpis { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; }
         .kpi { text-align: center; padding: 24px 32px; background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.2); border-radius: 10px; }
         .kpi-val { font-size: 36px; font-weight: 800; color: #C9A84C; display: block; }
         .kpi-label { font-size: 13px; color: #8A9BB0; margin-top: 4px; display: block; }
 
-        /* OFFRE — avec SVG */
+        /* ── OFFRE ── */
         .offre { background: #F4F5F7; }
         .offre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
         .offre-card {
-          background: #1B2A3E;
-          border-radius: 14px;
-          padding: 40px 32px 32px;
+          background: #1B2A3E; border-radius: 14px; padding: 40px 32px 32px;
           display: flex; flex-direction: column; align-items: flex-start;
-          gap: 0;
-          position: relative;
-          overflow: hidden;
+          position: relative; overflow: hidden;
           transition: transform 0.2s, box-shadow 0.2s;
           box-shadow: 0 4px 24px rgba(27,42,62,0.15);
         }
         .offre-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(27,42,62,0.25); }
-        .offre-card::before {
-          content: '';
-          position: absolute; top: 0; left: 0; right: 0; height: 3px;
-          background: linear-gradient(90deg, #C9A84C, #e8c96a);
-        }
-        .offre-icon-wrap {
-          width: 72px; height: 72px;
-          background: rgba(201,168,76,0.08);
-          border: 1px solid rgba(201,168,76,0.2);
-          border-radius: 16px;
-          display: flex; align-items: center; justify-content: center;
-          margin-bottom: 24px;
-        }
+        .offre-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #C9A84C, #e8c96a); }
+        .offre-icon-wrap { width: 72px; height: 72px; background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
         .offre-card h3 { color: #F4F5F7; font-size: 20px; font-weight: 700; margin: 0 0 14px; }
         .offre-card p { color: #8A9BB0; font-size: 14px; line-height: 1.7; margin: 0 0 24px; flex: 1; }
-        .offre-price {
-          font-size: 12px; color: #C9A84C; font-weight: 600;
-          letter-spacing: 0.5px;
-          border-top: 1px solid rgba(201,168,76,0.2);
-          padding-top: 16px; width: 100%;
-        }
+        .offre-price { font-size: 12px; color: #C9A84C; font-weight: 600; letter-spacing: 0.5px; border-top: 1px solid rgba(201,168,76,0.2); padding-top: 16px; width: 100%; }
 
-        /* CONTACT — multi-steps */
-        .contact { background: #fff; }
+        /* ── RÉALISATIONS (placeholder) ── */
+        .realisations { background: #fff; }
+
+        /* ── CONTACT ── */
+        .contact { background: #F4F5F7; }
         .contact-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 60px; align-items: start; }
         .contact-info h3 { color: #1B2A3E; font-size: 20px; font-weight: 700; margin: 0 0 24px; }
         .contact-item { display: flex; gap: 12px; margin-bottom: 20px; }
@@ -271,14 +353,7 @@ export default function Home() {
         /* Stepper */
         .stepper { display: flex; align-items: center; gap: 0; margin-bottom: 32px; }
         .step-item { display: flex; flex-direction: column; align-items: center; flex: 1; }
-        .step-circle {
-          width: 36px; height: 36px; border-radius: 50%;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 14px; font-weight: 700;
-          border: 2px solid #e0e4ea;
-          background: #fff; color: #8A9BB0;
-          transition: all 0.3s; position: relative; z-index: 1;
-        }
+        .step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; border: 2px solid #e0e4ea; background: #fff; color: #8A9BB0; transition: all 0.3s; position: relative; z-index: 1; }
         .step-circle.active { border-color: #C9A84C; background: #C9A84C; color: #1B2A3E; }
         .step-circle.done { border-color: #C9A84C; background: #1B2A3E; color: #C9A84C; }
         .step-label { font-size: 11px; color: #8A9BB0; margin-top: 6px; text-align: center; }
@@ -290,108 +365,69 @@ export default function Home() {
         .form-group { margin-bottom: 18px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .form-group label { display: block; font-size: 13px; color: #2E4A6B; font-weight: 600; margin-bottom: 6px; }
-        .form-group input,
-        .form-group select {
-          width: 100%; padding: 11px 14px;
-          border: 1px solid #e0e4ea; border-radius: 6px;
-          font-size: 14px; color: #1B2A3E; background: #F4F5F7;
-          outline: none; transition: border-color 0.2s; font-family: inherit;
-          appearance: none;
-        }
-        .form-group input:focus,
-        .form-group select:focus { border-color: #C9A84C; background: #fff; }
+        .form-group input, .form-group select { width: 100%; padding: 11px 14px; border: 1px solid #e0e4ea; border-radius: 6px; font-size: 14px; color: #1B2A3E; background: #fff; outline: none; transition: border-color 0.2s; font-family: inherit; appearance: none; }
+        .form-group input:focus, .form-group select:focus { border-color: #C9A84C; }
 
-        /* Secteurs radio-style */
         .secteur-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .secteur-card {
-          border: 2px solid #e0e4ea; border-radius: 8px;
-          padding: 14px 16px; cursor: pointer;
-          font-size: 14px; color: #2E4A6B; font-weight: 500;
-          transition: all 0.2s; background: #F4F5F7;
-          display: flex; align-items: center; gap: 10px;
-        }
+        .secteur-card { border: 2px solid #e0e4ea; border-radius: 8px; padding: 14px 16px; cursor: pointer; font-size: 14px; color: #2E4A6B; font-weight: 500; transition: all 0.2s; background: #F4F5F7; display: flex; align-items: center; gap: 10px; }
         .secteur-card:hover { border-color: #C9A84C; background: #fff; }
         .secteur-card.selected { border-color: #C9A84C; background: rgba(201,168,76,0.08); color: #1B2A3E; }
-        .secteur-dot {
-          width: 18px; height: 18px; border-radius: 50%;
-          border: 2px solid #8A9BB0; flex-shrink: 0;
-          display: flex; align-items: center; justify-content: center;
-        }
+        .secteur-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #8A9BB0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
         .secteur-dot.sel { border-color: #C9A84C; background: #C9A84C; }
         .secteur-dot.sel::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #1B2A3E; }
 
-        /* Attentes checkboxes */
-        .attente-item {
-          display: flex; align-items: flex-start; gap: 12px;
-          padding: 12px 14px; border: 2px solid #e0e4ea; border-radius: 8px;
-          margin-bottom: 10px; cursor: pointer;
-          background: #F4F5F7; transition: all 0.2s;
-        }
-        .attente-item:hover { border-color: #C9A84C; background: #fff; }
+        .attente-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border: 2px solid #e0e4ea; border-radius: 8px; margin-bottom: 10px; cursor: pointer; background: #fff; transition: all 0.2s; }
+        .attente-item:hover { border-color: #C9A84C; }
         .attente-item.checked { border-color: #C9A84C; background: rgba(201,168,76,0.08); }
-        .attente-check {
-          width: 20px; height: 20px; border-radius: 4px;
-          border: 2px solid #8A9BB0; flex-shrink: 0; margin-top: 1px;
-          display: flex; align-items: center; justify-content: center;
-          transition: all 0.2s;
-        }
+        .attente-check { width: 20px; height: 20px; border-radius: 4px; border: 2px solid #8A9BB0; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .attente-check.checked { border-color: #C9A84C; background: #C9A84C; }
         .attente-check.checked::after { content: '✓'; color: #1B2A3E; font-size: 13px; font-weight: 700; }
         .attente-label { font-size: 14px; color: #2E4A6B; line-height: 1.4; }
         .attente-item.checked .attente-label { color: #1B2A3E; font-weight: 500; }
 
-        /* Boutons de navigation form */
         .form-nav { display: flex; gap: 12px; margin-top: 24px; }
-        .btn-next {
-          flex: 1; background: #C9A84C; color: #1B2A3E;
-          padding: 13px; border: none; border-radius: 6px;
-          font-size: 15px; font-weight: 700; cursor: pointer;
-          transition: background 0.2s; font-family: inherit;
-        }
+        .btn-next { flex: 1; background: #C9A84C; color: #1B2A3E; padding: 13px; border: none; border-radius: 6px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; font-family: inherit; }
         .btn-next:hover:not(:disabled) { background: #b8913d; }
         .btn-next:disabled { opacity: 0.6; cursor: not-allowed; }
-        .btn-back {
-          background: transparent; color: #8A9BB0;
-          padding: 13px 20px; border: 1px solid #e0e4ea; border-radius: 6px;
-          font-size: 14px; cursor: pointer; font-family: inherit;
-          transition: all 0.2s;
-        }
+        .btn-back { background: transparent; color: #8A9BB0; padding: 13px 20px; border: 1px solid #e0e4ea; border-radius: 6px; font-size: 14px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
         .btn-back:hover { border-color: #1B2A3E; color: #1B2A3E; }
 
-        /* Étape 4 — Calendly */
         .step4-wrap { text-align: center; padding: 16px 0; }
         .step4-wrap h3 { color: #1B2A3E; font-size: 22px; font-weight: 700; margin: 0 0 8px; }
         .step4-wrap p { color: #8A9BB0; font-size: 15px; margin: 0 0 28px; line-height: 1.6; }
-        .btn-calendly {
-          display: inline-block; background: #C9A84C; color: #1B2A3E;
-          padding: 16px 36px; border-radius: 8px;
-          font-size: 16px; font-weight: 700; text-decoration: none;
-          transition: background 0.2s;
-        }
+        .btn-calendly { display: inline-block; background: #C9A84C; color: #1B2A3E; padding: 16px 36px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none; transition: background 0.2s; }
         .btn-calendly:hover { background: #b8913d; }
         .form-success-msg { font-size: 13px; color: #2e7d32; margin-top: 16px; }
         .form-error { background: #fdecea; color: #c62828; padding: 14px; border-radius: 6px; font-size: 14px; margin-top: 12px; text-align: center; }
 
-        /* FOOTER */
+        /* ── FOOTER ── */
         footer { background: #1B2A3E; padding: 40px; text-align: center; }
         .footer-logo { height: 32px; margin-bottom: 16px; }
         footer p { color: #8A9BB0; font-size: 13px; margin: 0; }
         footer a { color: #C9A84C; text-decoration: none; }
         footer a:hover { text-decoration: underline; }
 
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-          .nav-links { display: none; }
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+          .nav-center { display: none; }
           .burger { display: flex; }
-          .hero-inner { flex-direction: column; padding: 60px 20px 40px; gap: 32px; }
-          .hero-photo img { width: 200px; height: 260px; }
+        }
+        @media (max-width: 768px) {
+          .banner-title { font-size: 32px; }
+          .banner-subtitle { font-size: 16px; }
+          .banner-btns { flex-direction: column; align-items: center; }
+          .banner-btns .btn-primary,
+          .banner-btns .btn-secondary { width: 280px; text-align: center; }
+          .hero-inner { padding: 60px 20px 40px; }
           .hero-title { font-size: 28px; }
           .hero-subtitle { font-size: 16px; }
           .diag-grid { grid-template-columns: 1fr; }
           .acte { flex-direction: column; gap: 0; border-radius: 8px; }
           .acte-left { width: 100%; min-width: unset; padding: 16px 20px 12px; }
           .acte-right { padding: 16px 20px 20px; }
-          .cred-grid { grid-template-columns: 1fr; gap: 24px; }
+          .cred-layout { grid-template-columns: 1fr; gap: 28px; }
+          .cred-photo-block { flex-direction: row; align-items: center; gap: 20px; }
+          .cred-photo { width: 100px; height: 130px; margin-bottom: 0; }
           .offre-grid { grid-template-columns: 1fr; }
           .contact-grid { grid-template-columns: 1fr; gap: 32px; }
           .form-row { grid-template-columns: 1fr; }
@@ -400,22 +436,53 @@ export default function Home() {
           .navbar { padding: 0 20px; }
           .kpis { flex-direction: column; align-items: center; }
           .kpi { width: 100%; max-width: 280px; }
+          .scroll-arrow { bottom: 20px; }
         }
       `}</style>
 
-      {/* NAVBAR */}
-      <nav className="navbar">
+      {/* ── OVERLAY RECHERCHE ── */}
+      <div className={`search-overlay ${searchOpen ? "open" : ""}`} onClick={(e) => { if ((e.target as HTMLElement).classList.contains("search-overlay")) { setSearchOpen(false); setSearchQuery(""); } }}>
+        <button className="search-close" onClick={() => { setSearchOpen(false); setSearchQuery(""); }}>✕</button>
+        <div className="search-box">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="8.5" cy="8.5" r="5.5" stroke="#8A9BB0" strokeWidth="1.8"/>
+            <line x1="12.5" y1="12.5" x2="17" y2="17" stroke="#8A9BB0" strokeWidth="1.8" strokeLinecap="round"/>
+          </svg>
+          <input
+            autoFocus={searchOpen}
+            type="text"
+            placeholder="Rechercher un guide, article, service..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <p className="search-hint">Appuyez sur Echap pour fermer</p>
+      </div>
+
+      {/* ── NAVBAR ── */}
+      <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
+        {/* Logo */}
         <img src="/logo-sena-consulting-blanc.svg" alt="SENA CONSULTING" className="nav-logo" />
-        <ul className="nav-links">
+
+        {/* Liens centrés */}
+        <ul className="nav-center">
           <li><a href="#diagnostic">Diagnostic</a></li>
           <li><a href="#methode">Méthode</a></li>
           <li><a href="#credibilite">Crédibilité</a></li>
           <li><a href="#offre">Offre</a></li>
-          <li><a href="#contact" className="nav-cta">Audit Gratuit</a></li>
+          <li><a href="#realisations">Réalisations</a></li>
         </ul>
-        <button className="burger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
-          <span /><span /><span />
-        </button>
+
+        {/* Actions droite : recherche + CTA */}
+        <div className="nav-actions">
+          <button className="nav-search-btn" onClick={() => setSearchOpen(true)} aria-label="Rechercher">
+            <IconSearch />
+          </button>
+          <a href="#contact" className="nav-cta">Audit Gratuit</a>
+          <button className="burger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+            <span /><span /><span />
+          </button>
+        </div>
       </nav>
 
       {/* MOBILE MENU */}
@@ -424,39 +491,50 @@ export default function Home() {
         <a href="#methode" onClick={() => setMenuOpen(false)}>Méthode</a>
         <a href="#credibilite" onClick={() => setMenuOpen(false)}>Crédibilité</a>
         <a href="#offre" onClick={() => setMenuOpen(false)}>Offre</a>
+        <a href="#realisations" onClick={() => setMenuOpen(false)}>Réalisations</a>
         <a href="#contact" onClick={() => setMenuOpen(false)} style={{ color: "#C9A84C", fontWeight: "bold" }}>Audit Gratuit</a>
       </div>
 
-      {/* HERO */}
-      <section className="hero" id="accueil">
-        <div className="hero-inner">
-          <div className="hero-text">
-            <span className="hero-tag">Cabinet de conseil · PME / TPE</span>
-            <h1 className="hero-title">
-              Décuplez votre<br />
-              <span>chiffre d'affaires</span><br />
-              sans jargon inutile
-            </h1>
-            <p className="hero-subtitle">
-              La rigueur des grands cabinets, au service des PME/TPE.<br />
-              Des résultats concrets. Un accompagnement humain.
-            </p>
-            <div className="hero-btns">
-              <a href="#contact" className="btn-primary">Demander un audit gratuit</a>
-              <a href="#methode" className="btn-secondary">Notre méthode</a>
-            </div>
-          </div>
-          <div className="hero-photo">
-            <img src="/ulrich-gbada-consultant-sena-consulting.jpg" alt="Ulrich GBADA — Fondateur SENA CONSULTING" />
+      {/* ── BANNER PLEIN ÉCRAN ── */}
+      <div className="banner" id="accueil">
+        {/* Photo de bureau professionnel — autorité, sérieux, excellence */}
+        <img
+          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80&auto=format&fit=crop"
+          alt="SENA CONSULTING — Cabinet de conseil en performance business"
+          className="banner-img"
+        />
+        <div className="banner-overlay" />
+        <div className="banner-content">
+          <span className="banner-tag">Cabinet de conseil en performance business</span>
+          <h1 className="banner-title">
+            Décuplez votre<br />
+            <span>chiffre d'affaires</span><br />
+            sans jargon inutile
+          </h1>
+          <p className="banner-subtitle">
+            La rigueur des grands cabinets, au service des PME/TPE.<br />
+            Des résultats concrets. Un accompagnement humain.
+          </p>
+          <div className="banner-btns">
+            <a href="#contact" className="btn-primary">Demander un audit gratuit</a>
+            <a href="#methode" className="btn-secondary">Notre méthode</a>
           </div>
         </div>
-      </section>
 
-      {/* DIAGNOSTIC */}
+        {/* Flèche scroll */}
+        <div className="scroll-arrow" onClick={() => document.getElementById("diagnostic")?.scrollIntoView({ behavior: "smooth" })}>
+          <span />
+          <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+            <polyline points="1,1 8,9 15,1" stroke="#C9A84C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      {/* ── DIAGNOSTIC ── */}
       <section className="diagnostic" id="diagnostic">
         <div className="section-inner">
           <div className="section-tag">Le constat</div>
-          <h2 className="section-title">Ce que les autres cabinets...</h2>
+          <h2 className="section-title">Ce que font les autres cabinets...</h2>
           <div className="diag-grid">
             <div className="diag-card">
               <h3>Surfer sur les buzzwords</h3>
@@ -474,33 +552,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* METHODE */}
+      {/* ── METHODE ── */}
       <section className="methode" id="methode">
         <div className="section-inner">
           <div className="section-tag">Notre approche</div>
           <h2 className="section-title">La Méthode Grand Cabinet, accessible à tous</h2>
           <div className="actes">
             {[
-              {
-                num: "Acte I", name: "Diagnostic & Clarté",
-                desc: "Comprendre votre réalité terrain avant toute préconisation. Identifier les vrais leviers de croissance et les freins cachés.",
-                items: ["Audit business complet (modèle, marché, organisation)", "Cartographie des processus métier", "Identification des quick wins"],
-              },
-              {
-                num: "Acte II", name: "Stratégie & Décision",
-                desc: "Construire une feuille de route claire, actionnée par les données. Des décisions éclairées grâce à la data, pas à l'intuition seule.",
-                items: ["Tableaux de bord décisionnels (Data Analysis)", "Priorisation des actions à fort impact", "Plan de transformation sur mesure"],
-              },
-              {
-                num: "Acte III", name: "Exécution & Agilité",
-                desc: "Déployer vite, ajuster en continu. Le Cloud et les outils innovants (IA, CRM, Cloud…) comme accélérateurs — pas comme centres de coût.",
-                items: ["Implémentation agile des solutions", "Automatisation ciblée des tâches non cœur de métier", "Formation et conduite du changement"],
-              },
-              {
-                num: "Acte IV", name: "Ancrage & Croissance",
-                desc: "Pérenniser les résultats. Faire de votre entreprise une organisation apprenante, capable de se réinventer durablement.",
-                items: ["Montée en compétences des équipes", "Indicateurs de performance clés (KPIs)", "Accompagnement conseil continu"],
-              },
+              { num: "Acte I", name: "Diagnostic & Clarté", desc: "Comprendre votre réalité terrain avant toute préconisation. Identifier les vrais leviers de croissance et les freins cachés.", items: ["Audit business complet (modèle, marché, organisation)", "Cartographie des processus métier", "Identification des quick wins"] },
+              { num: "Acte II", name: "Stratégie & Décision", desc: "Construire une feuille de route claire, actionnée par les données. Des décisions éclairées grâce à la data, pas à l'intuition seule.", items: ["Tableaux de bord décisionnels (Data Analysis)", "Priorisation des actions à fort impact", "Plan de transformation sur mesure"] },
+              { num: "Acte III", name: "Exécution & Agilité", desc: "Déployer vite, ajuster en continu. Le Cloud et les outils innovants (IA, CRM, Cloud…) comme accélérateurs — pas comme centres de coût.", items: ["Implémentation agile des solutions", "Automatisation ciblée des tâches non cœur de métier", "Formation et conduite du changement"] },
+              { num: "Acte IV", name: "Ancrage & Croissance", desc: "Pérenniser les résultats. Faire de votre entreprise une organisation apprenante, capable de se réinventer durablement.", items: ["Montée en compétences des équipes", "Indicateurs de performance clés (KPIs)", "Accompagnement conseil continu"] },
             ].map((acte) => (
               <div className="acte" key={acte.num}>
                 <div className="acte-left">
@@ -517,12 +579,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CREDIBILITE */}
+      {/* ── CREDIBILITE ── */}
       <section className="credibilite" id="credibilite">
         <div className="section-inner">
           <div className="section-tag" style={{ color: "#C9A84C" }}>Pourquoi nous faire confiance</div>
-          <h2 className="section-title">10+ ans d'expérience terrain</h2>
-          <div className="cred-grid">
+          <h2 className="section-title">10+ ans d'expérience terrain pour le fondateur</h2>
+          <div className="cred-layout">
             <div className="cred-block">
               <h3>Grands Cabinets</h3>
               <ul className="cred-list">
@@ -540,16 +602,33 @@ export default function Home() {
                 <li>Ministère de l'Intérieur — Consultant Manager externe</li>
               </ul>
             </div>
+            <div className="cred-block">
+              <h3>Chef d'entreprise</h3>
+              <ul className="cred-list">
+                <li>SENA SÉCURITÉ PRIVÉE — Associé</li>
+                <li>SENA LINK — Fondateur</li>
+              </ul>
+            </div>
           </div>
+
+          {/* Photo Ulrich */}
+          <div className="cred-photo-block" style={{ marginBottom: 48 }}>
+            <img src="/ulrich-gbada-consultant-sena-consulting.jpg" alt="Ulrich GBADA" className="cred-photo" />
+            <div>
+              <div className="cred-photo-name">Ulrich GBADA</div>
+              <div className="cred-photo-title">Fondateur — SENA CONSULTING</div>
+            </div>
+          </div>
+
           <div className="kpis">
             <div className="kpi"><span className="kpi-val">10+</span><span className="kpi-label">Ans d'expérience</span></div>
             <div className="kpi"><span className="kpi-val">4</span><span className="kpi-label">Grands cabinets</span></div>
-            <div className="kpi"><span className="kpi-val">PME/TPE</span><span className="kpi-label">Notre cœur de cible</span></div>
+            <div className="kpi"><span className="kpi-val">Chef d'entreprise</span><span className="kpi-label">Au contact du réel</span></div>
           </div>
         </div>
       </section>
 
-      {/* OFFRE — cartes sombres avec SVG */}
+      {/* ── OFFRE ── */}
       <section className="offre" id="offre">
         <div className="section-inner">
           <div className="section-tag">Nos prestations</div>
@@ -577,13 +656,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CONTACT — formulaire 4 étapes */}
+      {/* ── RÉALISATIONS (placeholder) ── */}
+      <section className="realisations" id="realisations">
+        <div className="section-inner">
+          <div className="section-tag">Nos réalisations</div>
+          <h2 className="section-title">Des résultats qui parlent d'eux-mêmes</h2>
+          <div style={{ textAlign: "center", padding: "40px 0", color: "#8A9BB0", fontStyle: "italic", fontSize: 15, border: "2px dashed #e0e4ea", borderRadius: 12 }}>
+            Cette section sera enrichie prochainement avec nos études de cas et témoignages clients.
+          </div>
+        </div>
+      </section>
+
+      {/* ── CONTACT ── */}
       <section className="contact" id="contact">
         <div className="section-inner">
           <div className="section-tag">Passons à l'action</div>
           <h2 className="section-title">Demandez votre audit gratuit</h2>
           <div className="contact-grid">
-            {/* Infos de contact */}
             <div className="contact-info">
               <h3>Parlons de votre projet</h3>
               <div className="contact-item">
@@ -609,7 +698,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Formulaire multi-étapes */}
             <div>
               {/* Stepper */}
               <div className="stepper">
@@ -620,9 +708,7 @@ export default function Home() {
                   return (
                     <div key={label} style={{ display: "flex", alignItems: "center", flex: 1 }}>
                       <div className="step-item">
-                        <div className={`step-circle ${isActive ? "active" : isDone ? "done" : ""}`}>
-                          {isDone ? "✓" : n}
-                        </div>
+                        <div className={`step-circle ${isActive ? "active" : isDone ? "done" : ""}`}>{isDone ? "✓" : n}</div>
                         <div className={`step-label ${isActive ? "active" : ""}`}>{label}</div>
                       </div>
                       {i < 3 && <div className={`step-connector ${isDone ? "done" : ""}`} />}
@@ -631,33 +717,18 @@ export default function Home() {
                 })}
               </div>
 
-              {/* ÉTAPE 1 — Identité */}
+              {/* ÉTAPE 1 */}
               {step === 1 && (
                 <div>
                   <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="name">Nom complet *</label>
-                      <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} placeholder="Jean Dupont" required />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="email">Email professionnel *</label>
-                      <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} placeholder="jean@entreprise.fr" required />
-                    </div>
+                    <div className="form-group"><label htmlFor="name">Nom complet *</label><input type="text" id="name" name="name" value={formData.name} onChange={handleChange} placeholder="Jean Dupont" /></div>
+                    <div className="form-group"><label htmlFor="email">Email professionnel *</label><input type="email" id="email" name="email" value={formData.email} onChange={handleChange} placeholder="jean@entreprise.fr" /></div>
                   </div>
                   <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="company">Nom de la société</label>
-                      <input type="text" id="company" name="company" value={formData.company} onChange={handleChange} placeholder="Nom de votre entreprise" />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="phone">Téléphone</label>
-                      <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="06 00 00 00 00" />
-                    </div>
+                    <div className="form-group"><label htmlFor="company">Nom de la société</label><input type="text" id="company" name="company" value={formData.company} onChange={handleChange} placeholder="Nom de votre entreprise" /></div>
+                    <div className="form-group"><label htmlFor="phone">Téléphone</label><input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="06 00 00 00 00" /></div>
                   </div>
-                  <div className="form-group">
-                    <label htmlFor="address">Adresse d'exercice</label>
-                    <input type="text" id="address" name="address" value={formData.address} onChange={handleChange} placeholder="Ville, code postal ou adresse complète" />
-                  </div>
+                  <div className="form-group"><label htmlFor="address">Adresse d'exercice</label><input type="text" id="address" name="address" value={formData.address} onChange={handleChange} placeholder="Ville, code postal ou adresse complète" /></div>
                   <div className="form-row">
                     <div className="form-group">
                       <label htmlFor="taille">Taille de la société</label>
@@ -672,7 +743,7 @@ export default function Home() {
                     </div>
                     <div className="form-group">
                       <label htmlFor="ca">Chiffre d'affaires annuel *</label>
-                      <select id="ca" name="ca" value={formData.ca} onChange={handleChange} required>
+                      <select id="ca" name="ca" value={formData.ca} onChange={handleChange}>
                         <option value="">Sélectionner…</option>
                         <option>Moins de 100 000 €</option>
                         <option>100 000 – 500 000 €</option>
@@ -683,30 +754,19 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="form-nav">
-                    <button
-                      className="btn-next"
-                      onClick={() => setStep(2)}
-                      disabled={!formData.name || !formData.email || !formData.ca}
-                    >
-                      Étape suivante →
-                    </button>
+                    <button className="btn-next" onClick={() => setStep(2)} disabled={!formData.name || !formData.email || !formData.ca}>Étape suivante →</button>
                   </div>
                 </div>
               )}
 
-              {/* ÉTAPE 2 — Secteur */}
+              {/* ÉTAPE 2 */}
               {step === 2 && (
                 <div>
                   <p style={{ color: "#2E4A6B", fontSize: 14, marginBottom: 20 }}>Quel est votre secteur d'activité ?</p>
                   <div className="secteur-grid">
                     {secteurs.map((s) => (
-                      <div
-                        key={s}
-                        className={`secteur-card ${formData.secteur === s ? "selected" : ""}`}
-                        onClick={() => setFormData({ ...formData, secteur: s })}
-                      >
-                        <div className={`secteur-dot ${formData.secteur === s ? "sel" : ""}`} />
-                        {s}
+                      <div key={s} className={`secteur-card ${formData.secteur === s ? "selected" : ""}`} onClick={() => setFormData({ ...formData, secteur: s })}>
+                        <div className={`secteur-dot ${formData.secteur === s ? "sel" : ""}`} />{s}
                       </div>
                     ))}
                   </div>
@@ -718,27 +778,17 @@ export default function Home() {
                   )}
                   <div className="form-nav">
                     <button className="btn-back" onClick={() => setStep(1)}>← Retour</button>
-                    <button
-                      className="btn-next"
-                      onClick={() => setStep(3)}
-                      disabled={!formData.secteur || (formData.secteur === "Autre" && !formData.secteurAutre)}
-                    >
-                      Étape suivante →
-                    </button>
+                    <button className="btn-next" onClick={() => setStep(3)} disabled={!formData.secteur || (formData.secteur === "Autre" && !formData.secteurAutre)}>Étape suivante →</button>
                   </div>
                 </div>
               )}
 
-              {/* ÉTAPE 3 — Attentes */}
+              {/* ÉTAPE 3 */}
               {step === 3 && (
                 <div>
                   <p style={{ color: "#2E4A6B", fontSize: 14, marginBottom: 20 }}>Quels sont vos objectifs ? <span style={{ color: "#8A9BB0" }}>(plusieurs choix possibles)</span></p>
                   {attentesList.map((a) => (
-                    <div
-                      key={a}
-                      className={`attente-item ${formData.attentes.includes(a) ? "checked" : ""}`}
-                      onClick={() => handleCheckbox(a)}
-                    >
+                    <div key={a} className={`attente-item ${formData.attentes.includes(a) ? "checked" : ""}`} onClick={() => handleCheckbox(a)}>
                       <div className={`attente-check ${formData.attentes.includes(a) ? "checked" : ""}`} />
                       <span className="attente-label">{a}</span>
                     </div>
@@ -749,39 +799,21 @@ export default function Home() {
                       <input type="text" id="attenteAutre" name="attenteAutre" value={formData.attenteAutre} onChange={handleChange} placeholder="Décrivez votre besoin…" />
                     </div>
                   )}
-                  {formStatus === "error" && (
-                    <div className="form-error">Une erreur est survenue. Veuillez réessayer ou nous contacter directement.</div>
-                  )}
+                  {formStatus === "error" && <div className="form-error">Une erreur est survenue. Veuillez réessayer ou nous contacter directement.</div>}
                   <div className="form-nav">
                     <button className="btn-back" onClick={() => setStep(2)}>← Retour</button>
-                    <button
-                      className="btn-next"
-                      onClick={handleStep3Submit}
-                      disabled={formData.attentes.length === 0 || formStatus === "sending"}
-                    >
-                      {formStatus === "sending" ? "Envoi…" : "Confirmer →"}
-                    </button>
+                    <button className="btn-next" onClick={handleStep3Submit} disabled={formData.attentes.length === 0 || formStatus === "sending"}>{formStatus === "sending" ? "Envoi…" : "Confirmer →"}</button>
                   </div>
                 </div>
               )}
 
-              {/* ÉTAPE 4 — Calendly */}
+              {/* ÉTAPE 4 */}
               {step === 4 && (
                 <div className="step4-wrap">
                   <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
                   <h3>Votre demande est enregistrée !</h3>
-                  <p>
-                    Merci {formData.name ? formData.name.split(" ")[0] : ""} — nous avons bien reçu votre demande d'audit.<br />
-                    Réservez maintenant votre créneau pour un rendez-vous avec Ulrich.
-                  </p>
-                  <a
-                    href="https://calendly.com/contact-sena-consulting/audit"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-calendly"
-                  >
-                    📅 Réserver mon audit gratuit
-                  </a>
+                  <p>Merci {formData.name ? formData.name.split(" ")[0] : ""} — nous avons bien reçu votre demande d'audit.<br />Réservez maintenant votre créneau pour un rendez-vous avec Ulrich.</p>
+                  <a href="https://calendly.com/contact-sena-consulting/audit" target="_blank" rel="noopener noreferrer" className="btn-calendly">📅 Réserver mon audit gratuit</a>
                   <p className="form-success-msg">Un email de confirmation vous a également été envoyé.</p>
                 </div>
               )}
@@ -790,7 +822,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOOTER */}
+      {/* ── FOOTER ── */}
       <footer>
         <img src="/logo-sena-consulting-blanc.svg" alt="SENA CONSULTING" className="footer-logo" />
         <p>
