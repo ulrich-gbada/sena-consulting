@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 // ─── Icônes SVG chics ───────────────────────────────────────────────────────
 const IconAudit = () => (
@@ -37,34 +39,8 @@ const IconTransform = () => (
   </svg>
 );
 
-// ─── Icône recherche ─────────────────────────────────────────────────────────
-const IconSearch = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-    <circle cx="8.5" cy="8.5" r="5.5" stroke="#F4F5F7" strokeWidth="1.8"/>
-    <line x1="12.5" y1="12.5" x2="17" y2="17" stroke="#F4F5F7" strokeWidth="1.8" strokeLinecap="round"/>
-  </svg>
-);
 
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Fermer la recherche avec Echap
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); }
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, []);
 
   // ─── Formulaire multi-étapes ─────────────────────────────────────────────
   const [step, setStep] = useState(1);
@@ -122,79 +98,6 @@ export default function Home() {
     <>
       <style>{`
         * { box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-
-        /* ── NAV ── */
-        .navbar {
-          position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-          background: #1B2A3E;
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 0 40px; height: 96px;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-          transition: box-shadow 0.3s;
-        }
-        .navbar.scrolled { box-shadow: 0 4px 24px rgba(0,0,0,0.5); }
-
-        /* Logo x2 */
-        .nav-logo { height: 80px; width: auto; }
-
-        /* Liens centrés */
-        .nav-center { display: flex; gap: 40px; list-style: none; margin: 0; padding: 0; position: absolute; left: 50%; transform: translateX(-50%); }
-        .nav-center a { color: #F4F5F7; text-decoration: none; font-size: 19px; letter-spacing: 0.5px; transition: color 0.2s; white-space: nowrap; }
-        .nav-center a:hover { color: #C9A84C; }
-
-        /* Actions droite */
-        .nav-actions { display: flex; align-items: center; gap: 12px; }
-        .nav-search-btn {
-          background: none; border: none; cursor: pointer; padding: 8px;
-          display: flex; align-items: center; justify-content: center;
-          border-radius: 6px; transition: background 0.2s;
-        }
-        .nav-search-btn:hover { background: rgba(255,255,255,0.08); }
-        .nav-cta { background: #C9A84C; color: #1B2A3E !important; padding: 15px 27px; border-radius: 6px; font-weight: bold !important; font-size: 19px !important; text-decoration: none; white-space: nowrap; transition: background 0.2s; }
-        .nav-cta:hover { background: #b8913d !important; }
-
-        .burger { display: none; flex-direction: column; cursor: pointer; gap: 6px; background: none; border: none; padding: 4px; }
-        .burger span { display: block; width: 30px; height: 3px; background: #F4F5F7; }
-        .mobile-menu { display: none; flex-direction: column; background: #1B2A3E; padding: 16px 24px 24px; gap: 16px; position: fixed; top: 96px; left: 0; right: 0; z-index: 999; box-shadow: 0 12px 24px rgba(0,0,0,0.4); }
-        .mobile-menu.open { display: flex; }
-        .mobile-menu a { color: #F4F5F7; text-decoration: none; font-size: 15px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); display: block; }
-        .mobile-menu a:hover { color: #C9A84C; }
-        .mobile-search { display: flex; align-items: center; gap: 10px; background: none; border: none; cursor: pointer; padding: 10px 0; color: #F4F5F7; font-size: 15px; text-align: left; }
-        .mobile-search:hover { color: #C9A84C; }
-
-        /* ── OVERLAY RECHERCHE ── */
-        .search-overlay {
-          position: fixed; inset: 0; z-index: 2000;
-          background: rgba(20, 30, 50, 0.92);
-          backdrop-filter: blur(6px);
-          display: flex; flex-direction: column; align-items: center; justify-content: center;
-          opacity: 0; pointer-events: none; transition: opacity 0.25s;
-        }
-        .search-overlay.open { opacity: 1; pointer-events: auto; }
-        .search-box {
-          width: 90%; max-width: 600px;
-          background: #fff; border-radius: 12px;
-          display: flex; align-items: center; gap: 12px;
-          padding: 16px 20px;
-          border: 2px solid #C9A84C;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-        }
-        .search-box svg circle, .search-box svg line { stroke: #8A9BB0; }
-        .search-box input {
-          flex: 1; border: none; outline: none; font-size: 17px;
-          color: #1B2A3E; background: transparent; font-family: inherit;
-        }
-        .search-box input::placeholder { color: #8A9BB0; }
-        .search-close {
-          position: absolute; top: 24px; right: 24px;
-          width: 40px; height: 40px; border-radius: 50%;
-          background: rgba(255,255,255,0.1); border: none; cursor: pointer;
-          color: #fff; font-size: 18px; display: flex; align-items: center; justify-content: center;
-          transition: background 0.2s;
-        }
-        .search-close:hover { background: rgba(255,255,255,0.2); }
-        .search-hint { color: rgba(255,255,255,0.4); font-size: 13px; margin-top: 16px; letter-spacing: 0.5px; }
 
         /* ── BANNER PLEIN ÉCRAN ── */
         .banner {
@@ -284,22 +187,20 @@ export default function Home() {
         .acte-right p { font-size: 15px; line-height: 1.7; margin: 0 0 14px; }
         .acte-right ul { margin: 0; padding-left: 20px; }
         .acte-right li { font-size: 14px; line-height: 1.8; }
-        .acte:nth-child(1) .acte-left { background: #dce8f0; }
-        .acte:nth-child(1) .acte-right { background: #eef4f8; }
-        .acte:nth-child(1) .acte-right p { color: #1B2A3E; }
-        .acte:nth-child(1) .acte-right li { color: #2E4A6B; }
-        .acte:nth-child(2) .acte-left { background: #d5e3ef; }
-        .acte:nth-child(2) .acte-right { background: #e8f0f7; }
-        .acte:nth-child(2) .acte-right p { color: #1B2A3E; }
-        .acte:nth-child(2) .acte-right li { color: #2E4A6B; }
-        .acte:nth-child(3) .acte-left { background: #cddded; }
-        .acte:nth-child(3) .acte-right { background: #e1ecf5; }
-        .acte:nth-child(3) .acte-right p { color: #1B2A3E; }
-        .acte:nth-child(3) .acte-right li { color: #2E4A6B; }
-        .acte:nth-child(4) .acte-left { background: #c5d7eb; }
-        .acte:nth-child(4) .acte-right { background: #dae7f3; }
-        .acte:nth-child(4) .acte-right p { color: #1B2A3E; }
-        .acte:nth-child(4) .acte-right li { color: #2E4A6B; }
+        .acte-right p { color: #1B2A3E; }
+        .acte-right li { color: #2E4A6B; }
+        /* Acte I — bleu */
+        .acte:nth-child(1) .acte-left  { background: linear-gradient(135deg, #dbe7f3 0%, #c6d8ea 100%); }
+        .acte:nth-child(1) .acte-right { background: linear-gradient(135deg, #f1f6fb 0%, #e6eef7 100%); }
+        /* Acte II — or */
+        .acte:nth-child(2) .acte-left  { background: linear-gradient(135deg, #f3e8cc 0%, #e8d7a8 100%); }
+        .acte:nth-child(2) .acte-right { background: linear-gradient(135deg, #fbf7ea 0%, #f5edd6 100%); }
+        /* Acte III — vert */
+        .acte:nth-child(3) .acte-left  { background: linear-gradient(135deg, #d8ece1 0%, #bfdfcd 100%); }
+        .acte:nth-child(3) .acte-right { background: linear-gradient(135deg, #eff7f2 0%, #e3f0e8 100%); }
+        /* Acte IV — ardoise */
+        .acte:nth-child(4) .acte-left  { background: linear-gradient(135deg, #dfe4ec 0%, #c9d1dd 100%); }
+        .acte:nth-child(4) .acte-right { background: linear-gradient(135deg, #f2f4f7 0%, #e7eaef 100%); }
 
         /* ── CREDIBILITE ── */
         .credibilite { background: #1B2A3E; }
@@ -337,9 +238,6 @@ export default function Home() {
         .offre-card h3 { color: #F4F5F7; font-size: 20px; font-weight: 700; margin: 0 0 14px; }
         .offre-card p { color: #8A9BB0; font-size: 14px; line-height: 1.7; margin: 0 0 24px; flex: 1; }
         .offre-price { font-size: 12px; color: #C9A84C; font-weight: 600; letter-spacing: 0.5px; border-top: 1px solid rgba(201,168,76,0.2); padding-top: 16px; width: 100%; }
-
-        /* ── RÉALISATIONS (placeholder) ── */
-        .realisations { background: #fff; }
 
         /* ── CONTACT ── */
         .contact { background: #F4F5F7; }
@@ -402,21 +300,8 @@ export default function Home() {
         .form-success-msg { font-size: 13px; color: #2e7d32; margin-top: 16px; }
         .form-error { background: #fdecea; color: #c62828; padding: 14px; border-radius: 6px; font-size: 14px; margin-top: 12px; text-align: center; }
 
-        /* ── FOOTER ── */
-        footer { background: #1B2A3E; padding: 40px; text-align: center; }
-        .footer-logo { height: 64px; display: block; margin: 0 auto 16px; }
-        footer p { color: #8A9BB0; font-size: 13px; margin: 0; }
-        footer a { color: #C9A84C; text-decoration: none; }
-        footer a:hover { text-decoration: underline; }
-        .footer-links { margin-top: 12px !important; font-size: 12px !important; }
-        .footer-links a { color: #8A9BB0; }
 
         /* ── RESPONSIVE ── */
-        @media (max-width: 900px) {
-          .nav-center { display: none; }
-          .nav-cta, .nav-search-btn { display: none; }
-          .burger { display: flex; }
-        }
         @media (max-width: 768px) {
           .banner-title { font-size: 32px; }
           .banner-subtitle { font-size: 16px; }
@@ -438,70 +323,13 @@ export default function Home() {
           .form-row { grid-template-columns: 1fr; }
           .secteur-grid { grid-template-columns: 1fr; }
           section { padding: 60px 20px; }
-          .navbar { padding: 0 20px; }
           .kpis { flex-direction: column; align-items: center; }
           .kpi { width: 100%; max-width: 280px; }
           .scroll-arrow { bottom: 20px; }
         }
       `}</style>
 
-      {/* ── OVERLAY RECHERCHE ── */}
-      <div className={`search-overlay ${searchOpen ? "open" : ""}`} onClick={(e) => { if ((e.target as HTMLElement).classList.contains("search-overlay")) { setSearchOpen(false); setSearchQuery(""); } }}>
-        <button className="search-close" onClick={() => { setSearchOpen(false); setSearchQuery(""); }}>✕</button>
-        <div className="search-box">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <circle cx="8.5" cy="8.5" r="5.5" stroke="#8A9BB0" strokeWidth="1.8"/>
-            <line x1="12.5" y1="12.5" x2="17" y2="17" stroke="#8A9BB0" strokeWidth="1.8" strokeLinecap="round"/>
-          </svg>
-          <input
-            autoFocus={searchOpen}
-            type="text"
-            placeholder="Rechercher un guide, article, service..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <p className="search-hint">Appuyez sur Echap pour fermer</p>
-      </div>
-
-      {/* ── NAVBAR ── */}
-      <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
-        {/* Logo */}
-        <img src="/logo-sena-consulting-blanc.svg" alt="SENA CONSULTING" className="nav-logo" />
-
-        {/* Liens centrés */}
-        <ul className="nav-center">
-          <li><a href="#diagnostic">Diagnostic</a></li>
-          <li><a href="#methode">Méthode</a></li>
-          <li><a href="#credibilite">Crédibilité</a></li>
-          <li><a href="#offre">Offre</a></li>
-          <li><a href="/realisations">Réalisations</a></li>
-        </ul>
-
-        {/* Actions droite : recherche + CTA */}
-        <div className="nav-actions">
-          <button className="nav-search-btn" onClick={() => setSearchOpen(true)} aria-label="Rechercher">
-            <IconSearch />
-          </button>
-          <a href="#contact" className="nav-cta">Audit Gratuit</a>
-          <button className="burger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
-            <span /><span /><span />
-          </button>
-        </div>
-      </nav>
-
-      {/* MOBILE MENU */}
-      <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
-        <a href="#diagnostic" onClick={() => setMenuOpen(false)}>Diagnostic</a>
-        <a href="#methode" onClick={() => setMenuOpen(false)}>Méthode</a>
-        <a href="#credibilite" onClick={() => setMenuOpen(false)}>Crédibilité</a>
-        <a href="#offre" onClick={() => setMenuOpen(false)}>Offre</a>
-        <a href="/realisations" onClick={() => setMenuOpen(false)}>Réalisations</a>
-        <a href="#contact" onClick={() => setMenuOpen(false)} style={{ color: "#C9A84C", fontWeight: "bold" }}>Audit Gratuit</a>
-        <button className="mobile-search" onClick={() => { setMenuOpen(false); setSearchOpen(true); }} aria-label="Rechercher">
-          <IconSearch /> Rechercher
-        </button>
-      </div>
+      <Navbar />
 
       {/* ── BANNER PLEIN ÉCRAN ── */}
       <div className="banner" id="accueil">
@@ -664,17 +492,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── RÉALISATIONS (placeholder) ── */}
-      <section className="realisations" id="realisations">
-        <div className="section-inner">
-          <div className="section-tag">Nos réalisations</div>
-          <h2 className="section-title">Des résultats qui parlent d'eux-mêmes</h2>
-          <div style={{ textAlign: "center", padding: "40px 0", color: "#8A9BB0", fontStyle: "italic", fontSize: 15, border: "2px dashed #e0e4ea", borderRadius: 12 }}>
-            Cette section sera enrichie prochainement avec nos études de cas et témoignages clients.
-          </div>
-        </div>
-      </section>
-
       {/* ── CONTACT ── */}
       <section className="contact" id="contact">
         <div className="section-inner">
@@ -830,17 +647,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer>
-        <img src="/logo-sena-consulting-blanc.svg" alt="SENA CONSULTING" className="footer-logo" />
-        <p>
-          © {new Date().getFullYear()} — SENA CONSULTING · Conseil en performance business pour PME/TPE<br />
-          <a href="mailto:contact@sena-consulting.fr">contact@sena-consulting.fr</a> · 07 68 93 48 37
-        </p>
-        <p className="footer-links">
-          <a href="/mentions-legales">Mentions légales</a> · <a href="/politique-de-confidentialite">Politique de confidentialité</a>
-        </p>
-      </footer>
+      <Footer />
     </>
   );
 }
