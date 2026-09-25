@@ -24,10 +24,10 @@ export default function PageShell({
           box-shadow: 0 2px 12px rgba(0,0,0,0.3);
         }
         .nav-logo { height: 80px; width: auto; }
-        .nav-center { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; position: absolute; left: 50%; transform: translateX(-50%); }
-        .nav-center a { color: #F4F5F7; text-decoration: none; font-size: 13px; letter-spacing: 0.5px; transition: color 0.2s; white-space: nowrap; }
+        .nav-center { display: flex; gap: 40px; list-style: none; margin: 0; padding: 0; position: absolute; left: 50%; transform: translateX(-50%); }
+        .nav-center a { color: #F4F5F7; text-decoration: none; font-size: 19px; letter-spacing: 0.5px; transition: color 0.2s; white-space: nowrap; }
         .nav-center a:hover { color: #C9A84C; }
-        .nav-cta { background: #C9A84C; color: #1B2A3E; padding: 10px 18px; border-radius: 4px; font-weight: bold; font-size: 13px; text-decoration: none; white-space: nowrap; transition: background 0.2s; }
+        .nav-cta { background: #C9A84C; color: #1B2A3E; padding: 15px 27px; border-radius: 6px; font-weight: bold; font-size: 19px; text-decoration: none; white-space: nowrap; transition: background 0.2s; }
         .nav-cta:hover { background: #b8913d; }
 
         .page-hero { background: linear-gradient(135deg, #1B2A3E 0%, #2E4A6B 100%); padding: 156px 40px 60px; text-align: center; }

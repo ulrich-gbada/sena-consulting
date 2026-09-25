@@ -139,8 +139,8 @@ export default function Home() {
         .nav-logo { height: 80px; width: auto; }
 
         /* Liens centrés */
-        .nav-center { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; position: absolute; left: 50%; transform: translateX(-50%); }
-        .nav-center a { color: #F4F5F7; text-decoration: none; font-size: 13px; letter-spacing: 0.5px; transition: color 0.2s; white-space: nowrap; }
+        .nav-center { display: flex; gap: 40px; list-style: none; margin: 0; padding: 0; position: absolute; left: 50%; transform: translateX(-50%); }
+        .nav-center a { color: #F4F5F7; text-decoration: none; font-size: 19px; letter-spacing: 0.5px; transition: color 0.2s; white-space: nowrap; }
         .nav-center a:hover { color: #C9A84C; }
 
         /* Actions droite */
@@ -151,15 +151,17 @@ export default function Home() {
           border-radius: 6px; transition: background 0.2s;
         }
         .nav-search-btn:hover { background: rgba(255,255,255,0.08); }
-        .nav-cta { background: #C9A84C; color: #1B2A3E !important; padding: 10px 18px; border-radius: 4px; font-weight: bold !important; font-size: 13px !important; text-decoration: none; white-space: nowrap; transition: background 0.2s; }
+        .nav-cta { background: #C9A84C; color: #1B2A3E !important; padding: 15px 27px; border-radius: 6px; font-weight: bold !important; font-size: 19px !important; text-decoration: none; white-space: nowrap; transition: background 0.2s; }
         .nav-cta:hover { background: #b8913d !important; }
 
-        .burger { display: none; flex-direction: column; cursor: pointer; gap: 5px; background: none; border: none; padding: 4px; }
-        .burger span { display: block; width: 24px; height: 2px; background: #F4F5F7; }
-        .mobile-menu { display: none; flex-direction: column; background: #1B2A3E; padding: 16px 24px 24px; gap: 16px; position: relative; z-index: 999; }
+        .burger { display: none; flex-direction: column; cursor: pointer; gap: 6px; background: none; border: none; padding: 4px; }
+        .burger span { display: block; width: 30px; height: 3px; background: #F4F5F7; }
+        .mobile-menu { display: none; flex-direction: column; background: #1B2A3E; padding: 16px 24px 24px; gap: 16px; position: fixed; top: 96px; left: 0; right: 0; z-index: 999; box-shadow: 0 12px 24px rgba(0,0,0,0.4); }
         .mobile-menu.open { display: flex; }
         .mobile-menu a { color: #F4F5F7; text-decoration: none; font-size: 15px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); display: block; }
         .mobile-menu a:hover { color: #C9A84C; }
+        .mobile-search { display: flex; align-items: center; gap: 10px; background: none; border: none; cursor: pointer; padding: 10px 0; color: #F4F5F7; font-size: 15px; text-align: left; }
+        .mobile-search:hover { color: #C9A84C; }
 
         /* ── OVERLAY RECHERCHE ── */
         .search-overlay {
@@ -412,6 +414,7 @@ export default function Home() {
         /* ── RESPONSIVE ── */
         @media (max-width: 900px) {
           .nav-center { display: none; }
+          .nav-cta, .nav-search-btn { display: none; }
           .burger { display: flex; }
         }
         @media (max-width: 768px) {
@@ -495,6 +498,9 @@ export default function Home() {
         <a href="#offre" onClick={() => setMenuOpen(false)}>Offre</a>
         <a href="/realisations" onClick={() => setMenuOpen(false)}>Réalisations</a>
         <a href="#contact" onClick={() => setMenuOpen(false)} style={{ color: "#C9A84C", fontWeight: "bold" }}>Audit Gratuit</a>
+        <button className="mobile-search" onClick={() => { setMenuOpen(false); setSearchOpen(true); }} aria-label="Rechercher">
+          <IconSearch /> Rechercher
+        </button>
       </div>
 
       {/* ── BANNER PLEIN ÉCRAN ── */}
