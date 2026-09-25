@@ -129,7 +129,7 @@ export default function Home() {
           position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
           background: #1B2A3E;
           display: flex; align-items: center; justify-content: space-between;
-          padding: 0 32px; height: 72px;
+          padding: 0 40px; height: 96px;
           box-shadow: 0 2px 12px rgba(0,0,0,0.3);
           transition: box-shadow 0.3s;
         }
@@ -245,7 +245,7 @@ export default function Home() {
         }
 
         /* ── HERO (texte only, sans photo) ── */
-        .hero { background: linear-gradient(135deg, #1B2A3E 0%, #2E4A6B 100%); padding-top: 72px; display: flex; align-items: center; }
+        .hero { background: linear-gradient(135deg, #1B2A3E 0%, #2E4A6B 100%); padding-top: 96px; display: flex; align-items: center; }
         .hero-inner { max-width: 1100px; margin: 0 auto; padding: 80px 40px; }
         .hero-text { max-width: 680px; }
         .hero-tag { display: inline-block; background: rgba(201,168,76,0.15); color: #C9A84C; border: 1px solid rgba(201,168,76,0.3); padding: 6px 16px; border-radius: 20px; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; }
@@ -402,10 +402,12 @@ export default function Home() {
 
         /* ── FOOTER ── */
         footer { background: #1B2A3E; padding: 40px; text-align: center; }
-        .footer-logo { height: 32px; margin-bottom: 16px; }
+        .footer-logo { height: 64px; display: block; margin: 0 auto 16px; }
         footer p { color: #8A9BB0; font-size: 13px; margin: 0; }
         footer a { color: #C9A84C; text-decoration: none; }
         footer a:hover { text-decoration: underline; }
+        .footer-links { margin-top: 12px !important; font-size: 12px !important; }
+        .footer-links a { color: #8A9BB0; }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 900px) {
@@ -470,7 +472,7 @@ export default function Home() {
           <li><a href="#methode">Méthode</a></li>
           <li><a href="#credibilite">Crédibilité</a></li>
           <li><a href="#offre">Offre</a></li>
-          <li><a href="#realisations">Réalisations</a></li>
+          <li><a href="/realisations">Réalisations</a></li>
         </ul>
 
         {/* Actions droite : recherche + CTA */}
@@ -491,7 +493,7 @@ export default function Home() {
         <a href="#methode" onClick={() => setMenuOpen(false)}>Méthode</a>
         <a href="#credibilite" onClick={() => setMenuOpen(false)}>Crédibilité</a>
         <a href="#offre" onClick={() => setMenuOpen(false)}>Offre</a>
-        <a href="#realisations" onClick={() => setMenuOpen(false)}>Réalisations</a>
+        <a href="/realisations" onClick={() => setMenuOpen(false)}>Réalisations</a>
         <a href="#contact" onClick={() => setMenuOpen(false)} style={{ color: "#C9A84C", fontWeight: "bold" }}>Audit Gratuit</a>
       </div>
 
@@ -603,7 +605,7 @@ export default function Home() {
               </ul>
             </div>
             <div className="cred-block">
-              <h3>Chef d'entreprise</h3>
+              <h3>Chef d'entreprises</h3>
               <ul className="cred-list">
                 <li>SENA SÉCURITÉ PRIVÉE — Associé</li>
                 <li>SENA LINK — Fondateur</li>
@@ -623,7 +625,7 @@ export default function Home() {
           <div className="kpis">
             <div className="kpi"><span className="kpi-val">10+</span><span className="kpi-label">Ans d'expérience</span></div>
             <div className="kpi"><span className="kpi-val">4</span><span className="kpi-label">Grands cabinets</span></div>
-            <div className="kpi"><span className="kpi-val">Chef d'entreprise</span><span className="kpi-label">Au contact du réel</span></div>
+            <div className="kpi"><span className="kpi-val">Chef d'entreprises</span><span className="kpi-label">Au contact du réel</span></div>
           </div>
         </div>
       </section>
@@ -828,6 +830,9 @@ export default function Home() {
         <p>
           © {new Date().getFullYear()} — SENA CONSULTING · Conseil en performance business pour PME/TPE<br />
           <a href="mailto:contact@sena-consulting.fr">contact@sena-consulting.fr</a> · 07 68 93 48 37
+        </p>
+        <p className="footer-links">
+          <a href="/mentions-legales">Mentions légales</a> · <a href="/politique-de-confidentialite">Politique de confidentialité</a>
         </p>
       </footer>
     </>
