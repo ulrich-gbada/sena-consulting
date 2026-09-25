@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ChampAdresse, { type Adresse } from "./components/ChampAdresse";
 
 // ─── Icônes SVG chics ───────────────────────────────────────────────────────
 const IconAudit = () => (
@@ -45,10 +46,11 @@ export default function Home() {
   // ─── Formulaire multi-étapes ─────────────────────────────────────────────
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    name: "", email: "", company: "", phone: "", address: "", taille: "", ca: "",
+    name: "", email: "", company: "", phone: "", taille: "", ca: "",
     secteur: "", secteurAutre: "",
     attentes: [] as string[], attenteAutre: "",
   });
+  const [adresse, setAdresse] = useState<Adresse>({ label: "", nom: "", codePostal: "", ville: "", lat: "", lon: "" });
   const [formStatus, setFormStatus] = useState("idle");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -68,8 +70,15 @@ export default function Home() {
     try {
       const body = {
         ...formData,
-        attentes: formData.attentes.join(", ") + (formData.attenteAutre ? `, Autre: ${formData.attenteAutre}` : ""),
-        secteur: formData.secteur === "Autre" ? `Autre: ${formData.secteurAutre}` : formData.secteur,
+        address: adresse.nom,
+        codePostal: adresse.codePostal,
+        ville: adresse.ville,
+        latitude: adresse.lat,
+        longitude: adresse.lon,
+        attentes: formData.attentes
+          .filter((a) => a !== "Autre")
+          .concat(formData.attentes.includes("Autre") && formData.attenteAutre ? [`Autre : ${formData.attenteAutre}`] : []),
+        secteur: formData.secteur === "Autre" ? `Autre : ${formData.secteurAutre}` : formData.secteur,
       };
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -82,13 +91,12 @@ export default function Home() {
     } catch { setFormStatus("error"); }
   };
 
-  const secteurs = ["Agences immobilières", "BTP", "Carrossier / Garagiste", "École de conduite", "Organisme de formation", "Autre"];
+  const secteurs = ["Agences immobilières", "BTP", "Carrossier / Garagiste", "École de conduite", "Hôtellerie / Tourisme", "Organisme de formation", "Autre"];
   const attentesList = [
     "Augmenter mon chiffre d'affaires",
     "Améliorer ma rentabilité / Vendre au meilleur prix",
     "Recruter les meilleurs talents",
     "Gagner du temps au quotidien sur les tâches chronophages (Administratif, Devis, Factures, Comptabilité, Prospection…)",
-    "Recruter les meilleurs salariés",
     "Rester conforme vis-à-vis des contraintes légales",
     "Faire face à la concurrence des prix",
     "Autre",
@@ -550,10 +558,10 @@ export default function Home() {
                     <div className="form-group"><label htmlFor="email">Email professionnel *</label><input type="email" id="email" name="email" value={formData.email} onChange={handleChange} placeholder="jean@entreprise.fr" /></div>
                   </div>
                   <div className="form-row">
-                    <div className="form-group"><label htmlFor="company">Nom de la société</label><input type="text" id="company" name="company" value={formData.company} onChange={handleChange} placeholder="Nom de votre entreprise" /></div>
+                    <div className="form-group"><label htmlFor="company">Nom de la société</label><input type="text" id="company" name="company" value={formData.company} onChange={handleChange} placeholder="Nom de votre société" /></div>
                     <div className="form-group"><label htmlFor="phone">Téléphone</label><input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="06 00 00 00 00" /></div>
                   </div>
-                  <div className="form-group"><label htmlFor="address">Adresse d'exercice</label><input type="text" id="address" name="address" value={formData.address} onChange={handleChange} placeholder="Ville, code postal ou adresse complète" /></div>
+                  <div className="form-group"><label htmlFor="address">Adresse d'exercice</label><ChampAdresse valeur={adresse} onChange={setAdresse} /></div>
                   <div className="form-row">
                     <div className="form-group">
                       <label htmlFor="taille">Taille de la société</label>
