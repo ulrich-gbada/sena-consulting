@@ -108,7 +108,7 @@ export async function POST(request) {
           <div style="background: #ffffff; padding: 32px; border-radius: 0 0 8px 8px;">
             <p style="color: #1B2A3E; font-size: 16px; margin-top: 0;">Bonjour ${esc(name)},</p>
             <p style="color: #2E4A6B; line-height: 1.7;">Merci pour votre demande d'audit gratuit. Je l'ai bien reçue.</p>
-            <p style="color: #2E4A6B; line-height: 1.7;">Si ce n'est pas déjà fait, réservez dès maintenant votre créneau de restitution (45 min en visio) :</p>
+            <p style="color: #2E4A6B; line-height: 1.7;"><strong>Si ce n'est pas déjà fait</strong>, réservez dès maintenant votre créneau de pré-diagnostic (20 min au téléphone) :</p>
             <div style="text-align: center; margin: 24px 0;">
               <a href="https://calendly.com/contact-sena-consulting/audit" style="background: #C9A84C; color: #1B2A3E; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px;">Réserver mon créneau</a>
             </div>
