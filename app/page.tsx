@@ -197,7 +197,7 @@ export default function Home() {
         section { padding: 80px 40px; }
         .section-inner { max-width: 1100px; margin: 0 auto; }
         .section-tag { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #C9A84C; margin-bottom: 12px; }
-        .section-tag-xl { font-size: 24px; letter-spacing: 4px; font-weight: 700; margin-bottom: 16px; }
+        .section-tag-xl { font-size: 18px; letter-spacing: 3px; font-weight: 700; margin-bottom: 14px; }
         .section-title { font-size: 32px; font-weight: 700; color: #1B2A3E; margin: 0 0 48px; }
 
         /* ── DIAGNOSTIC ── */
@@ -435,8 +435,8 @@ export default function Home() {
               <p>Un vocabulaire opaque pour masquer l'incompréhension des enjeux business et noyer les dirigeants. Des consultants qui n'ont jamais dirigé une entreprise et n'ont jamais été « skin in the game » (ou a minima intrapreneurs).</p>
             </div>
             <div className="diag-card">
-              <h3>Prix exorbitants, valeur faible</h3>
-              <p>À l'ère de l'IA, la valeur n'est plus dans le faire (le « Build » en anglais) mais dans la <strong style={{ color: "#C9A84C" }}>performance business</strong> mesurable. En effet, la technologie ou l'IA ne doit pas être pensée comme un produit marketing mais comme un accélérateur du business.</p>
+              <h3>La valeur a changé de camp</h3>
+              <p>Build ou performance ? — À l'ère de l'IA, la valeur n'est plus dans le faire (le « Build » en anglais) mais dans la <strong style={{ color: "#C9A84C" }}>performance business</strong> mesurable. En effet, la technologie ou l'IA ne doit pas être pensée comme un produit marketing mais comme un accélérateur du business.</p>
             </div>
           </div>
         </div>
