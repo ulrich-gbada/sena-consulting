@@ -109,21 +109,25 @@ export default function Home() {
 
         /* ── BANNER PLEIN ÉCRAN ── */
         .banner {
-          position: relative; width: 100%; height: 100vh;
+          position: relative; width: 100%; height: 100vh; min-height: 640px;
           overflow: hidden; display: flex; align-items: center; justify-content: center;
+          /* Fond de secours : le banner est lisible même si l'image tarde ou échoue */
+          background: linear-gradient(135deg, #1B2A3E 0%, #2E4A6B 100%);
         }
         .banner-img {
           position: absolute; inset: 0; width: 100%; height: 100%;
           object-fit: cover; object-position: center;
           filter: brightness(0.45);
+          opacity: 0; transition: opacity 0.6s ease;
         }
+        .banner-img.loaded { opacity: 1; }
         .banner-overlay {
           position: absolute; inset: 0;
           background: linear-gradient(160deg, rgba(27,42,62,0.7) 0%, rgba(46,74,107,0.4) 60%, transparent 100%);
         }
         .banner-content {
-          position: relative; z-index: 2; text-align: center; padding: 0 24px;
-          max-width: 860px;
+          position: relative; z-index: 2; text-align: center; padding: 0 40px;
+          width: 100%; max-width: 1240px;
         }
         .banner-tag {
           display: inline-block;
@@ -134,14 +138,19 @@ export default function Home() {
           margin-bottom: 24px;
         }
         .banner-title {
-          font-size: 56px; font-weight: 800; color: #F4F5F7;
-          line-height: 1.1; margin: 0 0 20px; text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+          font-size: 52px; font-weight: 800; color: #F4F5F7;
+          line-height: 1.12; margin: 0 0 18px; text-shadow: 0 2px 20px rgba(0,0,0,0.5);
         }
         .banner-title span { color: #C9A84C; }
-        .banner-subtitle {
-          font-size: 19px; color: rgba(244,245,247,0.8);
-          line-height: 1.7; margin: 0 0 40px;
+        .banner-h2 {
+          font-size: 26px; font-weight: 600; color: #C9A84C;
+          line-height: 1.35; margin: 0 0 22px; letter-spacing: 0.2px;
         }
+        .banner-subtitle {
+          font-size: 18px; color: rgba(244,245,247,0.82);
+          line-height: 1.75; margin: 0 auto 40px; max-width: 1000px;
+        }
+        .banner-subtitle strong { color: #F4F5F7; font-weight: 700; }
         .banner-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
 
         /* Flèche scroll animée */
@@ -312,7 +321,9 @@ export default function Home() {
         /* ── RESPONSIVE ── */
         @media (max-width: 768px) {
           .banner-title { font-size: 32px; }
-          .banner-subtitle { font-size: 16px; }
+          .banner-h2 { font-size: 19px; }
+          .banner-subtitle { font-size: 15px; line-height: 1.65; }
+          .banner-content { padding: 0 20px; }
           .banner-btns { flex-direction: column; align-items: center; }
           .banner-btns .btn-primary,
           .banner-btns .btn-secondary { width: 280px; text-align: center; }
@@ -342,21 +353,35 @@ export default function Home() {
       {/* ── BANNER PLEIN ÉCRAN ── */}
       <div className="banner" id="accueil">
         {/* Photo de bureau professionnel — autorité, sérieux, excellence */}
+        {/* Image servie depuis /public (même domaine, cache Vercel). Chargement prioritaire,
+            fondu à l'affichage, repli sur l'URL Unsplash si le fichier local manque. */}
         <img
-          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80&auto=format&fit=crop"
-          alt="SENA CONSULTING — Cabinet de conseil en performance business"
+          src="/banner-sena-consulting.jpg"
+          alt=""
           className="banner-img"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          onLoad={(e) => e.currentTarget.classList.add("loaded")}
+          onError={(e) => {
+            const img = e.currentTarget;
+            if (!img.dataset.fallback) {
+              img.dataset.fallback = "1";
+              img.src = "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=75&auto=format&fit=crop";
+            }
+          }}
         />
         <div className="banner-overlay" />
         <div className="banner-content">
           <span className="banner-tag">Cabinet de conseil en performance business</span>
           <h1 className="banner-title">
-            Décuplez votre<br />
-            <span>chiffre d'affaires</span><br />
-            sans jargon inutile
+            Votre entreprise peut <span>10× sa croissance</span>.
           </h1>
+          <h2 className="banner-h2">
+            Décuplez votre chiffre d'affaires sans jargon inutile
+          </h2>
           <p className="banner-subtitle">
-            La rigueur des grands cabinets, au service des PME/TPE.<br />
+            <strong>Le frein, c'est rarement la technologie.</strong> La rigueur des grands cabinets, au service des PME/TPE.
             Des résultats concrets. Un accompagnement humain.
           </p>
           <div className="banner-btns">
