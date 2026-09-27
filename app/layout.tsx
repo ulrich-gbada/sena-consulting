@@ -37,7 +37,7 @@ export default function RootLayout({
     <html lang="fr">
       <head>
         {/* Préchargement de l'image du banner : démarre avant le parsing du JS */}
-        <link rel="preload" as="image" href="/banner-sena-consulting.jpg" fetchPriority="high" />
+        <link rel="preload" as="image" href="/banner-sena-consulting.avif" type="image/avif" fetchPriority="high" />
       </head>
       <body style={{ margin: 0, padding: 0 }}>{children}</body>
     </html>

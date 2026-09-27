@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ChampAdresse, { type Adresse } from "./components/ChampAdresse";
@@ -52,6 +52,14 @@ export default function Home() {
   });
   const [adresse, setAdresse] = useState<Adresse>({ label: "", nom: "", codePostal: "", ville: "", lat: "", lon: "" });
   const [formStatus, setFormStatus] = useState("idle");
+
+  // Image du banner : si elle est déjà décodée avant l'hydratation (préchargement),
+  // l'événement onLoad ne se déclenche jamais → on vérifie l'état au montage.
+  const bannerImg = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    const img = bannerImg.current;
+    if (img && img.complete && img.naturalWidth > 0) img.classList.add("loaded");
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -356,7 +364,8 @@ export default function Home() {
         {/* Image servie depuis /public (même domaine, cache Vercel). Chargement prioritaire,
             fondu à l'affichage, repli sur l'URL Unsplash si le fichier local manque. */}
         <img
-          src="/banner-sena-consulting.jpg"
+          ref={bannerImg}
+          src="/banner-sena-consulting.avif"
           alt=""
           className="banner-img"
           loading="eager"
