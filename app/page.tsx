@@ -117,7 +117,11 @@ export default function Home() {
 
         /* ── BANNER PLEIN ÉCRAN ── */
         .banner {
-          position: relative; width: 100%; height: 100vh; min-height: 640px;
+          position: relative; width: 100%; min-height: 640px;
+          /* svh = hauteur réellement visible sur mobile (hors barres du navigateur) :
+             la flèche reste visible sans scroller. 100vh en repli. */
+          height: 100vh; height: 100svh;
+          padding-top: 96px; /* navbar fixe : le contenu se centre dans la zone visible */
           overflow: hidden; display: flex; align-items: center; justify-content: center;
           /* Fond de secours : le banner est lisible même si l'image tarde ou échoue */
           background: linear-gradient(135deg, #1B2A3E 0%, #2E4A6B 100%);
@@ -158,6 +162,7 @@ export default function Home() {
           font-size: 18px; color: rgba(244,245,247,0.82);
           line-height: 1.75; margin: 0 auto 40px; max-width: 1000px;
         }
+        .banner-h2-dot { color: #F4F5F7; }
         .banner-subtitle strong { color: #F4F5F7; font-weight: 700; }
         .banner-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
 
@@ -352,7 +357,13 @@ export default function Home() {
           section { padding: 60px 20px; }
           .kpis { flex-direction: column; align-items: center; }
           .kpi { width: 100%; max-width: 280px; }
-          .scroll-arrow { bottom: 20px; }
+          .scroll-arrow { bottom: 14px; }
+          .scroll-arrow span { height: 32px; }
+          .banner-btns { margin-bottom: 24px; }
+          .banner-tag { margin-bottom: 16px; font-size: 11px; padding: 6px 14px; }
+          .banner-title { margin-bottom: 12px; }
+          .banner-h2 { margin-bottom: 14px; }
+          .banner-subtitle { margin-bottom: 26px; }
         }
       `}</style>
 
@@ -387,7 +398,7 @@ export default function Home() {
             Votre entreprise peut <span>10× sa croissance</span>.
           </h1>
           <h2 className="banner-h2">
-            Décuplez votre chiffre d'affaires sans jargon inutile
+            Décuplez votre chiffre d'affaires sans jargon inutile<span className="banner-h2-dot">.</span>
           </h2>
           <p className="banner-subtitle">
             <strong>Le frein, c'est rarement la technologie.</strong> La rigueur des grands cabinets, au service des PME/TPE.
