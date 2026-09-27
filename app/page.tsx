@@ -196,8 +196,7 @@ export default function Home() {
         /* ── SECTIONS ── */
         section { padding: 80px 40px; }
         .section-inner { max-width: 1100px; margin: 0 auto; }
-        .section-tag { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #C9A84C; margin-bottom: 12px; }
-        .section-tag-xl { font-size: 18px; letter-spacing: 3px; font-weight: 700; margin-bottom: 14px; }
+        .section-tag { font-size: 18px; letter-spacing: 3px; font-weight: 700; text-transform: uppercase; color: #C9A84C; margin-bottom: 14px; }
         .section-title { font-size: 32px; font-weight: 700; color: #1B2A3E; margin: 0 0 48px; }
 
         /* ── DIAGNOSTIC ── */
@@ -423,7 +422,7 @@ export default function Home() {
       {/* ── DIAGNOSTIC ── */}
       <section className="diagnostic" id="diagnostic">
         <div className="section-inner">
-          <div className="section-tag section-tag-xl">Le constat</div>
+          <div className="section-tag">Le constat</div>
           <h2 className="section-title">Un monde révolu...</h2>
           <div className="diag-grid">
             <div className="diag-card">
