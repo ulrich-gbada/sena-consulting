@@ -16,6 +16,13 @@ const IconCheck = () => (
   </svg>
 );
 
+/** Rend **gras** dans une chaîne de texte simple. */
+const Inline = ({ text }: { text: string }) => (
+  <>{text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith("**") ? <strong key={i}>{part.slice(2, -2)}</strong> : <span key={i}>{part}</span>
+  )}</>
+);
+
 export default function SegmentLanding({ page }: { page: SegmentPage }) {
   const o = page.offer;
 
@@ -289,7 +296,7 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
               </div>
               {o.pricingNotes && (
                 <ul className="sl-notes">
-                  {o.pricingNotes.map((n) => <li key={n}>{n}</li>)}
+                  {o.pricingNotes.map((n) => <li key={n}><Inline text={n} /></li>)}
                 </ul>
               )}
             </div>
