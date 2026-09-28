@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { SEGMENTS_COL_1, SEGMENTS_COL_2, type Segment } from "../data/segments";
 
 // ─── Navbar commune à toutes les pages ──────────────────────────────────────
 // Deux variantes gérées par media query :
@@ -9,13 +10,37 @@ import Link from "next/link";
 //   • Mobile (≤ 900px)             : logo + burger → menu déroulant
 // Référence visuelle : navbar de la page d'accueil.
 
-const NAV_LINKS = [
+const NAV_BEFORE = [
   { href: "/#diagnostic", label: "Diagnostic" },
   { href: "/#methode", label: "Méthode" },
   { href: "/#credibilite", label: "Crédibilité" },
   { href: "/#offre", label: "Offre" },
-  { href: "/realisations", label: "Réalisations" },
 ];
+const NAV_AFTER = [{ href: "/realisations", label: "Réalisations" }];
+
+const IconChevron = ({ open }: { open?: boolean }) => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ transition: "transform 0.2s", transform: open ? "rotate(180deg)" : "none" }}>
+    <polyline points="2,4 6,8 10,4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+/** Colonne du menu déroulant « Sur mesure » (desktop) */
+const MegaCol = ({ items, onClick }: { items: Segment[]; onClick: () => void }) => (
+  <ul className="mega-col">
+    {items.map((s) => (
+      <li key={s.slug}>
+        <Link href={`/sur-mesure/${s.slug}`} onClick={onClick}>{s.label}</Link>
+        {s.children && (
+          <ul className="mega-sub">
+            {s.children.map((c) => (
+              <li key={c.slug}><Link href={`/sur-mesure/${c.slug}`} onClick={onClick}>{c.label}</Link></li>
+            ))}
+          </ul>
+        )}
+      </li>
+    ))}
+  </ul>
+);
 
 const IconSearch = () => (
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -29,6 +54,9 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
+  const [megaOpen, setMegaOpen] = useState(false);      // desktop
+  const [mobileSubOpen, setMobileSubOpen] = useState(false); // accordéon mobile
+  const megaRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -38,13 +66,22 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); setMenuOpen(false); }
+      if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); setMenuOpen(false); setMegaOpen(false); }
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
 
   const closeSearch = () => { setSearchOpen(false); setSearchQuery(""); };
+  const closeAll = () => { setMenuOpen(false); setMegaOpen(false); setMobileSubOpen(false); };
+
+  // Fermeture du menu déroulant au clic en dehors
+  useEffect(() => {
+    if (!megaOpen) return;
+    const h = (e: MouseEvent) => { if (megaRef.current && !megaRef.current.contains(e.target as Node)) setMegaOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [megaOpen]);
 
   return (
     <>
@@ -60,9 +97,29 @@ export default function Navbar() {
         }
         .navbar.scrolled { box-shadow: 0 4px 24px rgba(0,0,0,0.5); }
         .nav-logo { height: 80px; width: auto; display: block; }
-        .nav-center { display: flex; gap: 40px; list-style: none; margin: 0; padding: 0; position: absolute; left: 50%; transform: translateX(-50%); }
-        .nav-center a { color: #F4F5F7; text-decoration: none; font-size: 19px; letter-spacing: 0.5px; transition: color 0.2s; white-space: nowrap; }
-        .nav-center a:hover { color: #C9A84C; }
+        .nav-center { display: flex; gap: 32px; list-style: none; margin: 0; padding: 0; position: absolute; left: 50%; transform: translateX(-50%); align-items: center; }
+        .nav-center a, .nav-center .nav-drop-btn { color: #F4F5F7; text-decoration: none; font-size: 18px; letter-spacing: 0.4px; transition: color 0.2s; white-space: nowrap; }
+        .nav-center a:hover, .nav-center .nav-drop-btn:hover, .nav-center .nav-drop-btn.open { color: #C9A84C; }
+
+        /* ── Menu déroulant « Sur mesure » (desktop) ── */
+        .nav-drop { position: relative; }
+        .nav-drop-btn { background: none; border: none; cursor: pointer; padding: 0; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; }
+        .mega {
+          position: absolute; top: calc(100% + 22px); left: 50%; transform: translateX(-50%);
+          background: #1B2A3E; border: 1px solid rgba(201,168,76,0.35); border-top: 3px solid #C9A84C;
+          border-radius: 0 0 10px 10px; box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+          padding: 22px 28px 24px; display: none; grid-template-columns: 1fr 1fr; gap: 0 44px; min-width: 560px;
+        }
+        .mega.open { display: grid; }
+        .mega::before { content: ""; position: absolute; top: -22px; left: 0; right: 0; height: 22px; } /* pont : pas de fermeture entre le bouton et le panneau */
+        .mega-title { grid-column: 1 / -1; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #C9A84C; margin: 0 0 14px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .mega-col { list-style: none; margin: 0; padding: 0; }
+        .mega-col > li { padding: 0; }
+        .mega-col > li > a { display: block; font-size: 15px !important; padding: 9px 0; letter-spacing: 0 !important; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .mega-col > li:last-child > a { border-bottom: none; }
+        .mega-sub { list-style: none; margin: 0 0 4px; padding: 0 0 0 16px; border-left: 2px solid rgba(201,168,76,0.4); margin-left: 4px; }
+        .mega-sub a { display: block; font-size: 14px !important; padding: 6px 0; color: #8A9BB0 !important; letter-spacing: 0 !important; }
+        .mega-sub a:hover { color: #C9A84C !important; }
         .nav-actions { display: flex; align-items: center; gap: 12px; }
         .nav-search-btn {
           background: none; border: none; cursor: pointer; padding: 8px;
@@ -81,6 +138,12 @@ export default function Navbar() {
         .mobile-menu a { color: #F4F5F7; text-decoration: none; font-size: 15px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); display: block; }
         .mobile-menu a:hover { color: #C9A84C; }
         .mobile-menu a.mobile-cta { color: #C9A84C; font-weight: bold; }
+        .mobile-acc-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.08); color: #F4F5F7; font-size: 15px; padding: 10px 0; cursor: pointer; font-family: inherit; text-align: left; }
+        .mobile-acc-btn.open { color: #C9A84C; }
+        .mobile-acc { display: none; flex-direction: column; padding: 4px 0 8px 14px; border-left: 2px solid rgba(201,168,76,0.4); margin: 4px 0 8px 4px; gap: 0; }
+        .mobile-acc.open { display: flex; }
+        .mobile-acc a { font-size: 14px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .mobile-acc a.sub { padding-left: 14px; color: #8A9BB0; font-size: 13px; }
         .mobile-search { display: flex; align-items: center; gap: 10px; background: none; border: none; cursor: pointer; padding: 10px 0; color: #F4F5F7; font-size: 15px; text-align: left; font-family: inherit; }
         .mobile-search:hover { color: #C9A84C; }
 
@@ -121,7 +184,7 @@ export default function Navbar() {
         [id] { scroll-margin-top: 96px; }
 
         /* ── Bascule desktop / mobile ── */
-        @media (max-width: 900px) {
+        @media (max-width: 1100px) {
           .nav-center, .nav-cta, .nav-search-btn { display: none; }
           .burger { display: flex; }
         }
@@ -159,7 +222,26 @@ export default function Navbar() {
         </Link>
 
         <ul className="nav-center">
-          {NAV_LINKS.map((l) => (
+          {NAV_BEFORE.map((l) => (
+            <li key={l.href}><Link href={l.href}>{l.label}</Link></li>
+          ))}
+          <li className="nav-drop" ref={megaRef} onMouseEnter={() => setMegaOpen(true)} onMouseLeave={() => setMegaOpen(false)}>
+            <button
+              type="button"
+              className={`nav-drop-btn ${megaOpen ? "open" : ""}`}
+              onClick={() => setMegaOpen(!megaOpen)}
+              aria-haspopup="true"
+              aria-expanded={megaOpen}
+            >
+              Sur mesure <IconChevron open={megaOpen} />
+            </button>
+            <div className={`mega ${megaOpen ? "open" : ""}`} role="menu">
+              <p className="mega-title">Un accompagnement adapté à votre métier</p>
+              <MegaCol items={SEGMENTS_COL_1} onClick={closeAll} />
+              <MegaCol items={SEGMENTS_COL_2} onClick={closeAll} />
+            </div>
+          </li>
+          {NAV_AFTER.map((l) => (
             <li key={l.href}><Link href={l.href}>{l.label}</Link></li>
           ))}
         </ul>
@@ -177,10 +259,28 @@ export default function Navbar() {
 
       {/* Menu mobile */}
       <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
-        {NAV_LINKS.map((l) => (
-          <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)}>{l.label}</Link>
+        {NAV_BEFORE.map((l) => (
+          <Link key={l.href} href={l.href} onClick={closeAll}>{l.label}</Link>
         ))}
-        <Link href="/#contact" className="mobile-cta" onClick={() => setMenuOpen(false)}>Audit Gratuit</Link>
+        <div>
+          <button type="button" className={`mobile-acc-btn ${mobileSubOpen ? "open" : ""}`} onClick={() => setMobileSubOpen(!mobileSubOpen)} aria-expanded={mobileSubOpen}>
+            Sur mesure <IconChevron open={mobileSubOpen} />
+          </button>
+          <div className={`mobile-acc ${mobileSubOpen ? "open" : ""}`}>
+            {[...SEGMENTS_COL_1, ...SEGMENTS_COL_2].map((s) => (
+              <div key={s.slug}>
+                <Link href={`/sur-mesure/${s.slug}`} onClick={closeAll}>{s.label}</Link>
+                {s.children?.map((c) => (
+                  <Link key={c.slug} href={`/sur-mesure/${c.slug}`} className="sub" onClick={closeAll}>{c.label}</Link>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+        {NAV_AFTER.map((l) => (
+          <Link key={l.href} href={l.href} onClick={closeAll}>{l.label}</Link>
+        ))}
+        <Link href="/#contact" className="mobile-cta" onClick={closeAll}>Audit Gratuit</Link>
         <button className="mobile-search" onClick={() => { setMenuOpen(false); setSearchOpen(true); }} aria-label="Rechercher">
           <IconSearch /> Rechercher
         </button>
