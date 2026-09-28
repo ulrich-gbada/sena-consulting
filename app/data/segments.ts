@@ -153,9 +153,9 @@ const OFFER_CARROSSIERS_AGREES: Offer = {
     { title: "Des remises qui s'empilent", text: "Remises sur pièces, véhicule de courtoisie gratuit, plateforme payante, pénalités. Chaque obligation a un coût que personne ne calcule." },
   ],
   steps: [
-    { when: "Jour 1", title: "Rendez-vous d'1 h à l'atelier", text: "Signature de la lettre de mission. Vous montrez conventions, barèmes et factures." },
-    { when: "Jour 5", title: "Analyse et construction du dossier", text: "Rien à faire de votre côté." },
-    { when: "Jour 7", title: "Restitution d'1 h", text: "Les résultats, les décisions, l'argumentaire." },
+    { when: "Étape 1", title: "Pré-diagnostic offert, 20 min au téléphone", text: "Vous savez si le Bilan vaut le coup pour vous, avant de signer quoi que ce soit." },
+    { when: "Étape 2", title: "Lettre de mission et documents", text: "Vous signez, vous envoyez conventions, barèmes et factures. Rien d'autre à faire." },
+    { when: "7 jours ouvrés", title: "Remise du Bilan à l'atelier", text: "Les résultats, les décisions par agrément, l'argumentaire." },
     { when: "Avant l'assureur", title: "Séance de préparation", text: "On répète ensemble l'entretien de négociation." },
   ],
   deliverables: [
