@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import PageShell from "../../components/PageShell";
+import SegmentLanding from "../../components/SegmentLanding";
 import { SEGMENT_PAGES } from "../../data/segments";
 
 export function generateStaticParams() {
@@ -11,9 +11,14 @@ export async function generateMetadata({ params }: { params: Promise<{ segment: 
   const { segment } = await params;
   const s = SEGMENT_PAGES.find((x) => x.slug === segment);
   if (!s) return {};
+  const title = s.offer ? `${s.offer.brand} — ${s.label} — SENA CONSULTING` : `${s.label} — Sur mesure — SENA CONSULTING`;
+  const description = s.offer
+    ? `${s.offer.headline} ${s.offer.brandLine ?? ""} Pré-diagnostic offert, 20 min au téléphone, sans engagement.`
+    : `Accompagnement SENA CONSULTING pour le secteur ${s.label}. Pré-diagnostic offert, 20 min au téléphone, sans engagement.`;
   return {
-    title: `${s.label} — Accompagnement sur mesure — SENA CONSULTING`,
-    description: `Offre sur mesure SENA CONSULTING pour le secteur ${s.label} : performance business, résultats mesurables.`,
+    title,
+    description,
+    openGraph: { title, description, url: `https://www.sena-consulting.fr/sur-mesure/${s.slug}`, siteName: "SENA CONSULTING", locale: "fr_FR", type: "website" },
   };
 }
 
@@ -21,16 +26,5 @@ export default async function SegmentPage({ params }: { params: Promise<{ segmen
   const { segment } = await params;
   const s = SEGMENT_PAGES.find((x) => x.slug === segment);
   if (!s) notFound();
-
-  return (
-    <PageShell tag="Sur mesure" title={s.label}>
-      <div className="placeholder">
-        Cette page présentera prochainement notre accompagnement dédié au secteur <strong>{s.label}</strong> :
-        enjeux spécifiques, offre, méthode et résultats attendus.
-      </div>
-      <p style={{ marginTop: 32 }}>
-        En attendant, <a href="/#contact">demandez votre pré-diagnostic offert</a> : 20 minutes au téléphone, sans engagement.
-      </p>
-    </PageShell>
-  );
+  return <SegmentLanding page={s} />;
 }
