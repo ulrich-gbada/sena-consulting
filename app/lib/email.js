@@ -22,3 +22,22 @@ export const gabaritEmail = ({ titre, corps, ctaTexte, ctaUrl, footerExtra = '' 
     </div>
   </div>`;
 
+
+// ─── Segment Resend de la newsletter ────────────────────────────────────────
+// Resend a remplacé les Audiences par des Segments. Le segment de diffusion est
+// résolu ainsi : RESEND_SEGMENT_ID si définie, sinon recherche par nom, sinon
+// création. Le résultat est mis en cache le temps de vie de la fonction.
+export const SEGMENT_NAME = 'Newsletter Réalisations';
+let segmentCache = null;
+
+export async function getSegmentId(resend) {
+  if (process.env.RESEND_SEGMENT_ID) return process.env.RESEND_SEGMENT_ID;
+  if (segmentCache) return segmentCache;
+  const liste = await resend.segments.list();
+  if (liste.error) throw new Error(`Resend (segments.list) : ${liste.error.message}`);
+  const existant = (liste.data?.data ?? []).find((s) => s.name === SEGMENT_NAME);
+  if (existant) return (segmentCache = existant.id);
+  const cree = await resend.segments.create({ name: SEGMENT_NAME });
+  if (cree.error) throw new Error(`Resend (segments.create) : ${cree.error.message}`);
+  return (segmentCache = cree.data.id);
+}

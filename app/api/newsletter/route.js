@@ -1,10 +1,9 @@
 import { Resend } from 'resend';
-import { gabaritEmail } from '../../lib/email';
+import { gabaritEmail, getSegmentId, SEGMENT_NAME } from '../../lib/email';
 
 // ─── Inscription à la newsletter Réalisations ───────────────────────────────
-// 1. L'abonné est ajouté à l'Audience Resend (RESEND_AUDIENCE_ID) — c'est la liste
-//    de diffusion utilisée par /api/newsletter/annonce pour annoncer chaque
-//    nouvelle publication.
+// 1. L'abonné est créé dans les contacts Resend et rattaché au segment
+//    « Newsletter Réalisations » — la liste utilisée par /api/newsletter/annonce.
 // 2. Notification interne (contact@).
 // 3. E-mail de bienvenue avec rappel de l'audit gratuit.
 //
@@ -32,18 +31,21 @@ export async function POST(request) {
     const emailNet = email.trim().toLowerCase().slice(0, 160);
     const { firstName, lastName } = splitNom(nomNet);
 
-    // 1. Audience Resend (liste de diffusion)
-    let audienceOk = false;
-    if (process.env.RESEND_AUDIENCE_ID) {
+    // 1. Contact Resend + segment de diffusion
+    let listeOk = false, listeErreur = '';
+    try {
+      const segmentId = await getSegmentId(resend);
       const c = await resend.contacts.create({
-        audienceId: process.env.RESEND_AUDIENCE_ID,
-        email: emailNet, firstName, lastName, unsubscribed: false,
+        email: emailNet, firstName, lastName, unsubscribed: false, segments: [{ id: segmentId }],
       });
-      if (c.error) console.error('[newsletter] audience :', JSON.stringify(c.error));
-      else audienceOk = true;
-    } else {
-      console.warn('[newsletter] RESEND_AUDIENCE_ID absente : abonné non ajouté à la liste de diffusion.');
-    }
+      if (c.error) {
+        // Contact déjà existant : on le rattache simplement au segment.
+        const add = await resend.contacts.segments.add({ email: emailNet, segmentId });
+        if (add.error) listeErreur = `${c.error.message} / ${add.error.message}`;
+        else listeOk = true;
+      } else listeOk = true;
+    } catch (e) { listeErreur = String(e.message ?? e); }
+    if (!listeOk) console.error('[newsletter] liste :', listeErreur);
 
     // 2. Notification interne — c'est elle qui garantit que l'inscription n'est pas perdue
     const notif = await resend.emails.send({
@@ -56,7 +58,7 @@ export async function POST(request) {
           <table style="border-collapse: collapse; width: 100%;">
             <tr><td style="padding: 8px 0; color: #8A9BB0; width: 30%;">Nom</td><td style="padding: 8px 0; color: #1B2A3E; font-weight: bold;">${esc(nomNet)}</td></tr>
             <tr><td style="padding: 8px 0; color: #8A9BB0;">E-mail</td><td style="padding: 8px 0;"><a href="mailto:${esc(emailNet)}" style="color: #C9A84C;">${esc(emailNet)}</a></td></tr>
-            <tr><td style="padding: 8px 0; color: #8A9BB0;">Liste Resend</td><td style="padding: 8px 0; color: #1B2A3E;">${audienceOk ? 'ajouté à l’Audience' : '<strong style="color:#c62828">NON ajouté</strong> — vérifier RESEND_AUDIENCE_ID'}</td></tr>
+            <tr><td style="padding: 8px 0; color: #8A9BB0;">Liste Resend</td><td style="padding: 8px 0; color: #1B2A3E;">${listeOk ? `ajouté au segment « ${SEGMENT_NAME} »` : `<strong style="color:#c62828">NON ajouté</strong> — ${esc(listeErreur)}`}</td></tr>
             <tr><td style="padding: 8px 0; color: #8A9BB0;">Date</td><td style="padding: 8px 0; color: #1B2A3E;">${new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}</td></tr>
           </table>
         </div>`,

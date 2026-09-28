@@ -1,14 +1,14 @@
 import { Resend } from 'resend';
 import { REALISATIONS, formatDate } from '../../../data/realisations';
-import { gabaritEmail } from '../../../lib/email';
+import { gabaritEmail, getSegmentId } from '../../../lib/email';
 
 // ─── Annonce d'une nouvelle publication à tous les abonnés ──────────────────
 // Appel (une fois par article publié) :
 //   POST /api/newsletter/annonce
 //   { "secret": "<NEWSLETTER_SECRET>", "slug": "<slug de l'article>", "test": "adresse@test.fr" (optionnel) }
 // Avec "test", l'e-mail n'est envoyé qu'à cette adresse (aperçu). Sans "test",
-// un Broadcast Resend est créé et envoyé à toute l'Audience, avec lien de
-// désinscription géré par Resend.
+// un Broadcast Resend est créé et envoyé au segment « Newsletter Réalisations »,
+// avec lien de désinscription géré par Resend.
 
 const SITE = 'https://www.sena-consulting.fr';
 const esc = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -51,8 +51,8 @@ export async function POST(request) {
       return Response.json({ success: true, mode: 'test', to: test });
     }
 
-    if (!process.env.RESEND_AUDIENCE_ID) return Response.json({ error: 'RESEND_AUDIENCE_ID manquante.' }, { status: 500 });
-    const created = await resend.broadcasts.create({ audienceId: process.env.RESEND_AUDIENCE_ID, from, subject, html, name: `Réalisations — ${a.slug}` });
+    const segmentId = await getSegmentId(resend);
+    const created = await resend.broadcasts.create({ segmentId, from, subject, html, name: `Réalisations — ${a.slug}` });
     if (created.error) throw new Error(`Resend (broadcast create) : ${created.error.message}`);
     const sent = await resend.broadcasts.send(created.data.id);
     if (sent.error) throw new Error(`Resend (broadcast send) : ${sent.error.message}`);
