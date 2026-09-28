@@ -1,6 +1,16 @@
 // Gabarit HTML commun aux e-mails de la newsletter (bienvenue, annonces).
 const SITE = 'https://www.sena-consulting.fr';
 
+/** Version texte brut d'un HTML simple : améliore la délivrabilité (Outlook, Gmail). */
+export const versionTexte = (html) => html
+  .replace(/<style[\s\S]*?<\/style>/gi, '')
+  .replace(/<br\s*\/?>/gi, '\n')
+  .replace(/<\/(p|div|h1|h2|h3|tr|li)>/gi, '\n')
+  .replace(/<a [^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi, '$2 ($1)')
+  .replace(/<[^>]+>/g, '')
+  .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  .split('\n').map((l) => l.trim()).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+
 export const gabaritEmail = ({ titre, corps, ctaTexte, ctaUrl, footerExtra = '' }) => `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #F4F5F7; padding: 32px;">
     <div style="background: #1B2A3E; padding: 24px; border-radius: 8px 8px 0 0; text-align: center;">

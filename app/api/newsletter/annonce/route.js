@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 import { REALISATIONS, formatDate } from '../../../data/realisations';
-import { gabaritEmail, getSegmentId } from '../../../lib/email';
+import { gabaritEmail, getSegmentId, versionTexte } from '../../../lib/email';
 
 // ─── Annonce d'une nouvelle publication à tous les abonnés ──────────────────
 // Appel (une fois par article publié) :
@@ -46,13 +46,14 @@ export async function POST(request) {
     const from = 'Ulrich GBADA — SENA CONSULTING <contact@sena-consulting.fr>';
 
     if (test) {
-      const r = await resend.emails.send({ from, to: [test], subject: `[TEST] ${subject}`, html: html.replace('{{{RESEND_UNSUBSCRIBE_URL}}}', `${SITE}/realisations#newsletter`) });
+      const htmlTest = html.replace('{{{RESEND_UNSUBSCRIBE_URL}}}', `${SITE}/realisations#newsletter`);
+      const r = await resend.emails.send({ from, replyTo: 'contact@sena-consulting.fr', to: [test], subject: `[TEST] ${subject}`, html: htmlTest, text: versionTexte(htmlTest) });
       if (r.error) throw new Error(`Resend (test) : ${r.error.message}`);
       return Response.json({ success: true, mode: 'test', to: test });
     }
 
     const segmentId = await getSegmentId(resend);
-    const created = await resend.broadcasts.create({ segmentId, from, subject, html, name: `Réalisations — ${a.slug}` });
+    const created = await resend.broadcasts.create({ segmentId, from, replyTo: 'contact@sena-consulting.fr', subject, html, text: versionTexte(html), name: `Réalisations — ${a.slug}` });
     if (created.error) throw new Error(`Resend (broadcast create) : ${created.error.message}`);
     const sent = await resend.broadcasts.send(created.data.id);
     if (sent.error) throw new Error(`Resend (broadcast send) : ${sent.error.message}`);

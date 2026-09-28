@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { gabaritEmail, getSegmentId, SEGMENT_NAME } from '../../lib/email';
+import { gabaritEmail, getSegmentId, SEGMENT_NAME, versionTexte } from '../../lib/email';
 
 // ─── Inscription à la newsletter Réalisations ───────────────────────────────
 // 1. L'abonné est créé dans les contacts Resend et rattaché au segment
@@ -66,11 +66,7 @@ export async function POST(request) {
     if (notif.error) throw new Error(`Resend (notification) : ${notif.error.message}`);
 
     // 3. Bienvenue
-    const bienvenue = await resend.emails.send({
-      from: 'Ulrich GBADA — SENA CONSULTING <contact@sena-consulting.fr>',
-      to: [emailNet],
-      subject: 'Bienvenue — nos analyses et cas concrets, directement dans votre boîte',
-      html: gabaritEmail({
+    const htmlBienvenue = gabaritEmail({
         titre: `Bienvenue ${esc(firstName)},`,
         corps: `
           <p style="color: #2E4A6B; line-height: 1.7; margin: 0 0 14px;">Merci pour votre inscription. Vous recevrez désormais un e-mail à chaque nouveau cas concret publié dans nos <a href="${SITE}/realisations" style="color: #C9A84C;">Réalisations</a> : un dirigeant, un problème précis, des chiffres, une méthode et le résultat obtenu.</p>
@@ -78,7 +74,14 @@ export async function POST(request) {
         ctaTexte: 'Demander un audit gratuit',
         ctaUrl: `${SITE}/#contact`,
         footerExtra: `<p style="color: #b0b8c4; font-size: 11px; margin: 14px 0 0;">Vous recevez cet e-mail parce que vous vous êtes inscrit sur sena-consulting.fr. Pour vous désabonner, répondez « STOP » à ce message.</p>`,
-      }),
+      });
+    const bienvenue = await resend.emails.send({
+      from: 'Ulrich GBADA — SENA CONSULTING <contact@sena-consulting.fr>',
+      replyTo: 'contact@sena-consulting.fr',
+      to: [emailNet],
+      subject: 'Bienvenue — nos analyses et cas concrets, directement dans votre boîte',
+      html: htmlBienvenue,
+      text: versionTexte(htmlBienvenue),
     });
     if (bienvenue.error) console.error('[newsletter] bienvenue non envoyée :', JSON.stringify(bienvenue.error));
 
