@@ -82,7 +82,7 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
         /* Étapes */
         .sl-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
         .sl-step { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px 22px; position: relative; }
-        .sl-step-when { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #C9A84C; font-weight: 700; margin-bottom: 10px; }
+        .sl-step-when { font-size: 16.5px; letter-spacing: 2.5px; text-transform: uppercase; color: #C9A84C; font-weight: 700; margin-bottom: 10px; }
         .sl-step h3 { color: #F4F5F7; font-size: 17px; margin: 0 0 8px; }
         .sl-step p { color: rgba(244,245,247,0.75); font-size: 14px; line-height: 1.6; margin: 0; }
 
@@ -92,7 +92,7 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
         .sl-deliv li svg { flex-shrink: 0; margin-top: 3px; }
 
         /* Exemple */
-        .sl-example-intro { font-size: 15px; color: #2E4A6B; line-height: 1.7; margin: 0 0 24px; max-width: 860px; }
+        .sl-example-intro { font-size: 15px; color: #2E4A6B; line-height: 1.7; margin: 0 0 24px; }
 
         /* Prix */
         .sl-price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 26px; }
