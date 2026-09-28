@@ -2,15 +2,15 @@ import { Resend } from 'resend';
 import { versionTexte } from '../../lib/email';
 import { getRealisation } from '../../data/realisations';
 import {
-  SECTEUR_CARROSSERIE, SOURCE_REGEX, CARROSSERIE_VIDE, QUESTIONS, PJ_TYPES, PJ_MAX_BASE64,
-  COULEUR_ETIQUETTE, erreursCarrosserie, nettoyer, scoreCarrosserie, libelle, estAgree,
-  lienCalendly, casConcretPour,
-} from '../../lib/carrosserie';
+  SOURCE_REGEX, PJ_TYPES, PJ_MAX_BASE64, COULEUR_ETIQUETTE,
+  erreurs, nettoyer, libelle, lienCalendly,
+} from '../../lib/branche';
+import { branchePour, casConcretPour } from '../../lib/branches';
 
-// Formulaire de demande d'audit en 4 étapes (5 pour Garagiste / Carrossier) :
+// Formulaire de demande d'audit en 4 étapes (5 pour les secteurs à offre validée) :
 //   1. Identité (name, email, company, phone, address, codePostal, ville, taille, ca)
 //   2. Secteur (secteur)
-//   2b. Activité (carrosserie, pièce jointe) — branche Carrosserie, SPECS v1.0/v1.1
+//   2b. Activité (activite, pièce jointe) — branches Carrosserie, Formation… (app/lib/branches.ts)
 //   3. Attentes (attentes)
 //   4. RDV Calendly (côté client)
 // Cette route est appelée à la validation de l'étape Attentes.
@@ -37,7 +37,7 @@ export async function POST(request) {
       name, email, company, phone,
       address, codePostal, ville, latitude, longitude,
       taille, ca, secteur, attentes,
-      source, carrosserie, pieceJointe,
+      source, activite, carrosserie, pieceJointe,
     } = body;
 
     if (!name || !email) {
@@ -48,37 +48,38 @@ export async function POST(request) {
       return Response.json({ error: 'Adresse email invalide.' }, { status: 400 });
     }
 
-    // ── Branche Carrosserie (SPECS v1.0 §8.1) ──
+    // ── Branches « Activité » (SPECS v1.0 §8.1, généralisées) ──
     const src = typeof source === 'string' && SOURCE_REGEX.test(source) ? source : '';
-    const estCarrosserie = secteur === SECTEUR_CARROSSERIE;
+    const branche = branchePour(secteur);
     let c = null, points = null, etiquette = null;
-    if (estCarrosserie) {
-      if (erreursCarrosserie(carrosserie).length) {
-        return Response.json({ error: "Informations sur l'atelier incomplètes." }, { status: 400 });
+    if (branche) {
+      const brut = activite ?? carrosserie; // « carrosserie » : nom du champ dans les SPECS v1.0
+      if (erreurs(branche, brut).length) {
+        return Response.json({ error: branche.mailInterne.erreur }, { status: 400 });
       }
-      c = nettoyer({ ...CARROSSERIE_VIDE, ...carrosserie });
-      ({ points, etiquette } = scoreCarrosserie(c));
+      c = nettoyer(branche, brut);
+      ({ points, etiquette } = branche.score(c));
     }
     let pj = null, pjRefusee = false;
-    if (estCarrosserie && pieceJointe && typeof pieceJointe === 'object') {
+    if (branche && branche.fichier && branche.fichier.visible(c) && pieceJointe && typeof pieceJointe === 'object') {
       const { nom, type, base64 } = pieceJointe;
       if (typeof nom === 'string' && typeof type === 'string' && typeof base64 === 'string'
           && PJ_TYPES.includes(type) && base64.length <= PJ_MAX_BASE64) {
         pj = { nom: nom.replace(/[^\w.\- ]/g, '_').slice(0, 80), type, base64 };
       } else pjRefusee = true;
     }
-    const urlCalendly = lienCalendly({ name, email, company, source: src, carrosserie: estCarrosserie });
-    const cas = casConcretPour(secteur, estCarrosserie ? c : null, (slug) => Boolean(getRealisation(slug)));
+    const urlCalendly = lienCalendly({ name, email, company, source: src, offre: branche?.offre });
+    const cas = casConcretPour(secteur, c, (slug) => Boolean(getRealisation(slug)));
     const blocCas = cas
       ? `<p style="color: #2E4A6B; line-height: 1.7;">${esc(cas.phrase)} <a href="${cas.url}" style="color: #C9A84C; font-weight: bold;">lire le cas concret</a>.</p>`
       : '';
-    const blocAtelier = estCarrosserie ? `
-            <h2 style="color: #1B2A3E; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; margin: 28px 0 8px;">Atelier</h2>
+    const blocAtelier = branche ? `
+            <h2 style="color: #1B2A3E; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; margin: 28px 0 8px;">${esc(branche.mailInterne.titre)}</h2>
             <div style="margin: 0 0 10px;">
               <span style="display:inline-block;background:${COULEUR_ETIQUETTE[etiquette]};color:#fff;font-weight:bold;font-size:13px;padding:6px 12px;border-radius:4px;letter-spacing:1px;">${etiquette}</span>${points !== null ? ` <span style="color:#1B2A3E;font-size:14px;margin-left:8px;">Score : ${points} / 10</span>` : ''}
             </div>
             <table style="width: 100%; border-collapse: collapse;">
-              ${Object.keys(QUESTIONS).map((k) => row(QUESTIONS[k], libelle(k, c[k]))).join('')}
+              ${branche.champs.map((ch) => row(esc(ch.question), libelle(branche, ch.cle, c[ch.cle]))).join('')}
               ${row('Pièce jointe', pj ? pj.nom : 'Aucune')}
               ${pjRefusee ? row('Pièce jointe refusée', '(format ou taille)') : ''}
             </table>
@@ -94,8 +95,8 @@ export async function POST(request) {
       from: 'SENA CONSULTING <contact@sena-consulting.fr>',
       to: ['contact@sena-consulting.fr'],
       replyTo: email,
-      subject: estCarrosserie
-        ? `[${etiquette}] Pré-diagnostic carrosserie — ${company || name}${ville ? ` (${ville})` : ''}`
+      subject: branche
+        ? `[${etiquette}] ${branche.mailInterne.objet} — ${company || name}${ville ? ` (${ville})` : ''}`
         : `Demande d'audit — ${name}${company ? ` (${company})` : ''}`,
       ...(pj ? { attachments: [{ filename: pj.nom, content: pj.base64, contentType: pj.type }] } : {}),
       html: `
@@ -146,7 +147,7 @@ export async function POST(request) {
     if (interne.error) throw new Error(`Resend (interne) : ${interne.error.message}`);
 
     // 2. Confirmation au prospect
-    const corpsConfirmation = estCarrosserie ? `
+    const corpsConfirmation = branche ? `
             <p style="color: #1B2A3E; font-size: 16px; margin-top: 0;">Bonjour ${esc(name)},</p>
             <p style="color: #2E4A6B; line-height: 1.7;">Merci pour votre demande. Je l'ai bien reçue.</p>
             <p style="color: #2E4A6B; line-height: 1.7;"><strong>Si ce n'est pas déjà fait</strong>, réservez votre pré-diagnostic (20 min au téléphone) :</p>
@@ -154,12 +155,10 @@ export async function POST(request) {
               <a href="${urlCalendly}" style="background: #C9A84C; color: #1B2A3E; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px;">Réserver mon créneau</a>
             </div>
             ${blocCas}
-            ${estAgree(c) ? `
+            ${branche.cible(c) ? `
             <p style="color: #2E4A6B; line-height: 1.7; margin-bottom: 6px;">Pour que 20 minutes suffisent, ayez sous la main :</p>
             <ul style="color: #2E4A6B; line-height: 1.7; margin: 0 0 16px; padding-left: 20px;">
-              <li>un barème d'un de vos assureurs (taux horaires et ingrédients peinture) ;</li>
-              <li>votre nombre d'heures facturées sur les 12 derniers mois, ou à défaut votre nombre de compagnons ;</li>
-              <li>vos délais de paiement, assureur par assureur, si vous les connaissez.</li>
+              ${branche.aMain.map((l) => `<li>${esc(l)}</li>`).join('')}
             </ul>` : ''}
             <p style="color: #2E4A6B; line-height: 1.7;">À la fin de l'appel, je vous dis franchement si un Bilan vaut le coup pour vous, ou non.</p>
             <p style="color: #2E4A6B; line-height: 1.7;">Sans réservation de votre part, je reviendrai vers vous sous <strong>24 à 48 heures</strong> ouvrées.</p>` : `
@@ -193,7 +192,7 @@ export async function POST(request) {
       from: 'Ulrich GBADA — SENA CONSULTING <contact@sena-consulting.fr>',
       replyTo: 'contact@sena-consulting.fr',
       to: [email],
-      subject: estCarrosserie ? 'Votre pré-diagnostic Bilan Agréments — SENA CONSULTING' : "Votre demande d'audit gratuit — SENA CONSULTING",
+      subject: branche ? `Votre pré-diagnostic ${branche.nomOffre} — SENA CONSULTING` : "Votre demande d'audit gratuit — SENA CONSULTING",
       html: htmlConfirmation,
       text: versionTexte(htmlConfirmation),
     });

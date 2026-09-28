@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from "react";
 import ChampAdresse, { type Adresse } from "./ChampAdresse";
-import EtapeCarrosserie from "./EtapeCarrosserie";
+import EtapeActivite from "./EtapeActivite";
 import { FORM_SECTEURS } from "../data/segments";
-import {
-  type Carrosserie, type PieceJointe, CARROSSERIE_VIDE, SECTEUR_CARROSSERIE,
-  ATTENTES_CARROSSERIE, OFFRE_BILAN, SOURCE_REGEX, nettoyer, visible, lienCalendly,
-} from "../lib/carrosserie";
+import { type Reponses, type PieceJointe, SOURCE_REGEX, nettoyer, lienCalendly } from "../lib/branche";
+import { BRANCHES, branchePour, branchePourOffre } from "../lib/branches";
 
 type EtapeId = "identite" | "secteur" | "activite" | "attentes" | "rdv";
 const LIBELLES_ETAPES: Record<EtapeId, string> = {
@@ -36,12 +34,15 @@ export default function ContactForm({
   const [adresse, setAdresse] = useState<Adresse>({ label: "", nom: "", codePostal: "", ville: "", lat: "", lon: "" });
   const [formStatus, setFormStatus] = useState("idle");
 
-  // ─── Branche Carrosserie (SPECS v1.0 §3, §5, §7) ─────────────────────────
-  const [carrosserie, setCarrosserie] = useState<Carrosserie>(CARROSSERIE_VIDE);
+  // ─── Branches « Activité » (SPECS v1.0 §3, §5, §7, généralisées) ─────────
+  // Les réponses sont gardées par branche : changer de secteur puis revenir ne les perd pas.
+  const [reponses, setReponses] = useState<Record<string, Reponses>>({});
   const [pieceJointe, setPieceJointe] = useState<PieceJointe | null>(null);
   const [source, setSource] = useState("");
-  const estCarrosserie = formData.secteur === SECTEUR_CARROSSERIE;
-  const ETAPES: EtapeId[] = estCarrosserie
+  const branche = branchePour(formData.secteur);
+  const activite: Reponses = branche ? (reponses[branche.id] ?? nettoyer(branche, {})) : {};
+  const setActivite = (r: Reponses) => { if (branche) setReponses((all) => ({ ...all, [branche.id]: r })); };
+  const ETAPES: EtapeId[] = branche
     ? ["identite", "secteur", "activite", "attentes", "rdv"]
     : ["identite", "secteur", "attentes", "rdv"];
   const idx = ETAPES.indexOf(etape);
@@ -51,8 +52,9 @@ export default function ContactForm({
   // Paramètres d'URL, lus une seule fois au montage. defaultSecteur (landing) l'emporte sur ?offre.
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
+    const offre = branchePourOffre(q.get("offre"));
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (q.get("offre") === OFFRE_BILAN && !defaultSecteur) setFormData((f) => ({ ...f, secteur: SECTEUR_CARROSSERIE }));
+    if (offre && !defaultSecteur) setFormData((f) => ({ ...f, secteur: offre.secteur }));
     const src = q.get("src") ?? "";
     if (SOURCE_REGEX.test(src)) setSource(src);
   }, [defaultSecteur]);
@@ -74,7 +76,7 @@ export default function ContactForm({
     setFormStatus("sending");
     try {
       const attentesEnvoyees = formData.attentes
-        .filter((a) => estCarrosserie || !ATTENTES_CARROSSERIE.includes(a))
+        .filter((a) => !BRANCHES.some((b) => b !== branche && b.attentes.includes(a)))
         .filter((a) => a !== "Autre")
         .concat(formData.attentes.includes("Autre") && formData.attenteAutre ? [`Autre : ${formData.attenteAutre}`] : []);
       const body = {
@@ -84,8 +86,8 @@ export default function ContactForm({
         attentes: attentesEnvoyees,
         secteur: formData.secteur === "Autre" ? `Autre : ${formData.secteurAutre}` : formData.secteur,
         source,                                                         // "" si absent
-        carrosserie: estCarrosserie ? nettoyer(carrosserie) : null,
-        pieceJointe: estCarrosserie && visible(carrosserie, "baremes2027") ? pieceJointe : null,
+        activite: branche ? nettoyer(branche, activite) : null,
+        pieceJointe: branche && branche.fichier && branche.fichier.visible(activite) ? pieceJointe : null,
       };
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -108,8 +110,9 @@ export default function ContactForm({
     "Faire face à la concurrence des prix",
     "Autre",
   ];
-  const attentesList = estCarrosserie ? [...ATTENTES_CARROSSERIE, ...attentesBase] : attentesBase;
-  const urlCalendly = lienCalendly({ name: formData.name, email: formData.email, company: formData.company, source, carrosserie: estCarrosserie });
+  const attentesList = branche ? [...branche.attentes, ...attentesBase] : attentesBase;
+  const urlCalendly = lienCalendly({ name: formData.name, email: formData.email, company: formData.company, source, offre: branche?.offre });
+  const prenom = formData.name ? formData.name.split(" ")[0] : "";
 
   return (
     <>
@@ -302,11 +305,12 @@ export default function ContactForm({
                 </div>
               )}
 
-              {/* ÉTAPE ACTIVITÉ (carrosserie uniquement) */}
-              {etape === "activite" && (
-                <EtapeCarrosserie
-                  valeur={carrosserie}
-                  onChange={setCarrosserie}
+              {/* ÉTAPE ACTIVITÉ (secteurs avec offre validée uniquement) */}
+              {etape === "activite" && branche && (
+                <EtapeActivite
+                  branche={branche}
+                  valeur={activite}
+                  onChange={setActivite}
                   pieceJointe={pieceJointe}
                   onPieceJointe={setPieceJointe}
                   onRetour={precedente}
@@ -343,14 +347,14 @@ export default function ContactForm({
                 <div className="step4-wrap">
                   <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
                   <h3>Votre demande est enregistrée !</h3>
-                  {estCarrosserie ? (
+                  {branche ? (
                     <>
-                      <p>Merci {formData.name ? formData.name.split(" ")[0] : ""}. Réservez maintenant votre pré-diagnostic : 20 minutes au téléphone avec Ulrich. À la fin de l'appel, vous saurez si un Bilan vaut le coup pour vous.</p>
-                      <a href={urlCalendly} target="_blank" rel="noopener noreferrer" className="btn-calendly">📅 Réserver mon pré-diagnostic (20 min)</a>
+                      <p>{branche.rdv.texte.replace("{prenom}", prenom)}</p>
+                      <a href={urlCalendly} target="_blank" rel="noopener noreferrer" className="btn-calendly">{branche.rdv.bouton}</a>
                     </>
                   ) : (
                     <>
-                      <p>Merci {formData.name ? formData.name.split(" ")[0] : ""} — nous avons bien reçu votre demande d'audit.<br />Réservez maintenant votre créneau pour un rendez-vous avec Ulrich.</p>
+                      <p>Merci {prenom} — nous avons bien reçu votre demande d'audit.<br />Réservez maintenant votre créneau pour un rendez-vous avec Ulrich.</p>
                       <a href={urlCalendly} target="_blank" rel="noopener noreferrer" className="btn-calendly">📅 Réserver mon audit gratuit</a>
                     </>
                   )}
