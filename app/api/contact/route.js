@@ -1,11 +1,19 @@
 import { Resend } from 'resend';
+import { versionTexte } from '../../lib/email';
+import { getRealisation } from '../../data/realisations';
+import {
+  SECTEUR_CARROSSERIE, SOURCE_REGEX, CARROSSERIE_VIDE, QUESTIONS, PJ_TYPES, PJ_MAX_BASE64,
+  COULEUR_ETIQUETTE, erreursCarrosserie, nettoyer, scoreCarrosserie, libelle, estAgree,
+  lienCalendly, casConcretPour,
+} from '../../lib/carrosserie';
 
-// Formulaire de demande d'audit en 4 étapes :
+// Formulaire de demande d'audit en 4 étapes (5 pour Garagiste / Carrossier) :
 //   1. Identité (name, email, company, phone, address, codePostal, ville, taille, ca)
 //   2. Secteur (secteur)
+//   2b. Activité (carrosserie, pièce jointe) — branche Carrosserie, SPECS v1.0/v1.1
 //   3. Attentes (attentes)
 //   4. RDV Calendly (côté client)
-// Cette route est appelée à la validation de l'étape 3.
+// Cette route est appelée à la validation de l'étape Attentes.
 
 const esc = (v) =>
   String(v ?? '')
@@ -29,6 +37,7 @@ export async function POST(request) {
       name, email, company, phone,
       address, codePostal, ville, latitude, longitude,
       taille, ca, secteur, attentes,
+      source, carrosserie, pieceJointe,
     } = body;
 
     if (!name || !email) {
@@ -39,17 +48,56 @@ export async function POST(request) {
       return Response.json({ error: 'Adresse email invalide.' }, { status: 400 });
     }
 
+    // ── Branche Carrosserie (SPECS v1.0 §8.1) ──
+    const src = typeof source === 'string' && SOURCE_REGEX.test(source) ? source : '';
+    const estCarrosserie = secteur === SECTEUR_CARROSSERIE;
+    let c = null, points = null, etiquette = null;
+    if (estCarrosserie) {
+      if (erreursCarrosserie(carrosserie).length) {
+        return Response.json({ error: "Informations sur l'atelier incomplètes." }, { status: 400 });
+      }
+      c = nettoyer({ ...CARROSSERIE_VIDE, ...carrosserie });
+      ({ points, etiquette } = scoreCarrosserie(c));
+    }
+    let pj = null, pjRefusee = false;
+    if (estCarrosserie && pieceJointe && typeof pieceJointe === 'object') {
+      const { nom, type, base64 } = pieceJointe;
+      if (typeof nom === 'string' && typeof type === 'string' && typeof base64 === 'string'
+          && PJ_TYPES.includes(type) && base64.length <= PJ_MAX_BASE64) {
+        pj = { nom: nom.replace(/[^\w.\- ]/g, '_').slice(0, 80), type, base64 };
+      } else pjRefusee = true;
+    }
+    const urlCalendly = lienCalendly({ name, email, company, source: src, carrosserie: estCarrosserie });
+    const cas = casConcretPour(secteur, estCarrosserie ? c : null, (slug) => Boolean(getRealisation(slug)));
+    const blocCas = cas
+      ? `<p style="color: #2E4A6B; line-height: 1.7;">${esc(cas.phrase)} <a href="${cas.url}" style="color: #C9A84C; font-weight: bold;">lire le cas concret</a>.</p>`
+      : '';
+    const blocAtelier = estCarrosserie ? `
+            <h2 style="color: #1B2A3E; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; margin: 28px 0 8px;">Atelier</h2>
+            <div style="margin: 0 0 10px;">
+              <span style="display:inline-block;background:${COULEUR_ETIQUETTE[etiquette]};color:#fff;font-weight:bold;font-size:13px;padding:6px 12px;border-radius:4px;letter-spacing:1px;">${etiquette}</span>${points !== null ? ` <span style="color:#1B2A3E;font-size:14px;margin-left:8px;">Score : ${points} / 10</span>` : ''}
+            </div>
+            <table style="width: 100%; border-collapse: collapse;">
+              ${Object.keys(QUESTIONS).map((k) => row(QUESTIONS[k], libelle(k, c[k]))).join('')}
+              ${row('Pièce jointe', pj ? pj.nom : 'Aucune')}
+              ${pjRefusee ? row('Pièce jointe refusée', '(format ou taille)') : ''}
+            </table>
+            <p style="margin: 10px 0 0;"><a href="https://www.pappers.fr/recherche?q=${encodeURIComponent(company || name)}" style="color:#C9A84C;">Vérifier l'entreprise sur Pappers</a></p>` : '';
+
     const adresseComplete = [address, [codePostal, ville].filter(Boolean).join(' ')].filter(Boolean).join(', ');
     const lienCarte = latitude && longitude
       ? `<br /><a href="https://www.google.com/maps?q=${esc(latitude)},${esc(longitude)}" style="color: #C9A84C; font-size: 12px;">Voir sur la carte</a>`
       : '';
 
     // 1. Notification interne
-    const interne = await resend.emails.send({
+    const paramsInterne = {
       from: 'SENA CONSULTING <contact@sena-consulting.fr>',
       to: ['contact@sena-consulting.fr'],
       replyTo: email,
-      subject: `Demande d'audit — ${name}${company ? ` (${company})` : ''}`,
+      subject: estCarrosserie
+        ? `[${etiquette}] Pré-diagnostic carrosserie — ${company || name}${ville ? ` (${ville})` : ''}`
+        : `Demande d'audit — ${name}${company ? ` (${company})` : ''}`,
+      ...(pj ? { attachments: [{ filename: pj.nom, content: pj.base64, contentType: pj.type }] } : {}),
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #F4F5F7; padding: 32px;">
           <div style="background: #1B2A3E; padding: 24px; border-radius: 8px 8px 0 0; text-align: center;">
@@ -72,10 +120,12 @@ export async function POST(request) {
               </tr>` : ''}
               ${row('Taille', taille)}
               ${row("Chiffre d'affaires", ca)}
+              ${row('Source', src)}
             </table>
 
             <h2 style="color: #1B2A3E; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; margin: 28px 0 8px;">Secteur</h2>
             <div style="background: #F4F5F7; padding: 12px 16px; border-radius: 6px; color: #1B2A3E;">${esc(secteur) || '—'}</div>
+            ${blocAtelier}
 
             <h2 style="color: #1B2A3E; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; margin: 28px 0 8px;">Attentes</h2>
             <div style="background: #F4F5F7; padding: 12px 16px; border-radius: 6px; color: #1B2A3E; line-height: 1.7;">
@@ -90,29 +140,46 @@ export async function POST(request) {
           </div>
         </div>
       `,
-    });
+    };
+    const interne = await resend.emails.send({ ...paramsInterne, text: versionTexte(paramsInterne.html) });
 
     if (interne.error) throw new Error(`Resend (interne) : ${interne.error.message}`);
 
     // 2. Confirmation au prospect
-    const confirmation = await resend.emails.send({
-      from: 'Ulrich GBADA — SENA CONSULTING <contact@sena-consulting.fr>',
-      to: [email],
-      subject: "Votre demande d'audit gratuit — SENA CONSULTING",
-      html: `
+    const corpsConfirmation = estCarrosserie ? `
+            <p style="color: #1B2A3E; font-size: 16px; margin-top: 0;">Bonjour ${esc(name)},</p>
+            <p style="color: #2E4A6B; line-height: 1.7;">Merci pour votre demande. Je l'ai bien reçue.</p>
+            <p style="color: #2E4A6B; line-height: 1.7;"><strong>Si ce n'est pas déjà fait</strong>, réservez votre pré-diagnostic (20 min au téléphone) :</p>
+            <div style="text-align: center; margin: 24px 0;">
+              <a href="${urlCalendly}" style="background: #C9A84C; color: #1B2A3E; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px;">Réserver mon créneau</a>
+            </div>
+            ${blocCas}
+            ${estAgree(c) ? `
+            <p style="color: #2E4A6B; line-height: 1.7; margin-bottom: 6px;">Pour que 20 minutes suffisent, ayez sous la main :</p>
+            <ul style="color: #2E4A6B; line-height: 1.7; margin: 0 0 16px; padding-left: 20px;">
+              <li>un barème d'un de vos assureurs (taux horaires et ingrédients peinture) ;</li>
+              <li>votre nombre d'heures facturées sur les 12 derniers mois, ou à défaut votre nombre de compagnons ;</li>
+              <li>vos délais de paiement, assureur par assureur, si vous les connaissez.</li>
+            </ul>` : ''}
+            <p style="color: #2E4A6B; line-height: 1.7;">À la fin de l'appel, je vous dis franchement si un Bilan vaut le coup pour vous, ou non.</p>
+            <p style="color: #2E4A6B; line-height: 1.7;">Sans réservation de votre part, je reviendrai vers vous sous <strong>24 à 48 heures</strong> ouvrées.</p>` : `
+            <p style="color: #1B2A3E; font-size: 16px; margin-top: 0;">Bonjour ${esc(name)},</p>
+            <p style="color: #2E4A6B; line-height: 1.7;">Merci pour votre demande d'audit gratuit. Je l'ai bien reçue.</p>
+            <p style="color: #2E4A6B; line-height: 1.7;"><strong>Si ce n'est pas déjà fait</strong>, réservez dès maintenant votre créneau de pré-diagnostic (20 min au téléphone) :</p>
+            <div style="text-align: center; margin: 24px 0;">
+              <a href="${urlCalendly}" style="background: #C9A84C; color: #1B2A3E; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px;">Réserver mon créneau</a>
+            </div>
+            ${blocCas}
+            <p style="color: #2E4A6B; line-height: 1.7;">Sans réservation de votre part, je reviendrai vers vous sous <strong>24 à 48 heures</strong> ouvrées.</p>`;
+
+    const htmlConfirmation = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #F4F5F7; padding: 32px;">
           <div style="background: #1B2A3E; padding: 24px; border-radius: 8px 8px 0 0; text-align: center;">
             <h1 style="color: #C9A84C; margin: 0; font-size: 20px; letter-spacing: 2px;">SENA CONSULTING</h1>
             <p style="color: #8A9BB0; margin: 8px 0 0; font-size: 13px;">Cabinet de conseil en performance business pour PME/TPE</p>
           </div>
           <div style="background: #ffffff; padding: 32px; border-radius: 0 0 8px 8px;">
-            <p style="color: #1B2A3E; font-size: 16px; margin-top: 0;">Bonjour ${esc(name)},</p>
-            <p style="color: #2E4A6B; line-height: 1.7;">Merci pour votre demande d'audit gratuit. Je l'ai bien reçue.</p>
-            <p style="color: #2E4A6B; line-height: 1.7;"><strong>Si ce n'est pas déjà fait</strong>, réservez dès maintenant votre créneau de pré-diagnostic (20 min au téléphone) :</p>
-            <div style="text-align: center; margin: 24px 0;">
-              <a href="https://calendly.com/contact-sena-consulting/audit" style="background: #C9A84C; color: #1B2A3E; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px;">Réserver mon créneau</a>
-            </div>
-            <p style="color: #2E4A6B; line-height: 1.7;">Sans réservation de votre part, je reviendrai vers vous sous <strong>24 à 48 heures</strong> ouvrées.</p>
+            ${corpsConfirmation}
             <hr style="border: none; border-top: 1px solid #F4F5F7; margin: 24px 0;" />
             <p style="color: #8A9BB0; font-size: 13px; margin: 0;">Cordialement,</p>
             <p style="color: #1B2A3E; font-weight: bold; margin: 4px 0;">Ulrich GBADA</p>
@@ -121,7 +188,14 @@ export async function POST(request) {
             <p style="color: #8A9BB0; font-size: 13px; margin: 4px 0;">🌐 <a href="https://www.sena-consulting.fr" style="color: #C9A84C;">www.sena-consulting.fr</a></p>
           </div>
         </div>
-      `,
+      `;
+    const confirmation = await resend.emails.send({
+      from: 'Ulrich GBADA — SENA CONSULTING <contact@sena-consulting.fr>',
+      replyTo: 'contact@sena-consulting.fr',
+      to: [email],
+      subject: estCarrosserie ? 'Votre pré-diagnostic Bilan Agréments — SENA CONSULTING' : "Votre demande d'audit gratuit — SENA CONSULTING",
+      html: htmlConfirmation,
+      text: versionTexte(htmlConfirmation),
     });
 
     if (confirmation.error) throw new Error(`Resend (confirmation) : ${confirmation.error.message}`);
