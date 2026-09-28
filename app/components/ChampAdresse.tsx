@@ -18,6 +18,13 @@ export type Adresse = {
 
 const VIDE: Adresse = { label: "", nom: "", codePostal: "", ville: "", lat: "", lon: "" };
 
+const IconPin = () => (
+  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+  </svg>
+);
+
 export default function ChampAdresse({
   valeur,
   onChange,
@@ -35,7 +42,11 @@ export default function ChampAdresse({
 
   // Recherche différée (300 ms) : une requête par frappe saturerait l'API.
   useEffect(() => {
-    if (manuel || saisie.length < 4 || saisie === valeur.label) { setSuggestions([]); return; }
+    if (manuel || saisie.length < 4 || saisie === valeur.label) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSuggestions([]);
+      return;
+    }
     const stop = new AbortController();
     const t = setTimeout(async () => {
       setCharge(true);
@@ -45,7 +56,7 @@ export default function ChampAdresse({
           { signal: stop.signal }
         );
         const j = await r.json();
-        setSuggestions((j.features || []).map((f: any) => ({
+        setSuggestions((j.features || []).map((f: { properties: Record<string, string>; geometry: { coordinates: [number, number] } }) => ({
           label: f.properties.label,
           nom: f.properties.name || f.properties.label,
           codePostal: f.properties.postcode || "",
@@ -75,6 +86,7 @@ export default function ChampAdresse({
 
   // Une seule suggestion : retenue d'office.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (suggestions.length === 1 && ouvert) retenir(suggestions[0]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suggestions, ouvert]);
@@ -91,13 +103,6 @@ export default function ChampAdresse({
     setManuel(m); setOuvert(false); setSuggestions([]);
     setSaisie(""); onChange(VIDE);
   };
-
-  const IconPin = () => (
-    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-    </svg>
-  );
 
   return (
     <div ref={boite} className="adresse-wrap">
@@ -136,6 +141,7 @@ export default function ChampAdresse({
               autoComplete="off"
               role="combobox"
               aria-expanded={ouvert}
+              aria-controls="adresse-suggestions"
               aria-autocomplete="list"
             />
             <span className={`adresse-icon ${valeur.lat ? "ok" : ""}`} aria-hidden="true">
@@ -149,7 +155,7 @@ export default function ChampAdresse({
           </div>
 
           {ouvert && suggestions.length > 0 && (
-            <ul role="listbox" className="adresse-list">
+            <ul role="listbox" id="adresse-suggestions" className="adresse-list">
               {suggestions.map((s, i) => (
                 <li key={s.label + i} role="option" aria-selected={i === surligne}>
                   <button type="button" className={i === surligne ? "hl" : ""} onClick={() => retenir(s)} onMouseEnter={() => setSurligne(i)}>

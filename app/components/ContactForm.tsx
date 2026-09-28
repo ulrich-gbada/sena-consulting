@@ -1,8 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ChampAdresse, { type Adresse } from "./ChampAdresse";
+import EtapeCarrosserie from "./EtapeCarrosserie";
 import { FORM_SECTEURS } from "../data/segments";
+import {
+  type Carrosserie, type PieceJointe, CARROSSERIE_VIDE, SECTEUR_CARROSSERIE,
+  ATTENTES_CARROSSERIE, OFFRE_BILAN, SOURCE_REGEX, nettoyer, visible, lienCalendly,
+} from "../lib/carrosserie";
+
+type EtapeId = "identite" | "secteur" | "activite" | "attentes" | "rdv";
+const LIBELLES_ETAPES: Record<EtapeId, string> = {
+  identite: "Identité", secteur: "Secteur", activite: "Activité", attentes: "Attentes", rdv: "RDV",
+};
 
 // ─── Formulaire de demande d'audit (4 étapes) ───────────────────────────────
 // Utilisé sur la page d'accueil et sur chaque page « Sur mesure » (secteur préréglé).
@@ -17,7 +27,7 @@ export default function ContactForm({
   defaultSecteur?: string;
 }) {
   // ─── Formulaire multi-étapes ─────────────────────────────────────────────
-  const [step, setStep] = useState(1);
+  const [etape, setEtape] = useState<EtapeId>("identite");
   const [formData, setFormData] = useState({
     name: "", email: "", company: "", phone: "", taille: "", ca: "",
     secteur: defaultSecteur ?? "", secteurAutre: "",
@@ -25,6 +35,27 @@ export default function ContactForm({
   });
   const [adresse, setAdresse] = useState<Adresse>({ label: "", nom: "", codePostal: "", ville: "", lat: "", lon: "" });
   const [formStatus, setFormStatus] = useState("idle");
+
+  // ─── Branche Carrosserie (SPECS v1.0 §3, §5, §7) ─────────────────────────
+  const [carrosserie, setCarrosserie] = useState<Carrosserie>(CARROSSERIE_VIDE);
+  const [pieceJointe, setPieceJointe] = useState<PieceJointe | null>(null);
+  const [source, setSource] = useState("");
+  const estCarrosserie = formData.secteur === SECTEUR_CARROSSERIE;
+  const ETAPES: EtapeId[] = estCarrosserie
+    ? ["identite", "secteur", "activite", "attentes", "rdv"]
+    : ["identite", "secteur", "attentes", "rdv"];
+  const idx = ETAPES.indexOf(etape);
+  const suivante = () => setEtape(ETAPES[idx + 1]);
+  const precedente = () => setEtape(ETAPES[idx - 1]);
+
+  // Paramètres d'URL, lus une seule fois au montage. defaultSecteur (landing) l'emporte sur ?offre.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (q.get("offre") === OFFRE_BILAN && !defaultSecteur) setFormData((f) => ({ ...f, secteur: SECTEUR_CARROSSERIE }));
+    const src = q.get("src") ?? "";
+    if (SOURCE_REGEX.test(src)) setSource(src);
+  }, [defaultSecteur]);
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -42,17 +73,19 @@ export default function ContactForm({
   const handleStep3Submit = async () => {
     setFormStatus("sending");
     try {
+      const attentesEnvoyees = formData.attentes
+        .filter((a) => estCarrosserie || !ATTENTES_CARROSSERIE.includes(a))
+        .filter((a) => a !== "Autre")
+        .concat(formData.attentes.includes("Autre") && formData.attenteAutre ? [`Autre : ${formData.attenteAutre}`] : []);
       const body = {
         ...formData,
-        address: adresse.nom,
-        codePostal: adresse.codePostal,
-        ville: adresse.ville,
-        latitude: adresse.lat,
-        longitude: adresse.lon,
-        attentes: formData.attentes
-          .filter((a) => a !== "Autre")
-          .concat(formData.attentes.includes("Autre") && formData.attenteAutre ? [`Autre : ${formData.attenteAutre}`] : []),
+        address: adresse.nom, codePostal: adresse.codePostal, ville: adresse.ville,
+        latitude: adresse.lat, longitude: adresse.lon,
+        attentes: attentesEnvoyees,
         secteur: formData.secteur === "Autre" ? `Autre : ${formData.secteurAutre}` : formData.secteur,
+        source,                                                         // "" si absent
+        carrosserie: estCarrosserie ? nettoyer(carrosserie) : null,
+        pieceJointe: estCarrosserie && visible(carrosserie, "baremes2027") ? pieceJointe : null,
       };
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -60,13 +93,13 @@ export default function ContactForm({
         body: JSON.stringify(body),
       });
       const data = await res.json();
-      if (data.success) { setFormStatus("success"); setStep(4); }
+      if (data.success) { setFormStatus("success"); setEtape("rdv"); }
       else { setFormStatus("error"); }
     } catch { setFormStatus("error"); }
   };
 
   const secteurs = FORM_SECTEURS;
-  const attentesList = [
+  const attentesBase = [
     "Augmenter mon chiffre d'affaires",
     "Améliorer ma rentabilité / Vendre au meilleur prix",
     "Recruter les meilleurs talents",
@@ -75,6 +108,8 @@ export default function ContactForm({
     "Faire face à la concurrence des prix",
     "Autre",
   ];
+  const attentesList = estCarrosserie ? [...ATTENTES_CARROSSERIE, ...attentesBase] : attentesBase;
+  const urlCalendly = lienCalendly({ name: formData.name, email: formData.email, company: formData.company, source, carrosserie: estCarrosserie });
 
   return (
     <>
@@ -149,6 +184,7 @@ export default function ContactForm({
           .form-row { grid-template-columns: 1fr; }
           .secteur-grid { grid-template-columns: 1fr; }
         }
+        @media (max-width: 400px) { .step-circle { width: 30px; height: 30px; font-size: 12px; } .step-label { font-size: 10px; } }
       `}</style>
 
       <section className="contact" id="contact">
@@ -184,24 +220,24 @@ export default function ContactForm({
             <div>
               {/* Stepper */}
               <div className="stepper">
-                {["Identité", "Secteur", "Attentes", "RDV"].map((label, i) => {
+                {ETAPES.map((id, i) => {
                   const n = i + 1;
-                  const isActive = step === n;
-                  const isDone = step > n;
+                  const isActive = etape === id;
+                  const isDone = i < idx;
                   return (
-                    <div key={label} style={{ display: "flex", alignItems: "center", flex: 1 }}>
+                    <div key={id} style={{ display: "flex", alignItems: "center", flex: 1 }}>
                       <div className="step-item">
                         <div className={`step-circle ${isActive ? "active" : isDone ? "done" : ""}`}>{isDone ? "✓" : n}</div>
-                        <div className={`step-label ${isActive ? "active" : ""}`}>{label}</div>
+                        <div className={`step-label ${isActive ? "active" : ""}`}>{LIBELLES_ETAPES[id]}</div>
                       </div>
-                      {i < 3 && <div className={`step-connector ${isDone ? "done" : ""}`} />}
+                      {i < ETAPES.length - 1 && <div className={`step-connector ${isDone ? "done" : ""}`} />}
                     </div>
                   );
                 })}
               </div>
 
               {/* ÉTAPE 1 */}
-              {step === 1 && (
+              {etape === "identite" && (
                 <div>
                   <div className="form-row">
                     <div className="form-group"><label htmlFor="name">Nom complet *</label><input type="text" id="name" name="name" value={formData.name} onChange={handleChange} placeholder="Jean Dupont" /></div>
@@ -237,13 +273,13 @@ export default function ContactForm({
                     </div>
                   </div>
                   <div className="form-nav">
-                    <button className="btn-next" onClick={() => setStep(2)} disabled={!formData.name || !formData.email || !formData.ca}>Étape suivante →</button>
+                    <button className="btn-next" onClick={suivante} disabled={!formData.name || !formData.email || !formData.ca}>Étape suivante →</button>
                   </div>
                 </div>
               )}
 
               {/* ÉTAPE 2 */}
-              {step === 2 && (
+              {etape === "secteur" && (
                 <div>
                   <p style={{ color: "#2E4A6B", fontSize: 14, marginBottom: 20 }}>Quel est votre secteur d'activité ?</p>
                   <div className="secteur-grid">
@@ -260,14 +296,26 @@ export default function ContactForm({
                     </div>
                   )}
                   <div className="form-nav">
-                    <button className="btn-back" onClick={() => setStep(1)}>← Retour</button>
-                    <button className="btn-next" onClick={() => setStep(3)} disabled={!formData.secteur || (formData.secteur === "Autre" && !formData.secteurAutre)}>Étape suivante →</button>
+                    <button className="btn-back" onClick={precedente}>← Retour</button>
+                    <button className="btn-next" onClick={suivante} disabled={!formData.secteur || (formData.secteur === "Autre" && !formData.secteurAutre)}>Étape suivante →</button>
                   </div>
                 </div>
               )}
 
-              {/* ÉTAPE 3 */}
-              {step === 3 && (
+              {/* ÉTAPE ACTIVITÉ (carrosserie uniquement) */}
+              {etape === "activite" && (
+                <EtapeCarrosserie
+                  valeur={carrosserie}
+                  onChange={setCarrosserie}
+                  pieceJointe={pieceJointe}
+                  onPieceJointe={setPieceJointe}
+                  onRetour={precedente}
+                  onSuivant={suivante}
+                />
+              )}
+
+              {/* ÉTAPE ATTENTES */}
+              {etape === "attentes" && (
                 <div>
                   <p style={{ color: "#2E4A6B", fontSize: 14, marginBottom: 20 }}>Quels sont vos objectifs ? <span style={{ color: "#8A9BB0" }}>(plusieurs choix possibles)</span></p>
                   {attentesList.map((a) => (
@@ -284,19 +332,28 @@ export default function ContactForm({
                   )}
                   {formStatus === "error" && <div className="form-error">Une erreur est survenue. Veuillez réessayer ou nous contacter directement.</div>}
                   <div className="form-nav">
-                    <button className="btn-back" onClick={() => setStep(2)}>← Retour</button>
+                    <button className="btn-back" onClick={precedente}>← Retour</button>
                     <button className="btn-next" onClick={handleStep3Submit} disabled={formData.attentes.length === 0 || formStatus === "sending"}>{formStatus === "sending" ? "Envoi…" : "Confirmer →"}</button>
                   </div>
                 </div>
               )}
 
               {/* ÉTAPE 4 */}
-              {step === 4 && (
+              {etape === "rdv" && (
                 <div className="step4-wrap">
                   <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
                   <h3>Votre demande est enregistrée !</h3>
-                  <p>Merci {formData.name ? formData.name.split(" ")[0] : ""} — nous avons bien reçu votre demande d'audit.<br />Réservez maintenant votre créneau pour un rendez-vous avec Ulrich.</p>
-                  <a href="https://calendly.com/contact-sena-consulting/audit" target="_blank" rel="noopener noreferrer" className="btn-calendly">📅 Réserver mon audit gratuit</a>
+                  {estCarrosserie ? (
+                    <>
+                      <p>Merci {formData.name ? formData.name.split(" ")[0] : ""}. Réservez maintenant votre pré-diagnostic : 20 minutes au téléphone avec Ulrich. À la fin de l'appel, vous saurez si un Bilan vaut le coup pour vous.</p>
+                      <a href={urlCalendly} target="_blank" rel="noopener noreferrer" className="btn-calendly">📅 Réserver mon pré-diagnostic (20 min)</a>
+                    </>
+                  ) : (
+                    <>
+                      <p>Merci {formData.name ? formData.name.split(" ")[0] : ""} — nous avons bien reçu votre demande d'audit.<br />Réservez maintenant votre créneau pour un rendez-vous avec Ulrich.</p>
+                      <a href={urlCalendly} target="_blank" rel="noopener noreferrer" className="btn-calendly">📅 Réserver mon audit gratuit</a>
+                    </>
+                  )}
                   <p className="form-success-msg">Un email de confirmation vous a également été envoyé.</p>
                 </div>
               )}
