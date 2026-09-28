@@ -19,8 +19,10 @@ export default function ConfidentialitePage() {
         Via le formulaire de demande d&apos;audit : nom, adresse e-mail, société, téléphone, adresse, taille de l&apos;entreprise,
         chiffre d&apos;affaires, secteur d&apos;activité et attentes exprimées. Pour les carrossiers et garagistes : informations
         sur l&apos;activité de l&apos;atelier (agréments, nombre d&apos;assureurs, délais de paiement…) et, si vous en joignez une,
-        une page de barème ou de convention. Cette pièce n&apos;est pas stockée sur le site : elle est transmise par e-mail à
-        SENA CONSULTING uniquement.
+        une page de barème ou de convention. Pour les organismes de formation : informations sur l&apos;activité de
+        l&apos;organisme (certification Qualiopi, part du CPF, prix moyens, évolution des inscriptions…) et, si vous en joignez
+        un, votre catalogue tarifaire ou une fiche formation. Ces pièces ne sont pas stockées sur le site : elles sont
+        transmises par e-mail à SENA CONSULTING uniquement.
       </p>
 
       <h2>Finalité et base légale</h2>
