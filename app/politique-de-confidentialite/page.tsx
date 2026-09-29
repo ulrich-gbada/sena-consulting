@@ -21,7 +21,16 @@ export default function ConfidentialitePage() {
         sur l&apos;activité de l&apos;atelier (agréments, nombre d&apos;assureurs, délais de paiement, sinistres, cession de créance, avis clients…) et, si vous en joignez une,
         une page de barème ou de convention. Pour les organismes de formation : informations sur l&apos;activité de
         l&apos;organisme (certification Qualiopi, part du CPF, prix moyens, évolution des inscriptions…) et, si vous en joignez
-        un, votre catalogue tarifaire ou une fiche formation. Ces pièces ne sont pas stockées sur le site : elles sont
+        un, votre catalogue tarifaire ou une fiche formation. Pour les hôtels et hébergements : informations sur
+        l&apos;activité de l&apos;établissement (type, nombre de chambres, part des plateformes, participation au programme
+        Genius, réservation directe…) et, si vous en joignez un, un relevé de commissions ou une facture de plateforme. Pour
+        les opérateurs d&apos;activités : informations sur l&apos;activité (catégorie, nombre de participants, part des
+        plateformes, bons cadeaux, réservation directe…) et, si vous en joignez un, un relevé de paiement de plateforme.
+        Pour les restaurants : informations sur l&apos;activité (type d&apos;établissement, part de la livraison, formule et
+        promotions des plateformes, prix en livraison, commande directe…) et, si vous en joignez un, un relevé de versement
+        de plateforme. Pour les entreprises du bâtiment : informations sur l&apos;entreprise (effectif, type de clients,
+        retards de paiement, retenues de garantie, devis sans réponse) et, le cas échéant, l&apos;identifiant de prospection
+        figurant dans le lien que vous avez suivi. Ces pièces ne sont pas stockées sur le site : elles sont
         transmises par e-mail à SENA CONSULTING uniquement.
       </p>
 

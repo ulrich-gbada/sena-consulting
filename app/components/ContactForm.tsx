@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import ChampAdresse, { type Adresse } from "./ChampAdresse";
 import EtapeActivite from "./EtapeActivite";
 import { FORM_SECTEURS } from "../data/segments";
-import { type Reponses, type PieceJointe, SOURCE_REGEX, nettoyer, lienCalendly, offreDe } from "../lib/branche";
+import { type Reponses, type PieceJointe, SOURCE_REGEX, ID_REGEX, nettoyer, lienCalendly, offreDe, attentesDe } from "../lib/branche";
 import { BRANCHES, branchePour, branchePourOffre } from "../lib/branches";
 
 type EtapeId = "identite" | "secteur" | "activite" | "attentes" | "rdv";
@@ -45,6 +45,7 @@ export default function ContactForm({
   });
   const [pieceJointe, setPieceJointe] = useState<PieceJointe | null>(null);
   const [source, setSource] = useState("");
+  const [prospectId, setProspectId] = useState(""); // ?id= (identifiant de la liste de chasse, SPECS BTP §1)
   const branche = branchePour(formData.secteur);
   const activite: Reponses = branche ? (reponses[branche.id] ?? nettoyer(branche, {})) : {};
   const setActivite = (r: Reponses) => { if (branche) setReponses((all) => ({ ...all, [branche.id]: r })); };
@@ -66,6 +67,8 @@ export default function ContactForm({
     }
     const src = q.get("src") ?? "";
     if (SOURCE_REGEX.test(src)) setSource(src);
+    const id = q.get("id") ?? "";
+    if (ID_REGEX.test(id)) setProspectId(id);
   }, [defaultSecteur]);
 
 
@@ -85,7 +88,8 @@ export default function ContactForm({
     setFormStatus("sending");
     try {
       const attentesEnvoyees = formData.attentes
-        .filter((a) => !BRANCHES.some((b) => b !== branche && b.attentes.includes(a)))
+        // Une attente de branche n'est envoyée que si elle est affichée pour le secteur et les réponses courants
+        .filter((a) => !BRANCHES.some((b) => b.attentes.includes(a)) || (branche ? attentesDe(branche, activite).includes(a) : false))
         .filter((a) => a !== "Autre")
         .concat(formData.attentes.includes("Autre") && formData.attenteAutre ? [`Autre : ${formData.attenteAutre}`] : []);
       const body = {
@@ -95,6 +99,7 @@ export default function ContactForm({
         attentes: attentesEnvoyees,
         secteur: formData.secteur === "Autre" ? `Autre : ${formData.secteurAutre}` : formData.secteur,
         source,                                                         // "" si absent
+        prospectId,
         activite: branche ? nettoyer(branche, activite) : null,
         pieceJointe: branche && branche.fichier && branche.fichier.visible(activite) ? pieceJointe : null,
       };
@@ -119,8 +124,9 @@ export default function ContactForm({
     "Faire face à la concurrence des prix",
     "Autre",
   ];
-  const attentesList = branche ? [...branche.attentes, ...attentesBase] : attentesBase;
-  const urlCalendly = lienCalendly({ name: formData.name, email: formData.email, company: formData.company, source, offre: branche ? offreDe(branche, activite).offre : undefined });
+  const attentesList = branche ? [...attentesDe(branche, activite), ...attentesBase] : attentesBase;
+  const urlCalendly = lienCalendly({ name: formData.name, email: formData.email, company: formData.company, source, id: prospectId, offre: branche ? offreDe(branche, activite).offre : undefined });
+  const sansRdv = Boolean(branche && branche.horsCible && branche.score(nettoyer(branche, activite)).etiquette === "HORS CIBLE");
   const prenom = formData.name ? formData.name.split(" ")[0] : "";
 
   return (
@@ -356,7 +362,9 @@ export default function ContactForm({
                 <div className="step4-wrap">
                   <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
                   <h3>Votre demande est enregistrée !</h3>
-                  {branche ? (
+                  {branche && sansRdv ? (
+                    <p>{branche.horsCible!.rdv.replace("{prenom}", prenom)}</p>
+                  ) : branche ? (
                     <>
                       <p>{branche.rdv.texte.replace("{prenom}", prenom).replace("{offre}", offreDe(branche, activite).cible ? offreDe(branche, activite).nomOffre : "accompagnement").replace("si le accompagnement", "si un accompagnement")}</p>
                       <a href={urlCalendly} target="_blank" rel="noopener noreferrer" className="btn-calendly">{branche.rdv.bouton}</a>

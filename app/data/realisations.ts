@@ -29,6 +29,424 @@ export type Realisation = {
 
 export const REALISATIONS: Realisation[] = [
   // ─────────────────────────────────────────────────────────────────────────
+  // 8. Plan Argent Dormant — BTP (SPECS BTP v1.0 §4 et §6)
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    slug: "plan-argent-dormant-mystere-plomberie-chauffage",
+    titre: "Mystère Plomberie Chauffage : 148 490 € qui dormaient dans ses fichiers",
+    sousTitre: "Plan Argent Dormant — factures échues, retenues de garantie oubliées, travail fait non facturé et devis jamais relancés",
+    offre: "Plan Argent Dormant",
+    segment: "BTP",
+    segmentSlug: "btp",
+    date: "2026-09-29",
+    lecture: "6 min",
+    resume:
+      "Un plombier-chauffagiste fictif des Hauts-de-Seine, 11 salariés, 1,45 M€ de chiffre d'affaires, des clients professionnels qui paient à 60 jours et plus. En trois jours ouvrés, le Plan a passé ses quatre exports au crible : 86 400 € de factures échues, 18 650 € de retenues de garantie exigibles, 43 440 € de travail fait non facturé, et 94 devis jamais relancés pour 612 000 € HT. Au total, 148 490 € déjà gagnés hors devis, dont 104 641 € encaissables sous 30 à 60 jours en hypothèse prudente, avec la liste triée et les messages prêts à envoyer.",
+    chiffres: [
+      { value: "148 490 €", label: "identifiés, hors devis" },
+      { value: "104 641 €", label: "encaissables sous 30 à 60 jours (prudent)" },
+      { value: "94", label: "devis jamais relancés" },
+    ],
+    apercu: {
+      t: "bars", title: "Les quatre gisements : identifié et encaissable (prudent)", unit: "€",
+      categories: ["Factures échues", "Retenues de garantie", "Réalisé non facturé", "Acomptes sur devis"],
+      series: [{ name: "Identifié", values: [86400, 18650, 43440, 10461] }, { name: "Encaissable (prudent)", values: [43335, 13055, 37790, 10461] }],
+    },
+    pdf: "PLAN_ARGENT_DORMANT_EXEMPLE.pdf",
+    blocs: [
+      { t: "h2", c: "Le client" },
+      { t: "table", head: ["", ""], rows: [
+        ["Entreprise", "Mystère Plomberie Chauffage (fictive) — plomberie, chauffage, climatisation · Hauts-de-Seine (92)"],
+        ["Effectif", "11 salariés : le gérant, 8 techniciens, 1 chargé d'affaires, 1 assistante à mi-temps"],
+        ["Chiffre d'affaires", "1,45 M€ HT · clients professionnels (entreprises générales, syndics, bailleurs) et particuliers"],
+        ["Données utilisées", "Quatre exports : devis, factures, chantiers réceptionnés, travaux en cours"],
+      ]},
+      { t: "note", c: "Entreprise et montants fictifs. Les taux d'encaissement sont des hypothèses : le gain dépend des clients de l'entreprise, qui restent libres de payer ou non." },
+
+      { t: "h2", c: "Rubrique 1 — Les quatre gisements" },
+      { t: "stats", items: [
+        { value: "86 400 €", label: "de factures échues, dont 18 500 € à plus de 90 jours" },
+        { value: "18 650 €", label: "de retenues de garantie libérables depuis plus d'un an, jamais réclamées" },
+        { value: "43 440 €", label: "de travail fait non facturé : situations non émises, travaux supplémentaires" },
+        { value: "612 000 €", label: "de devis sans réponse (94 devis), dont 148 000 € jugés chauds" },
+      ]},
+      { t: "bars", title: "Identifié et encaissable sous 30 à 60 jours, par gisement", unit: "€",
+        categories: ["Factures échues", "Retenues de garantie", "Réalisé non facturé + travaux supp.", "Acomptes sur devis relancés"],
+        series: [{ name: "Identifié", values: [86400, 18650, 43440, 10461] }, { name: "Encaissable (prudent)", values: [43335, 13055, 37790, 10461] }] },
+      { t: "table", head: ["Gisement", "Identifié", "Encaissable (prudent)"], rows: [
+        ["Factures échues", "86 400 €", "43 335 €"],
+        ["Retenues de garantie", "18 650 €", "13 055 €"],
+        ["Réalisé non facturé + travaux supplémentaires", "43 440 €", "37 790 €"],
+        ["Acomptes sur devis relancés", "10 461 €", "10 461 €"],
+        ["**Total**", "**148 490 € (hors devis)**", "**104 641 €**"],
+      ]},
+      { t: "p", c: "Le gisement le plus rapide n'est pas le plus gros : le travail fait non facturé s'encaisse presque en totalité, parce qu'il suffit d'émettre la situation. Les factures échues, elles, dépendent des clients." },
+
+      { t: "h2", c: "Rubrique 2 — Les devis sans réponse" },
+      { t: "bars", title: "94 devis jamais relancés, triés par chances de signature", unit: "€",
+        categories: ["21 devis chauds", "38 devis tièdes", "35 devis froids"],
+        series: [{ name: "Montant HT", values: [148000, 261000, 203000] }] },
+      { t: "p", c: "Un devis chaud est un devis de moins de trois mois, pour un client déjà connu ou un chantier daté. Les 21 devis chauds reçoivent un SMS puis un appel ; les tièdes un e-mail avec une date de validité ; les froids une seule relance. Hypothèse retenue : 30 % de signature sur les chauds avec un acompte de 30 %, soit 10 461 € d'acomptes sous 30 jours." },
+
+      { t: "h2", c: "Rubrique 3 — Les factures en retard" },
+      { t: "bars", title: "Factures échues par tranche de retard", unit: "€",
+        categories: ["1 à 30 jours", "31 à 60 jours", "61 à 90 jours", "Plus de 90 jours"],
+        series: [{ name: "Montant TTC", values: [31800, 13400, 22700, 18500] }] },
+      { t: "table", head: ["Retard", "Montant", "Message", "Hypothèse d'encaissement"], rows: [
+        ["1 à 30 jours", "31 800 €", "R1 : rappel courtois, RIB joint", "80 %"],
+        ["31 à 60 jours", "13 400 €", "R2 : rappel des pénalités de retard et de l'indemnité de 40 €", "60 %"],
+        ["61 à 90 jours", "22 700 €", "R3 : dernier rappel avant mise en demeure", "35 %"],
+        ["Plus de 90 jours", "18 500 €", "Mise en demeure par le conseil du client ou son organisation professionnelle", "15 %"],
+      ]},
+      { t: "p", c: "Entre professionnels, les pénalités de retard et l'indemnité forfaitaire de 40 € par facture sont dues de plein droit (art. L441-10 du Code de commerce). Le Plan les calcule ; le dirigeant décide de les mentionner ou non." },
+
+      { t: "h2", c: "Rubrique 4 — Retenues de garantie et chantiers" },
+      { t: "p", c: "La retenue de garantie est plafonnée à 5 % du marché et doit être libérée un an après la réception, sauf opposition motivée du client (loi n° 71-584 du 16 juillet 1971). Sur 14 chantiers réceptionnés depuis plus d'un an, 9 retenues n'ont jamais été réclamées : **18 650 €**, dont 13 055 € encaissables sous 60 jours avec un simple courrier de demande de libération, chantier par chantier." },
+      { t: "p", c: "Côté chantiers en cours, 3 situations de travaux n'ont pas été émises et 6 travaux supplémentaires ont été réalisés sans avenant : **43 440 €** de travail déjà fait, dont 37 790 € facturables immédiatement." },
+
+      { t: "h2", c: "Rubrique 5 — Le plan des 10 premiers jours" },
+      { t: "ul", items: [
+        "**Jour 1** — Émettre les 3 situations et les 6 avenants (43 440 €). Envoyer les 9 courriers de libération de retenue.",
+        "**Jour 2** — Relances R1 et R2 sur les factures de moins de 60 jours (45 200 €).",
+        "**Jours 3 à 5** — SMS puis appel sur les 21 devis chauds ; e-mail sur les 38 tièdes.",
+        "**Jour 7** — Relances R3 ; point de suivi de 15 minutes : ce qui est rentré, ce qui bloque.",
+        "**Jour 10** — Dernière relance sur les devis froids ; dossiers de plus de 90 jours transmis au conseil ou à l'organisation professionnelle.",
+      ]},
+      { t: "p", c: "Temps du dirigeant : environ 6 heures sur 10 jours, messages fournis. Un seul indicateur : le montant encaissé chaque semaine, rapporté aux 104 641 € attendus." },
+
+      { t: "h2", c: "Ce que ce cas ne dit pas" },
+      { t: "p", c: "Il ne dit pas que les clients paieront : l'hypothèse prudente suppose qu'une partie ne répondra pas. Il ne dit pas non plus que les 612 000 € de devis se signeront : seuls les acomptes des devis chauds sont comptés. Ce qu'il dit, c'est que 148 490 € étaient déjà gagnés et n'avaient jamais été réclamés. Une seule retenue de garantie de 2 000 € récupérée paie quatre fois la mission." },
+      { t: "note", c: "Document d'exemple. Mystère Plomberie Chauffage est une entreprise fictive ; ses chiffres sont construits pour être plausibles pour une PME de cette taille, pas pour être moyens. Sena Consulting ne contacte jamais un débiteur : les messages partent de l'entreprise." },
+    ],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 7. Bilan Commissions · Restauration — Pizzeria Il Forno
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    slug: "bilan-commissions-restauration-pizzeria-il-forno",
+    titre: "Pizzeria Il Forno : 69 488 € par an versés aux plateformes de livraison",
+    sousTitre: "Bilan Commissions · Restauration · Express 72 h — ce qu'Uber Eats et Deliveroo coûtent, plat par plat, et ce qui revient dès les prochains relevés",
+    offre: "Bilan Commissions · Restauration",
+    segment: "Restauration",
+    segmentSlug: "restauration",
+    date: "2026-09-29",
+    lecture: "6 min",
+    resume:
+      "Une pizzeria indépendante de 45 places à Paris 11e, 7 salariés, 620 000 € de chiffre d'affaires dont un tiers en livraison via Uber Eats et Deliveroo, en formule Premium sans l'avoir jamais mesurée. Le bilan additionne ce que les plateformes prélèvent vraiment (commissions, promotions cofinancées, remboursements déduits : 35 % des ventes en livraison), calcule la marge de chaque plat en salle et en livraison, et chiffre cinq leviers. Les trois leviers immédiats rapportent 209 € par semaine, visibles dès les prochains relevés de versement.",
+    chiffres: [
+      { value: "69 488 €", label: "par an versés aux plateformes" },
+      { value: "35 %", label: "de chaque euro vendu en livraison" },
+      { value: "+10 861 €", label: "de marge par an avec les 3 leviers immédiats" },
+    ],
+    apercu: {
+      t: "bars", title: "Part du chiffre d'affaires par canal", unit: "%",
+      categories: ["Uber Eats", "Deliveroo", "Click & collect", "Sur place, emporter"],
+      series: [{ name: "Part du CA", values: [20, 12, 3, 65] }], max: 70,
+    },
+    pdf: "CAS_CLIENT_MYSTERE_BILAN_COMMISSIONS_RESTAURATION.pdf",
+    blocs: [
+      { t: "h2", c: "Le client" },
+      { t: "table", head: ["", ""], rows: [
+        ["Restaurant", "Pizzeria Il Forno (fictif) · Paris 11e · pizzeria, 45 places"],
+        ["Effectif", "7 salariés"],
+        ["Chiffre d'affaires 2025", "620 000 €, dont 198 400 € en livraison via les plateformes"],
+        ["Données utilisées", "Relevés de versement Uber Eats et Deliveroo sur 3 mois, export de caisse des ventes par plat, coûts matière estimés avec le gérant"],
+      ]},
+      { t: "note", c: "Document d'exemple. Pizzeria Il Forno est un restaurant fictif ; ses chiffres sont construits sur des ordres de grandeur du secteur et ne représentent aucune entreprise réelle." },
+
+      { t: "h2", c: "Rubrique 1 — Dépendance aux plateformes" },
+      { t: "bars", title: "Part du chiffre d'affaires par canal, 12 derniers mois", unit: "%",
+        categories: ["Uber Eats (Premium)", "Deliveroo", "Click & collect direct", "Sur place et à emporter"],
+        series: [{ name: "Part du CA", values: [20, 12, 3, 65] }], max: 70 },
+      { t: "table", head: ["Canal", "Part", "Chiffre d'affaires", "Commission", "Montant versé"], rows: [
+        ["Uber Eats (formule Premium)", "20 %", "124 000 €", "30 %", "37 200 €"],
+        ["Deliveroo", "12 %", "74 400 €", "30 %", "22 320 €"],
+        ["Click & collect direct", "3 %", "18 600 €", "—", "—"],
+        ["Sur place et à emporter", "65 %", "403 000 €", "—", "—"],
+      ]},
+
+      { t: "h2", c: "Rubrique 2 — Le coût réel" },
+      { t: "stats", items: [
+        { value: "59 520 €", label: "de commissions sur 12 mois" },
+        { value: "9 968 €", label: "de promotions cofinancées (6 000 €) et de remboursements clients déduits (3 968 €)" },
+        { value: "69 488 €", label: "au total : 35 % des ventes en livraison, 11,2 % du chiffre d'affaires" },
+      ]},
+      { t: "p", c: "Un tiers du chiffre d'affaires passe par la livraison, et plus d'un euro sur trois vendu en livraison repart vers la plateforme. Il Forno est en formule Premium sur Uber Eats (30 %) sans avoir mesuré ce que la visibilité supplémentaire lui rapporte." },
+
+      { t: "h2", c: "Rubrique 3 — La carte livraison, plat par plat" },
+      { t: "p", c: "Marge sur coût matière et emballage, en salle et en livraison, après 30 % de commission et 2 % de remboursements. Quatre plats gardent moins de 30 % en livraison." },
+      { t: "bars", title: "Marge par plat : en salle et en livraison (%)", unit: "%",
+        categories: ["Margherita", "Regina", "Quatre fromages", "Burrata truffe", "Calzone", "Carbonara", "Lasagnes", "Tiramisu", "Salade César", "Boisson"],
+        series: [{ name: "En salle", values: [71, 68, 61, 53, 67, 68, 58, 74, 59, 66] }, { name: "En livraison", values: [39, 36, 29, 21, 35, 36, 26, 42, 27, 34] }], max: 80 },
+      { t: "table", head: ["Plat", "Prix", "Matière + emballage", "Marge en salle", "Marge en livraison"], rows: [
+        ["Margherita", "11,00 €", "3,20 €", "7,80 € · 71 %", "4,28 € · 39 %"],
+        ["Regina", "13,50 €", "4,30 €", "9,20 € · 68 %", "4,88 € · 36 %"],
+        ["**Quatre fromages**", "14,50 €", "5,60 €", "8,90 € · 61 %", "**4,26 € · 29 %**"],
+        ["**Burrata truffe**", "18,00 €", "8,40 €", "9,60 € · 53 %", "**3,84 € · 21 %**"],
+        ["Calzone", "14,00 €", "4,60 €", "9,40 € · 67 %", "4,92 € · 35 %"],
+        ["Pâtes carbonara", "13,00 €", "4,20 €", "8,80 € · 68 %", "4,64 € · 36 %"],
+        ["**Lasagnes maison**", "14,00 €", "5,90 €", "8,10 € · 58 %", "**3,62 € · 26 %**"],
+        ["Tiramisu", "6,50 €", "1,70 €", "4,80 € · 74 %", "2,72 € · 42 %"],
+        ["**Salade César**", "12,50 €", "5,10 €", "7,40 € · 59 %", "**3,40 € · 27 %**"],
+        ["Boisson 33 cl", "3,50 €", "1,20 €", "2,30 € · 66 %", "1,18 € · 34 %"],
+      ]},
+      { t: "p", c: "Les mêmes plats gardent environ deux fois moins de marge en livraison qu'en salle. La burrata truffe, les lasagnes, la salade César et les quatre fromages descendent sous 30 % : ce sont eux qu'on augmente en premier sur la carte livraison, ou qu'on retire si la hausse ne passe pas. La marge présentée ne couvre ni la main-d'œuvre ni les charges fixes : un plat à 20 % de marge sur coût matière est, en pratique, vendu à perte en livraison." },
+
+      { t: "h2", c: "Rubrique 4 — Cinq leviers chiffrés" },
+      { t: "bars", title: "Gain de marge annuel par levier", unit: "€",
+        categories: ["Carte livraison +8 %", "Remboursements contestés", "Premium → Plus", "Promotions arrêtées", "Click & collect direct"],
+        series: [{ name: "Gain / an", values: [6785, 1984, 1934, 2092, 2698] }] },
+      { t: "table", head: ["Levier", "Effet", "Gain / an"], rows: [
+        ["Prix de la carte livraison +8 % (plats à marge faible en priorité)", "Prochain relevé", "+6 785 €"],
+        ["Contester les remboursements injustifiés", "Prochain relevé", "+1 984 €"],
+        ["Formule Uber Eats Premium → Plus", "Selon délai de la plateforme", "+1 934 €"],
+        ["Arrêter les promotions cofinancées non rentables", "Prochain relevé", "+2 092 €"],
+        ["Click & collect direct (8 % des commandes)", "4 à 8 semaines", "+2 698 €"],
+        ["**Total, scénario central**", "", "**+15 494 €**"],
+      ]},
+      { t: "p", c: "Hypothèses : prix +8 % en livraison avec 5 % de commandes en moins ; la moitié des remboursements injustifiés récupérée ; formule Plus au lieu de Premium avec 8 % de commandes Uber Eats en moins ; 60 % du budget promotions arrêté ; 8 % des commandes ramenées en direct avec 10 % de remise et 3 % de frais. Les trois leviers immédiats (prix, remboursements, promotions) rapportent **10 861 € par an, soit environ 209 € par semaine**, visibles dès les prochains relevés. Scénario prudent, si la moitié seulement se réalise : 7 747 € par an." },
+
+      { t: "h2", c: "Rubrique 5 — Le plan, semaine par semaine" },
+      { t: "ul", items: [
+        "**Semaine 1 — Carte livraison.** Hausse de 8 % des prix en livraison, en commençant par les 4 plats sous 30 % ; retrait de ceux qui ne passent pas. Mise à jour dans Uber Eats Manager et Deliveroo Hub.",
+        "**Semaine 1 — Remboursements.** Contester chaque remboursement sans photo ni motif clair, dans les délais de la plateforme.",
+        "**Semaine 1 — Promotions.** Arrêter les offres cofinancées dont la commande moyenne ne couvre pas la remise.",
+        "**Semaine 2 — Formule Uber Eats.** Demander le passage de Premium à Plus ; suivre les commandes pendant 4 semaines.",
+        "**Semaines 2 à 8 — Click & collect direct.** Bouton de commande sur la fiche Google et le site, flyer dans chaque sac livré avec une remise sur la commande directe suivante.",
+        "**Semaines 3 à 8 — Événements.** Soirées à thème vendues à l'avance par Instagram, la fiche Google et l'affichage en salle, jamais de SMS ou d'e-mail sans consentement.",
+      ]},
+      { t: "p", c: "Un seul indicateur : frais de plateforme ÷ ventes en livraison, relevé sur chaque versement. Il part ici de 35 %." },
+
+      { t: "h2", c: "Conclusion" },
+      { t: "p", c: "Il Forno vend bien en livraison, mais a fixé sa carte livraison comme sa carte en salle. Avec 30 % de commission, les mêmes prix ne laissent plus la même marge, et certains plats ne rapportent presque plus rien. Les trois leviers immédiats rapportent environ 209 € par semaine, dès les prochains relevés : le bilan est remboursé en moins d'un mois." },
+      { t: "note", c: "Taux de commission : Uber Eats 15 % (Lite), 25 % (Plus), 30 % (Premium) ; Deliveroo 25 à 35 % avec livraison (comparatifs professionnels 2026). Le gain dépend de la mise en œuvre par le restaurant et des réactions des clients : il n'est pas garanti." },
+    ],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 6. Bilan Commissions · Activités — Lumière Tours (avenant Tourisme §6)
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    slug: "bilan-commissions-activites-lumiere-tours",
+    titre: "Lumière Tours : 87 574 € par an versés aux plateformes",
+    sousTitre: "Bilan Commissions · Activités — ce que GetYourGuide et Viator coûtent à un opérateur, et ce que rapporte la vente directe",
+    offre: "Bilan Commissions · Activités",
+    segment: "Tourisme",
+    segmentSlug: "tourisme",
+    date: "2026-09-29",
+    lecture: "6 min",
+    resume:
+      "Un opérateur de visites à vélo et de food tours à Paris, 6 salariés et 10 guides indépendants, 7 400 participants et 481 000 € de chiffre d'affaires, dont 66 % via GetYourGuide et Viator. Ni bons cadeaux en ligne, ni réservation depuis Google, un site plus cher que la plateforme. Le bilan chiffre commissions et promotions canal par canal (87 574 € par an, 18,2 % du chiffre d'affaires), note la vente directe sur huit points (3 / 10) et calcule ce que rapporte chaque point de ventes ramené en direct : 6 662 € par an dans le scénario central, sans compter les bons cadeaux de Noël.",
+    chiffres: [
+      { value: "66 %", label: "des ventes via les plateformes" },
+      { value: "87 574 €", label: "de commissions et promotions par an" },
+      { value: "+6 662 €", label: "de marge par an (central, hors bons cadeaux)" },
+    ],
+    apercu: {
+      t: "bars", title: "Part du chiffre d'affaires par canal", unit: "%",
+      categories: ["GetYourGuide", "Viator", "Autres plateformes", "Site", "Entreprises, groupes", "Téléphone", "Bons cadeaux"],
+      series: [{ name: "Part du CA", values: [38, 22, 6, 14, 12, 5, 3] }], max: 40,
+    },
+    pdf: "CAS_CLIENT_MYSTERE_BILAN_COMMISSIONS_ACTIVITES.pdf",
+    blocs: [
+      { t: "h2", c: "Le client" },
+      { t: "table", head: ["", ""], rows: [
+        ["Opérateur", "Lumière Tours (fictif) · Paris"],
+        ["Activité", "Visites guidées à vélo et food tours · 6 salariés, 10 guides indépendants"],
+        ["Participants 2025", "7 400 participants · prix moyen 65 €"],
+        ["Chiffre d'affaires", "481 000 €"],
+        ["Données utilisées", "Relevés de paiement GetYourGuide et Viator sur 12 mois, export du logiciel de réservation, site, fiche Google"],
+      ]},
+      { t: "note", c: "Document d'exemple. Lumière Tours est un opérateur fictif ; ses chiffres sont construits sur des ordres de grandeur du secteur et ne représentent aucune entreprise réelle." },
+
+      { t: "h2", c: "Rubrique 1 — Dépendance aux plateformes" },
+      { t: "bars", title: "Part du chiffre d'affaires par canal de vente, 12 derniers mois", unit: "%",
+        categories: ["GetYourGuide", "Viator", "Autres plateformes", "Site (moteur)", "Entreprises, groupes", "Téléphone, e-mail, sur place", "Bons cadeaux"],
+        series: [{ name: "Part du CA", values: [38, 22, 6, 14, 12, 5, 3] }], max: 40 },
+      { t: "table", head: ["Canal", "Part", "Chiffre d'affaires", "Commission", "Montant versé"], rows: [
+        ["GetYourGuide", "38 %", "182 780 €", "25 %", "45 695 €"],
+        ["Viator", "22 %", "105 820 €", "22 %", "23 280 €"],
+        ["Autres plateformes", "6 %", "28 860 €", "20 %", "5 772 €"],
+        ["Site (moteur de réservation)", "14 %", "67 340 €", "—", "—"],
+        ["Entreprises, groupes, privatisations", "12 %", "57 720 €", "—", "—"],
+        ["Téléphone, e-mail, sur place", "5 %", "24 050 €", "—", "—"],
+        ["Bons cadeaux", "3 %", "14 430 €", "—", "—"],
+        ["**Total plateformes**", "**66 %**", "**317 460 €**", "", "**74 747 €**"],
+      ]},
+      { t: "p", c: "Deux participants sur trois arrivent par une plateforme, et GetYourGuide seul pèse 38 % du chiffre d'affaires. Les plateformes apportent des touristes étrangers que l'opérateur ne toucherait pas seul : elles restent utiles. Le sujet est ailleurs : une partie de ces ventes pourrait être faite en direct." },
+
+      { t: "h2", c: "Rubrique 2 — Le coût réel de la distribution" },
+      { t: "stats", items: [
+        { value: "74 747 €", label: "de commissions versées aux plateformes sur 12 mois" },
+        { value: "12 827 €", label: "de promotions (10 % sur 40 % des ventes GetYourGuide et Viator)" },
+        { value: "87 574 €", label: "de coût total, soit 18,2 % du chiffre d'affaires" },
+      ]},
+      { t: "table", head: ["Ce que ça représente", ""], rows: [
+        ["Par jour", "240 €"],
+        ["Par participant vendu sur une plateforme", "17,93 €"],
+        ["Sur un billet à 65 € vendu sur GetYourGuide", "16,25 € de commission ; avec une promotion de 10 %, 21,13 €"],
+      ]},
+      { t: "p", c: "Les plateformes gardent l'adresse e-mail du client : l'opérateur ne peut pas le recontacter, et le client revient… sur la plateforme. Les avis s'accumulent sur la plateforme (1 240 sur GetYourGuide) plutôt que sur Google (85). Et le site est plus cher que GetYourGuide : le food tour du samedi est à 65 € sur la plateforme et à 69 € sur le site. Contrairement aux hôtels, aucune loi n'encadre les clauses de prix entre un opérateur d'activités et une plateforme : les conditions de chaque contrat sont vérifiées dans le bilan avant toute recommandation de prix." },
+
+      { t: "h2", c: "Rubrique 3 — Diagnostic de la vente directe" },
+      { t: "table", head: ["Point vérifié", "Constat", "Niveau"], rows: [
+        ["Prix du site face aux plateformes", "Plus cher que GetYourGuide (+4 € sur le food tour)", "**Critique**"],
+        ["Réservation depuis Google", "Non activée (moteur non connecté à Google)", "**Critique**"],
+        ["Bons cadeaux en ligne", "Non proposés, alors que Noël arrive", "**Critique**"],
+        ["Moteur de réservation", "Présent, 6 étapes, paiement peu adapté au téléphone", "À corriger"],
+        ["Avis Google", "85 avis, contre 1 240 sur GetYourGuide et 610 sur Viator", "À corriger"],
+        ["Données clients", "Aucune collecte d'e-mail le jour de l'activité", "À corriger"],
+        ["Entreprises, groupes, privatisations", "12 % du CA, sans page dédiée ni tarif groupe", "Opportunité"],
+        ["Hôtels partenaires (concierges)", "Aucun partenariat formalisé", "Opportunité"],
+      ]},
+      { t: "stats", items: [
+        { value: "3 / 10", label: "maturité de la vente directe aujourd'hui" },
+        { value: "6 / 10", label: "objectif à 90 jours, une fois le plan appliqué" },
+      ]},
+      { t: "p", c: "Les touristes étrangers découvrent l'opérateur sur les plateformes, et c'est normal. Mais trois publics pourraient acheter en direct : les Français qui offrent une activité (bons cadeaux), les entreprises et les groupes, et les clients qui cherchent l'opérateur par son nom sur Google. Aujourd'hui, aucun des trois n'a de raison de passer par le site." },
+
+      { t: "h2", c: "Rubrique 4 — Trois scénarios chiffrés" },
+      { t: "bars", title: "Gain de marge annuel selon le scénario", unit: "€",
+        categories: ["Prudent · 5 points", "Central · 8 points", "Ambitieux · 12 points"],
+        series: [{ name: "Gain de marge / an", values: [4164, 6662, 9993] }] },
+      { t: "table", head: ["Scénario", "Points ramenés", "Chiffre d'affaires basculé", "Gain de marge par an"], rows: [
+        ["Prudent", "5 points", "24 050 €", "4 164 €"],
+        ["**Central**", "**8 points**", "**38 480 €**", "**6 662 €**"],
+        ["Ambitieux", "12 points", "57 720 €", "9 993 €"],
+      ]},
+      { t: "p", c: "Une vente sur plateforme rapporte de 75 à 80 % du prix après commission, moins encore avec une promotion. La même vente en direct rapporte 91 % du prix : on déduit 6 % de coût du canal direct et 3 % pour un avantage offert au client. Chaque euro basculé rapporte donc en moyenne 17,3 % de marge en plus. Objectif retenu : le scénario central, passer de 34 % à 42 % de ventes directes, soit 6 662 € par an, sans compter les bons cadeaux vendus en plus à Noël." },
+
+      { t: "h2", c: "Rubrique 5 — Plan d'action sur 90 jours" },
+      { t: "ul", items: [
+        "**J1 → J15 — Bons cadeaux de Noël.** Mise en vente sur le site (module du moteur de réservation), page dédiée, envoi aux anciens clients directs, affiche au point de départ. Indicateur : bons vendus avant le 24 décembre.",
+        "**J1 → J15 — Prix et avantage direct.** Site jamais plus cher qu'une plateforme ; un avantage réservé au direct, affiché.",
+        "**J1 → J30 — Google.** Activités réservables depuis Google via le moteur de réservation ; routine d'avis Google avec QR code en fin d'activité.",
+        "**J15 → J45 — Entreprises et groupes.** Page « Groupes et privatisations », tarif groupe, envoi à 50 entreprises et comités d'entreprise.",
+        "**J30 → J60 — Hôtels partenaires.** 20 concierges d'hôtels du quartier, commission de 10 % et lien de réservation dédié.",
+        "**J60 → J90 — Données clients et programmes des plateformes.** Collecte de l'e-mail le jour de l'activité, avec consentement ; revoir l'intérêt des promotions à la lumière des chiffres.",
+      ]},
+      { t: "p", c: "Un seul indicateur chapeaute tout : le coût des plateformes rapporté au chiffre d'affaires, relevé chaque mois sur les relevés de paiement. Il part ici de 18,2 %. Aucune action ne demande de quitter les plateformes." },
+
+      { t: "h2", c: "Conclusion" },
+      { t: "p", c: "Lumière Tours a de bons produits et d'excellents avis. Son problème n'est pas la demande : c'est de laisser les plateformes encaisser 87 574 € par an, y compris sur des ventes qui pourraient se faire en direct. Le scénario central rapporte 6 662 € de marge par an. La première action, les bons cadeaux, peut rapporter dès décembre." },
+      { t: "note", c: "Taux de commission des plateformes d'activités : publications professionnelles 2026 (Viator 20 % standard, jusqu'à 25 à 30 % avec programmes ; GetYourGuide 20 à 30 %). Le gain dépend de la mise en œuvre du plan par l'opérateur : il n'est pas garanti." },
+    ],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 5. Bilan Commissions — Hôtel des Tilleuls (SPECS Hôtellerie §6)
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    slug: "bilan-commissions-hotel-des-tilleuls",
+    titre: "Hôtel des Tilleuls : 163 274 € par an versés aux plateformes",
+    sousTitre: "Bilan Commissions — ce que la distribution coûte vraiment à un hôtel indépendant, et ce que rapporte le retour au direct",
+    offre: "Bilan Commissions",
+    segment: "Hôtellerie",
+    segmentSlug: "hotellerie-restauration",
+    date: "2026-09-29",
+    lecture: "7 min",
+    resume:
+      "Un hôtel indépendant de 28 chambres à Paris, 80 % d'occupation, 142 € de prix moyen, 1,16 M€ de chiffre d'affaires dont 62 % via Booking.com, Expedia et les autres plateformes, un site plus cher que Booking.com. Le bilan additionne commissions et remise Genius (163 274 € par an, 14,1 % du chiffre d'affaires, 447 € par jour), note la vente directe sur huit points (3 / 10) et calcule ce que rapporte chaque point de réservations ramené en direct : 16 768 € de marge par an dans le scénario central, avec un plan de 90 jours qui ne quitte aucune plateforme.",
+    chiffres: [
+      { value: "62 %", label: "des réservations via les plateformes" },
+      { value: "163 274 €", label: "de commissions et remises par an" },
+      { value: "+16 768 €", label: "de marge par an (scénario central)" },
+    ],
+    apercu: {
+      t: "bars", title: "Part du chiffre d'affaires par canal", unit: "%",
+      categories: ["Booking.com", "Expedia", "Autres plateformes", "Site", "Téléphone", "Entreprises"],
+      series: [{ name: "Part du CA", values: [48, 11, 3, 9, 17, 12] }], max: 50,
+    },
+    pdf: "CAS_CLIENT_MYSTERE_BILAN_COMMISSIONS.pdf",
+    blocs: [
+      { t: "h2", c: "Le client" },
+      { t: "table", head: ["", ""], rows: [
+        ["Hôtel", "Hôtel des Tilleuls (fictif) · Paris 12e · hôtel indépendant 3 étoiles"],
+        ["Capacité", "28 chambres · taux d'occupation 80 % · prix moyen 142 €"],
+        ["Chiffre d'affaires hébergement", "1 160 992 €"],
+        ["Données utilisées", "Relevés de commissions Booking.com et Expedia sur 12 mois, ventes par canal du logiciel de gestion, site, fiche Google"],
+      ]},
+      { t: "note", c: "Document d'exemple. L'Hôtel des Tilleuls est un établissement fictif ; ses chiffres sont construits sur des ordres de grandeur du secteur et ne représentent aucune entreprise réelle." },
+
+      { t: "h2", c: "Rubrique 1 — Dépendance aux plateformes" },
+      { t: "bars", title: "Part du chiffre d'affaires par canal de réservation, 12 derniers mois", unit: "%",
+        categories: ["Booking.com", "Expedia", "Autres plateformes", "Site (moteur)", "Téléphone, e-mail", "Entreprises"],
+        series: [{ name: "Part du CA", values: [48, 11, 3, 9, 17, 12] }], max: 50 },
+      { t: "table", head: ["Canal", "Part", "Chiffre d'affaires", "Commission", "Montant versé"], rows: [
+        ["Booking.com", "48 %", "557 276 €", "18 %", "100 310 €"],
+        ["Expedia", "11 %", "127 709 €", "18 %", "22 988 €"],
+        ["Autres plateformes", "3 %", "34 830 €", "17 %", "5 921 €"],
+        ["Site (moteur de réservation)", "9 %", "104 489 €", "—", "—"],
+        ["Téléphone, e-mail", "17 %", "197 369 €", "—", "—"],
+        ["Entreprises", "12 %", "139 319 €", "—", "—"],
+        ["**Total plateformes**", "**62 %**", "**719 815 €**", "", "**129 218 €**"],
+      ]},
+      { t: "p", c: "Près de deux réservations sur trois passent par une plateforme, et Booking.com seul pèse près de la moitié du chiffre d'affaires. Les plateformes apportent des clients que l'hôtel ne toucherait pas seul : elles restent utiles. Le sujet est ailleurs : une partie de ces réservations, celles des clients réguliers, des entreprises et des clients qui cherchent l'hôtel par son nom, pourrait être faite en direct." },
+
+      { t: "h2", c: "Rubrique 2 — Le coût réel de la distribution" },
+      { t: "stats", items: [
+        { value: "129 218 €", label: "de commissions versées aux plateformes sur 12 mois" },
+        { value: "34 056 €", label: "de remises Genius (10 % sur 55 % des réservations Booking.com)" },
+        { value: "163 274 €", label: "de coût total, soit 14,1 % du chiffre d'affaires" },
+      ]},
+      { t: "table", head: ["Ce que ça représente", ""], rows: [
+        ["Par jour", "447 €"],
+        ["Par chambre et par an", "5 831 €"],
+        ["Par nuitée vendue sur une plateforme", "32,21 €"],
+      ]},
+      { t: "p", c: "La commission n'est qu'une partie du coût. La remise Genius, consentie pour garder la visibilité sur Booking.com, en est une autre. Et le site de l'hôtel est plus cher que Booking.com : le 14 novembre, la chambre double est à 139 € sur Booking.com (tarif Genius) et à 145 € sur le site. Un client qui compare réserve donc là où l'hôtel paie 18 % de commission." },
+
+      { t: "h2", c: "Rubrique 3 — Diagnostic de la réservation directe" },
+      { t: "p", c: "Huit points vérifiés, depuis l'extérieur comme un client, puis avec l'équipe de réception." },
+      { t: "table", head: ["Point vérifié", "Constat", "Niveau"], rows: [
+        ["Prix du site face aux plateformes", "Plus cher que Booking.com (+6 € le 14/11 : 139 € en tarif Genius, 145 € sur le site)", "**Critique**"],
+        ["Avantage réservé au direct", "Aucun", "**Critique**"],
+        ["Moteur de réservation", "Présent, 5 étapes, peu lisible sur téléphone", "À corriger"],
+        ["Réservation depuis Google (liens gratuits)", "Non activée", "**Critique**"],
+        ["Fiche Google", "212 avis, contre 1 480 sur Booking.com ; photos de 2021", "À corriger"],
+        ["Clients réguliers", "Aucune relance ; e-mails non collectés à l'arrivée", "À corriger"],
+        ["Entreprises du quartier", "12 % du chiffre d'affaires, sans contrat ni tarif négocié", "Opportunité"],
+        ["Demandes par téléphone et e-mail", "Délai de réponse non suivi ; devis non relancés", "À corriger"],
+      ]},
+      { t: "stats", items: [
+        { value: "3 / 10", label: "maturité de la réservation directe aujourd'hui" },
+        { value: "7 / 10", label: "objectif à 90 jours, une fois le plan appliqué" },
+      ]},
+      { t: "p", c: "L'hôtel ne manque pas de clients : il les laisse réserver au prix le plus cher pour lui. Trois points sont critiques et se corrigent en moins d'un mois, sans investissement lourd : le prix du site, un avantage réservé au direct et la réservation depuis Google." },
+
+      { t: "h2", c: "Rubrique 4 — Trois scénarios chiffrés" },
+      { t: "bars", title: "Gain de marge annuel selon le scénario", unit: "€",
+        categories: ["Prudent · 6 points", "Central · 10 points", "Ambitieux · 15 points"],
+        series: [{ name: "Gain de marge / an", values: [10061, 16768, 25153] }] },
+      { t: "table", head: ["Scénario", "Points ramenés", "Chiffre d'affaires basculé", "Gain de marge par an"], rows: [
+        ["Prudent", "6 points", "69 660 €", "10 061 €"],
+        ["**Central**", "**10 points**", "**116 099 €**", "**16 768 €**"],
+        ["Ambitieux", "15 points", "174 149 €", "25 153 €"],
+      ]},
+      { t: "p", c: "Une réservation sur plateforme rapporte 82 % du prix après commission, et 73,8 % quand la remise Genius s'applique. La même réservation en direct rapporte 93 % du prix : on déduit 5 % de coût du canal direct (moteur de réservation, liens Google) et 2 % pour l'avantage offert au client direct (petit-déjeuner ou départ tardif, plutôt qu'une baisse de prix). Chaque euro basculé rapporte donc en moyenne 14,4 % de marge en plus. Objectif retenu : le scénario central. Ramener 10 points, c'est passer de 38 % à 48 % de ventes directes, environ 1 réservation sur 6 prise aujourd'hui sur une plateforme. Le gain, 16 768 € par an, équivaut au coût annuel d'un réceptionniste à mi-temps." },
+
+      { t: "h2", c: "Rubrique 5 — Plan d'action sur 90 jours" },
+      { t: "ul", items: [
+        "**J1 → J15 — Prix et avantage direct.** Aligner le site au moins sur le tarif Genius, ajouter un avantage réservé au direct (petit-déjeuner ou départ à 13 h), l'afficher sur le site et à la réception. Indicateur : site jamais plus cher qu'une plateforme (contrôle hebdomadaire).",
+        "**J1 → J30 — Google.** Activer les liens de réservation gratuits via le moteur de réservation, mettre à jour photos et description, répondre à tous les avis, lancer une routine d'avis au départ. Indicateur : réservations issues de Google par mois.",
+        "**J15 → J45 — Moteur de réservation.** Réduire le parcours à 3 étapes et le rendre lisible sur téléphone. Indicateur : taux de transformation du site.",
+        "**J30 → J60 — Clients réguliers.** Collecter l'e-mail à l'arrivée, avec consentement ; message après séjour avec un code direct. Indicateur : part des clients qui reviennent en direct.",
+        "**J30 → J90 — Entreprises du quartier.** Contrat de tarif négocié pour les 20 entreprises qui envoient déjà des clients. Indicateur : contrats signés, nuitées entreprises.",
+        "**J60 → J90 — Réglages Booking.com.** Revoir le niveau de remise Genius et l'intérêt du programme Preferred à la lumière des chiffres. Indicateur : coût total des plateformes / chiffre d'affaires.",
+      ]},
+      { t: "p", c: "Un seul indicateur chapeaute tout : le coût des plateformes rapporté au chiffre d'affaires, relevé chaque mois. Il part ici de 14,1 %. Aucune action ne demande de quitter les plateformes." },
+
+      { t: "h2", c: "Ce que dit la loi, en clair" },
+      { t: "p", c: "Un hôtel a le droit de vendre moins cher en direct : les clauses de parité tarifaire sont interdites en France (art. L311-5-1 du Code du tourisme) et, en Europe, par le Digital Markets Act depuis le 14 novembre 2024. Booking.com l'a confirmé en septembre 2026. Informations générales, pas un avis juridique." },
+
+      { t: "h2", c: "Conclusion" },
+      { t: "p", c: "L'hôtel des Tilleuls a une clientèle solide et un bon taux d'occupation. Son problème n'est pas de remplir : c'est de laisser les plateformes encaisser 163 274 € par an sur des clients dont une partie réserverait volontiers en direct, si le direct n'était pas plus cher et plus compliqué. Le scénario central rapporte 16 768 € de marge par an ; la première action, le prix du site, se met en place en quinze jours." },
+      { t: "note", c: "Taux de commission : Booking.com 15 à 18 % de base, remise Genius 10 à 20 % en plus (publications professionnelles 2026). Le gain dépend de la mise en œuvre du plan par l'hôtel : il n'est pas garanti." },
+    ],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
   // 4. Plan Libre Choix — Carrossiers non agréés (SPECS v1.2 §3)
   // ─────────────────────────────────────────────────────────────────────────
   {

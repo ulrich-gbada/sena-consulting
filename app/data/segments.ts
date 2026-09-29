@@ -18,7 +18,14 @@ export const SEGMENTS_COL_1: Segment[] = [
       { slug: "garagiste-carrossier-non-agree", label: "Non agréés" },
     ],
   },
-  { slug: "hotellerie-restauration", label: "Hôtellerie / Restauration" },
+  {
+    slug: "hotellerie-restauration",
+    label: "Hôtellerie / Restauration",
+    children: [
+      { slug: "hotellerie-restauration", label: "Hôtels" },
+      { slug: "restauration", label: "Restaurants" },
+    ],
+  },
 ];
 
 export const SEGMENTS_COL_2: Segment[] = [
@@ -70,8 +77,16 @@ export type Offer = {
   pricingNotes?: string[];
   /** Bloc « Nos engagements » */
   commitments?: string[];
-  /** Exemple de résultat (optionnel) */
-  example?: { intro: string; stats: Stat[] };
+  /** Exemple de résultat (optionnel) ; `article` : slug du cas concret dans /realisations */
+  example?: { intro: string; stats: Stat[]; article?: string };
+  /** Encadré juridique ou de contexte, sous « Le constat » (optionnel) */
+  legal?: { title: string; text: string };
+  /** Tableau (ex. les 4 gisements du Plan Argent Dormant), sous « Ce que vous recevez » (optionnel) */
+  table?: { title: string; head: string[]; rows: string[][] };
+  /** Public visé, affiché sous le prix (optionnel) */
+  audience?: string;
+  /** Renvoi vers une offre voisine, sous le bandeau CTA (optionnel) */
+  related?: { text: string; href: string; cta: string };
   /** Texte du bouton principal */
   cta: string;
   /** Secteur présélectionné dans le formulaire */
@@ -389,8 +404,266 @@ const OFFER_AGENCES_IMMO: Offer = {
   formTitle: "Démonstration sur vos propres chiffres : pré-diagnostic offert",
 };
 
+
+const OFFER_HOTELLERIE: Offer = {
+  brand: "Bilan Commissions",
+  brandLine: "Une offre Sena Consulting · pour les hôtels indépendants · livré sous 5 jours ouvrés",
+  headline: "Plateformes de réservation : combien elles vous coûtent, combien vous pouvez récupérer",
+  sub: "Pour les hôtels indépendants. Le bilan chiffre vos commissions canal par canal et donne le plan pour ramener une partie de vos réservations en direct, sans quitter les plateformes.",
+  changedTitle: "Ce que la distribution coûte, sans que personne ne le calcule",
+  stats: [
+    { value: "15 à 18 %", label: "Commission de base de Booking.com" },
+    { value: "10 à 20 %", label: "Remise Genius consentie en plus" },
+    { value: "63 %", label: "Part des réservations des indépendants passée par les plateformes en 2025" },
+  ],
+  pains: [
+    { title: "Votre site est plus cher que Booking.com", text: "Vos clients réguliers comparent, puis réservent là où vous payez une commission." },
+    { title: "La remise Genius coûte presque autant qu'une commission", text: "Elle n'apparaît sur aucune facture : elle est déduite avant même que l'argent n'arrive." },
+    { title: "Personne ne vous dit ce que chaque canal coûte vraiment", text: "Commission, remises, programmes de visibilité : le coût réel se calcule, canal par canal, sur vos relevés." },
+  ],
+  legal: {
+    title: "Vous avez le droit de vendre moins cher en direct",
+    text: "Les clauses de parité tarifaire sont interdites en France depuis la loi Macron (art. L311-5-1 du Code du tourisme) et, en Europe, par le Digital Markets Act depuis le 14 novembre 2024. Booking.com l'a confirmé en septembre 2026 : votre prix sur votre site est libre.",
+  },
+  steps: [
+    { when: "Offert · 20 min", title: "Pré-diagnostic au téléphone", text: "Votre part de plateformes, vos canaux, l'ordre de grandeur en jeu. On vous dit si le bilan vaut le coup." },
+    { when: "Jour 0", title: "Les pièces", text: "Relevés de commissions sur 12 mois et ventes par canal. Rien d'autre à faire." },
+    { when: "5 jours ouvrés", title: "Le bilan", text: "Les 5 rubriques calculées sur vos chiffres, en PDF." },
+    { when: "45 min", title: "La restitution", text: "Nous passons en revue les scénarios et arrêtons le plan des 90 jours." },
+  ],
+  deliverables: [
+    "Dépendance — d'où viennent vos réservations, canal par canal, et ce que chaque canal prélève.",
+    "Coût réel — commissions, remise Genius et programmes de visibilité : par jour, par chambre, par nuitée.",
+    "Diagnostic du direct — les 8 points qui envoient vos clients sur les plateformes, notés sur 10.",
+    "Scénarios — ce que rapporte chaque point de réservations ramené en direct : prudent, central, ambitieux.",
+    "Plan 90 jours — les actions dans l'ordre, un indicateur par étape, sans quitter les plateformes.",
+  ],
+  pricing: [
+    { label: "Pré-diagnostic", value: "Offert", note: "20 minutes au téléphone, sans engagement. Si l'enjeu ne justifie pas le bilan, on vous le dit." },
+    { label: "Bilan Commissions", value: "890 €", note: "Les 5 rubriques sur vos chiffres, livré sous 5 jours ouvrés, restitution de 45 minutes incluse" },
+  ],
+  pricingNotes: [
+    "Tarif de lancement réservé aux 5 premiers hôtels, **puis 1 490 € pour les autres.** Réglé à la commande.",
+    "TVA non applicable, art. 293 B du CGI.",
+    "Pièces à fournir pour le bilan : relevés de commissions Booking.com et Expedia sur 12 mois, ventes par canal de votre logiciel de gestion, accès en lecture à votre extranet si possible.",
+  ],
+  commitments: [
+    "Pré-diagnostic offert, sans engagement.",
+    "Vos chiffres restent confidentiels. Ils ne sont jamais transmis à un tiers.",
+    "Si l'enjeu ne justifie pas le bilan, on vous le dit : vous ne signez que si le potentiel est réel.",
+    "Aucune action du plan ne demande de quitter les plateformes.",
+  ],
+  example: {
+    intro: "Hôtel des Tilleuls (fictif), 28 chambres à Paris, cas illustratif complet disponible dans nos réalisations :",
+    stats: [
+      { value: "62 %", label: "des réservations via les plateformes" },
+      { value: "163 274 €", label: "de commissions et remises par an, soit 14,1 % du chiffre d'affaires" },
+      { value: "+16 768 €", label: "de marge par an en appliquant notre plan (scénario central)" },
+    ],
+    article: "bilan-commissions-hotel-des-tilleuls",
+  },
+  related: {
+    text: "Restaurateur ? Les commissions des plateformes de livraison ont leur propre bilan, livré en 72 heures.",
+    href: "/sur-mesure/restauration",
+    cta: "Voir le Bilan Commissions · Restauration",
+  },
+  cta: "Réserver mon pré-diagnostic (20 min)",
+  formSecteur: "Hôtellerie / Tourisme",
+  formTitle: "Votre pré-diagnostic Bilan Commissions",
+};
+
+const OFFER_TOURISME_ACTIVITES: Offer = {
+  brand: "Bilan Commissions · Activités",
+  brandLine: "Une offre Sena Consulting · pour les opérateurs de visites, activités et excursions · livré sous 5 jours ouvrés",
+  headline: "GetYourGuide, Viator : combien elles vous coûtent, combien vous pouvez récupérer",
+  sub: "Pour les opérateurs de visites, activités et excursions. Le bilan chiffre vos commissions et promotions canal par canal, et donne le plan pour vendre en direct ce qui peut l'être : bons cadeaux, entreprises, groupes, clients qui vous cherchent par votre nom.",
+  changedTitle: "Ce que les plateformes prélèvent, et ce qu'elles gardent",
+  stats: [
+    { value: "20 à 30 %", label: "Commission de GetYourGuide et de Viator" },
+    { value: "60 cts", label: "Ce qu'il reste d'un euro vendu avec 15 % de promotion et 25 % de commission" },
+    { value: "0", label: "Adresse e-mail client transmise par la plateforme" },
+  ],
+  pains: [
+    { title: "Vos clients vous cherchent sur Google", text: "Et réservent… sur la plateforme, parce que rien ne les invite à réserver chez vous." },
+    { title: "Pas de bons cadeaux sur votre site", text: "Ceux qui veulent offrir votre activité paient une commission, alors qu'ils vous connaissent déjà." },
+    { title: "Les promotions coûtent presque autant qu'une commission", text: "Acceptées pour rester visible, elles n'apparaissent jamais comme un coût." },
+  ],
+  steps: [
+    { when: "Offert · 20 min", title: "Pré-diagnostic au téléphone", text: "Votre part de plateformes, vos canaux, l'ordre de grandeur en jeu. On vous dit si le bilan vaut le coup." },
+    { when: "Jour 0", title: "Les pièces", text: "Relevés de paiement des plateformes sur 12 mois et export des réservations. Rien d'autre à faire." },
+    { when: "5 jours ouvrés", title: "Le bilan", text: "Les 5 rubriques calculées sur vos chiffres, en PDF." },
+    { when: "45 min", title: "La restitution", text: "Nous passons en revue les scénarios et arrêtons le plan des 90 jours." },
+  ],
+  deliverables: [
+    "Dépendance — d'où viennent vos participants, canal par canal.",
+    "Coût réel — commissions et promotions, par participant et par an.",
+    "Diagnostic du direct — les 8 points qui envoient vos clients sur les plateformes, notés sur 10.",
+    "Scénarios — ce que rapporte chaque point de ventes ramené en direct : prudent, central, ambitieux.",
+    "Plan 90 jours — les actions dans l'ordre, bons cadeaux de Noël en tête.",
+  ],
+  pricing: [
+    { label: "Pré-diagnostic", value: "Offert", note: "20 minutes au téléphone, sans engagement. Si l'enjeu ne justifie pas le bilan, on vous le dit." },
+    { label: "Bilan Commissions · Activités", value: "690 €", note: "Les 5 rubriques sur vos chiffres, livré sous 5 jours ouvrés, restitution de 45 minutes incluse" },
+  ],
+  pricingNotes: [
+    "Tarif de lancement réservé aux 5 premiers opérateurs, **puis 990 € pour les autres.** Réglé à la commande.",
+    "TVA non applicable, art. 293 B du CGI.",
+    "Pièces à fournir pour le bilan : relevés de paiement des plateformes sur 12 mois, export des réservations de votre logiciel, accès en lecture à votre moteur de réservation si possible.",
+  ],
+  commitments: [
+    "Pré-diagnostic offert, sans engagement.",
+    "Vos chiffres restent confidentiels. Ils ne sont jamais transmis à un tiers.",
+    "Si l'enjeu ne justifie pas le bilan, on vous le dit : vous ne signez que si le potentiel est réel.",
+    "Aucune action du plan ne demande de quitter les plateformes.",
+  ],
+  example: {
+    intro: "Lumière Tours (fictif), visites à vélo et food tours à Paris, cas illustratif complet disponible dans nos réalisations :",
+    stats: [
+      { value: "66 %", label: "des ventes via les plateformes" },
+      { value: "87 574 €", label: "de commissions et promotions par an, soit 18,2 % du chiffre d'affaires" },
+      { value: "+6 662 €", label: "de marge par an en appliquant notre plan, hors bons cadeaux" },
+    ],
+    article: "bilan-commissions-activites-lumiere-tours",
+  },
+  cta: "Réserver mon pré-diagnostic (20 min)",
+  formSecteur: "Hôtellerie / Tourisme",
+  formTitle: "Votre pré-diagnostic Bilan Commissions · Activités",
+  formActivite: { typeEtab: "activite" },
+};
+
+const OFFER_RESTAURATION: Offer = {
+  brand: "Bilan Commissions · Restauration",
+  brandLine: "Une offre Sena Consulting · pour les restaurants livrés · Express 72 h",
+  headline: "Uber Eats, Deliveroo : combien ils vous coûtent, plat par plat, et ce que vous pouvez récupérer dès vos prochains relevés",
+  sub: "Pour les restaurants indépendants qui vendent en livraison. Le bilan mesure ce que les plateformes prélèvent vraiment, calcule la marge de chaque plat en salle et en livraison, et livre les leviers chiffrés en 72 heures.",
+  changedTitle: "Ce qu'un euro vendu en livraison laisse vraiment",
+  stats: [
+    { value: "15 à 30 %", label: "de commission selon la formule (Lite, Plus, Premium), avant promotions et remboursements" },
+    { value: "35 %", label: "de chaque euro vendu en livraison part en frais de plateforme dans notre cas illustratif" },
+    { value: "72 h", label: "pour recevoir votre bilan, après réception des pièces" },
+  ],
+  pains: [
+    { title: "La même carte en salle et en livraison", text: "Avec 30 % de commission, les mêmes prix ne laissent plus la même marge. Certains plats ne rapportent presque plus rien." },
+    { title: "Des frais que personne n'additionne", text: "Commission, promotions cofinancées, remboursements clients déduits : le vrai coût n'apparaît que sur les relevés de versement." },
+    { title: "Une formule jamais remise en question", text: "Premium, Plus, Lite : la visibilité supplémentaire se paie. Personne n'a mesuré ce qu'elle rapporte." },
+  ],
+  steps: [
+    { when: "Offert · 20 min", title: "Pré-diagnostic", text: "Au téléphone ou au restaurant : votre part de livraison, votre formule, votre carte. On vous dit si le bilan vaut le coup." },
+    { when: "Jour 0", title: "Les pièces", text: "Relevés de versement des 3 derniers mois, export de caisse des ventes par plat, prix d'achat des principaux ingrédients." },
+    { when: "72 heures", title: "Le bilan", text: "Les 5 rubriques calculées sur vos relevés et vos ventes par plat, en PDF." },
+    { when: "30 min", title: "La restitution", text: "Les leviers dans l'ordre, semaine 1 et semaine 2, puis les deux mois suivants." },
+  ],
+  deliverables: [
+    "Dépendance — la part de la livraison, plateforme par plateforme.",
+    "Coût réel — commissions, promotions cofinancées, remboursements : le taux de frais sur vos ventes en livraison.",
+    "Carte livraison — la marge de chaque plat en salle et en livraison, et les plats à corriger en premier.",
+    "Leviers chiffrés — ce que rapporte chaque levier, et quand : prix, remboursements, promotions, formule, commande directe.",
+    "Plan — semaine 1, semaine 2, puis les 2 mois suivants, avec un seul indicateur à suivre sur chaque relevé.",
+  ],
+  pricing: [
+    { label: "Pré-diagnostic", value: "Offert", note: "20 minutes au téléphone, sans engagement. Si l'enjeu ne justifie pas le bilan, on vous le dit." },
+    { label: "Bilan Commissions · Restauration · Express 72 h", value: "490 €", note: "Les 5 rubriques sur vos chiffres, livré sous 72 heures ouvrées, restitution de 30 minutes incluse" },
+  ],
+  pricingNotes: [
+    "Tarif de lancement, **puis 790 €.** Réglé à la commande.",
+    "TVA non applicable, art. 293 B du CGI.",
+    "Pièces à fournir pour le bilan : relevés de versement Uber Eats et Deliveroo des 3 derniers mois, export de caisse des ventes par plat, prix d'achat de vos principaux ingrédients.",
+  ],
+  commitments: [
+    "Pré-diagnostic offert, sans engagement.",
+    "Vos chiffres restent confidentiels. Ils ne sont jamais transmis à un tiers.",
+    "Les trois premiers leviers se lisent sur vos prochains relevés de versement : le bilan se rembourse en quelques semaines dans la plupart des cas.",
+    "Aucune action du plan ne demande de quitter les plateformes.",
+  ],
+  example: {
+    intro: "Pizzeria Il Forno (fictif), Paris 11e, 620 000 € de chiffre d'affaires dont un tiers en livraison, cas illustratif complet disponible dans nos réalisations :",
+    stats: [
+      { value: "69 488 €", label: "par an versés aux plateformes : commissions, promotions et remboursements" },
+      { value: "4 plats", label: "qui gardent moins de 30 % de marge en livraison" },
+      { value: "+209 € / sem.", label: "de marge avec les 3 leviers immédiats, soit 10 861 € par an" },
+    ],
+    article: "bilan-commissions-restauration-pizzeria-il-forno",
+  },
+  related: {
+    text: "Hôtelier ? Les commissions de Booking.com et d'Expedia ont leur propre bilan.",
+    href: "/sur-mesure/hotellerie-restauration",
+    cta: "Voir le Bilan Commissions pour les hôtels",
+  },
+  cta: "Réserver mon pré-diagnostic (20 min)",
+  formSecteur: "Restauration",
+  formTitle: "Votre pré-diagnostic Bilan Commissions · Restauration",
+};
+
+const OFFER_BTP: Offer = {
+  brand: "Plan Argent Dormant",
+  brandLine: "Une offre Sena Consulting · pour les entreprises du bâtiment · liste et messages en 3 jours ouvrés · garantie",
+  headline: "Votre trésorerie dort dans vos fichiers.",
+  sub: "Devis jamais relancés, factures en retard, retenues de garantie jamais réclamées, travail fait pas encore facturé. Ce n'est pas du chiffre d'affaires à trouver : c'est de l'argent déjà gagné, à encaisser.",
+  changedTitle: "Ce que vos fichiers contiennent déjà",
+  stats: [
+    { value: "60 j et plus", label: "de délai de paiement chez beaucoup de clients professionnels : c'est votre trésorerie qui finance l'attente" },
+    { value: "5 %", label: "de retenue de garantie sur chaque chantier, à libérer un an après la réception. Combien n'ont jamais été réclamées ?" },
+    { value: "40 €", label: "d'indemnité forfaitaire due de plein droit par facture en retard entre professionnels, en plus des pénalités" },
+  ],
+  pains: [
+    { title: "« Je n'ai pas le temps de relancer »", text: "Les devis partent, les factures aussi. Personne n'a le temps de rappeler : le chantier suivant a déjà commencé." },
+    { title: "« Mes clients paient en retard »", text: "Situations de novembre payées en janvier, factures à 60 jours, parfois plus. Vous avancez les matériaux et les salaires." },
+    { title: "« La retenue, je verrai plus tard »", text: "5 % de chaque chantier, libérables un an après la réception. Sans demande, l'argent reste chez le client." },
+  ],
+  steps: [
+    { when: "Offert · 20 min", title: "Pré-diagnostic au téléphone", text: "Vos retards, vos retenues, vos devis en attente. On vous dit si le Plan vaut le coup, et on ne vend pas sous le seuil de la garantie." },
+    { when: "Jour 0", title: "4 exports", text: "Devis, factures, chantiers réceptionnés, travaux en cours. Depuis votre logiciel ou vos fichiers Excel, on les sort ensemble si besoin." },
+    { when: "3 jours ouvrés", title: "La liste et les messages", text: "Le tableau trié des sommes à encaisser et les messages prêts à envoyer. Restitution de 30 minutes." },
+    { when: "J+7", title: "Le point de suivi", text: "15 minutes : ce qui est rentré, ce qui bloque, ce qu'on ajuste." },
+  ],
+  deliverables: [
+    "Le tableau trié des sommes à relancer, par gisement et par priorité : montant × chances de paiement.",
+    "Les messages prêts à envoyer : relance des devis, relances de factures R1 à R3, demande de libération de retenue, envoi des situations et avenants.",
+    "Le plan des 10 premiers jours : qui relancer, quand, avec quel message, pour environ 6 heures de votre temps.",
+    "La restitution de 30 minutes et le point de suivi de 15 minutes à J+7.",
+  ],
+  table: {
+    title: "Les quatre gisements",
+    head: ["Gisement", "Ce qu'on cherche", "Ce que vous recevez"],
+    rows: [
+      ["Devis sans réponse", "Les devis envoyés depuis 3 à 12 mois, jamais relancés", "Tri chaud / tiède / froid, SMS et e-mails de relance"],
+      ["Factures échues", "Les factures dépassées, par tranche de retard", "Relances R1 à R3, pénalités et indemnité de 40 € calculées"],
+      ["Retenues de garantie", "Les chantiers réceptionnés depuis plus d'un an", "Courrier de demande de libération, chantier par chantier"],
+      ["Travail fait non facturé", "Situations non émises, travaux supplémentaires non facturés", "Situations et avenants prêts à envoyer"],
+    ],
+  },
+  pricing: [
+    { label: "Pré-diagnostic", value: "Offert", note: "20 minutes au téléphone, sans engagement." },
+    { label: "Plan Argent Dormant", value: "490 €", note: "Tarif de lancement, réservé aux 10 premières entreprises, puis 790 €. Réglé à la commande." },
+  ],
+  pricingNotes: [
+    "**Garantie :** si nous identifions moins de 5 000 € de factures, retenues et travaux à encaisser (hors devis), vous êtes remboursé.",
+    "Prix nets, TVA non applicable, art. 293 B du CGI.",
+    "Références : loi n° 71-584 du 16 juillet 1971 (retenue de garantie) ; art. L441-10 du Code de commerce (pénalités de retard et indemnité forfaitaire).",
+  ],
+  audience: "Pour les entreprises du bâtiment de 3 à 49 salariés, second œuvre et gros œuvre, en Île-de-France.",
+  commitments: [
+    "Nous ne relançons jamais vos clients à votre place : les messages partent de chez vous, à votre nom.",
+    "Nous ne promettons pas que vos clients paieront. Nous garantissons ce que nous trouvons.",
+    "Vos fichiers restent confidentiels et sont supprimés à la fin de la mission. On peut travailler sans les coordonnées de vos clients.",
+    "Une seule retenue de garantie de 2 000 € récupérée paie quatre fois la mission.",
+  ],
+  example: {
+    intro: "Mystère Plomberie Chauffage (fictif), Hauts-de-Seine, 11 salariés, cas illustratif complet disponible dans nos réalisations :",
+    stats: [
+      { value: "148 490 €", label: "identifiés hors devis : factures échues, retenues, travail fait non facturé" },
+      { value: "104 641 €", label: "encaissables sous 30 à 60 jours, en hypothèse prudente" },
+      { value: "94 devis", label: "jamais relancés, 612 000 € HT" },
+    ],
+    article: "plan-argent-dormant-mystere-plomberie-chauffage",
+  },
+  cta: "Réserver le pré-diagnostic (20 min, offert)",
+  formSecteur: "BTP",
+  formTitle: "Votre pré-diagnostic Plan Argent Dormant",
+};
+
 export const SEGMENT_PAGES: SegmentPage[] = [
-  { slug: "btp", label: "BTP", audience: "Entreprises du bâtiment et des travaux publics", formSecteur: "BTP" },
+  { slug: "btp", label: "BTP", formSecteur: "BTP", offer: OFFER_BTP },
   { slug: "organisme-de-formation", label: "Organisme de formation", formSecteur: "Organisme de formation", offer: OFFER_ORGANISMES_FORMATION },
   {
     slug: "garagiste-carrossier", label: "Garagiste / Carrossier", formSecteur: "Garagiste / Carrossier",
@@ -402,8 +675,9 @@ export const SEGMENT_PAGES: SegmentPage[] = [
   },
   { slug: "garagiste-carrossier-agree", label: "Carrossiers agréés", parent: "Garagiste / Carrossier", formSecteur: "Garagiste / Carrossier", offer: OFFER_CARROSSIERS_AGREES },
   { slug: "garagiste-carrossier-non-agree", label: "Carrossiers non agréés", parent: "Garagiste / Carrossier", formSecteur: "Garagiste / Carrossier", offer: OFFER_CARROSSIERS_NON_AGREES },
-  { slug: "hotellerie-restauration", label: "Hôtellerie / Restauration", audience: "Hôtels, restaurants et établissements de bouche", formSecteur: "Hôtellerie / Tourisme" },
-  { slug: "tourisme", label: "Tourisme", audience: "Professionnels du tourisme et des loisirs", formSecteur: "Hôtellerie / Tourisme" },
+  { slug: "hotellerie-restauration", label: "Hôtellerie / Restauration", formSecteur: "Hôtellerie / Tourisme", offer: OFFER_HOTELLERIE },
+  { slug: "restauration", label: "Restaurants", parent: "Hôtellerie / Restauration", formSecteur: "Restauration", offer: OFFER_RESTAURATION },
+  { slug: "tourisme", label: "Tourisme", formSecteur: "Hôtellerie / Tourisme", offer: OFFER_TOURISME_ACTIVITES },
   { slug: "ecole-de-conduite", label: "École de conduite", formSecteur: "École de conduite", offer: OFFER_AUTO_ECOLES },
   { slug: "evenementiel", label: "Professionnels de l'Événementiel", formSecteur: "Professionnels de l'Événementiel", offer: OFFER_EVENEMENTIEL },
   { slug: "agences-immobilieres", label: "Agences immobilières", formSecteur: "Agences immobilières", offer: OFFER_AGENCES_IMMO },

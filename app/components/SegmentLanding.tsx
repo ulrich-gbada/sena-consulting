@@ -93,6 +93,29 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
 
         /* Exemple */
         .sl-example-intro { font-size: 15px; color: #2E4A6B; line-height: 1.7; margin: 0 0 24px; }
+        .sl-example-link { margin: 26px 0 0; }
+        .sl-example-link a { color: #C9A84C; font-weight: 700; text-decoration: none; font-size: 15px; }
+        .sl-example-link a:hover { text-decoration: underline; }
+
+        /* Encadré juridique */
+        .sl-legal { margin-top: 32px; background: #F4F5F7; border-left: 4px solid #1B2A3E; border-radius: 10px; padding: 24px 28px; }
+        .sl-legal h3 { margin: 0 0 8px; font-size: 17px; color: #1B2A3E; }
+        .sl-legal p { margin: 0; font-size: 14.5px; line-height: 1.7; color: #2E4A6B; }
+
+        /* Tableau */
+        .sl-table-wrap { margin-top: 40px; overflow-x: auto; }
+        .sl-table-wrap h3 { font-size: 20px; color: #1B2A3E; margin: 0 0 16px; }
+        .sl-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; font-size: 14.5px; }
+        .sl-table th { background: #1B2A3E; color: #F4F5F7; text-align: left; padding: 12px 16px; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; }
+        .sl-table td { padding: 13px 16px; border-bottom: 1px solid #e6e9ee; color: #2E4A6B; line-height: 1.55; vertical-align: top; }
+        .sl-table td:first-child { color: #1B2A3E; font-weight: 700; }
+
+        /* Pour qui */
+        .sl-audience { margin-top: 26px; font-size: 15px; color: #1B2A3E; font-weight: 600; }
+
+        /* Offre voisine */
+        .sl-related { background: #F4F5F7; padding: 28px 40px; text-align: center; font-size: 15px; color: #2E4A6B; }
+        .sl-related a { color: #1B2A3E; font-weight: 700; margin-left: 8px; }
 
         /* Prix */
         .sl-price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 26px; }
@@ -228,6 +251,12 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
                   </div>
                 ))}
               </div>
+              {o.legal && (
+                <div className="sl-legal">
+                  <h3>{o.legal.title}</h3>
+                  <p>{o.legal.text}</p>
+                </div>
+              )}
             </div>
           </section>
 
@@ -258,6 +287,15 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
                   <li key={d}><IconCheck />{d}</li>
                 ))}
               </ul>
+              {o.table && (
+                <div className="sl-table-wrap">
+                  <h3>{o.table.title}</h3>
+                  <table className="sl-table">
+                    <thead><tr>{o.table.head.map((h) => <th key={h}>{h}</th>)}</tr></thead>
+                    <tbody>{o.table.rows.map((r) => <tr key={r[0]}>{r.map((c, i) => <td key={i}>{c}</td>)}</tr>)}</tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </section>
 
@@ -276,6 +314,9 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
                     </div>
                   ))}
                 </div>
+                {o.example.article && (
+                  <p className="sl-example-link"><Link href={`/realisations/${o.example.article}`}>Lire le cas complet et télécharger l'exemple en PDF →</Link></p>
+                )}
               </div>
             </section>
           )}
@@ -299,6 +340,7 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
                   {o.pricingNotes.map((n) => <li key={n}><Inline text={n} /></li>)}
                 </ul>
               )}
+              {o.audience && <p className="sl-audience">{o.audience}</p>}
             </div>
           </section>
 
@@ -344,6 +386,11 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
             <p>20 minutes au téléphone. On regarde vos chiffres, on vous dit si l'enjeu justifie d'aller plus loin.</p>
             <a href="#contact" className="btn-dark">{o.cta}</a>
           </div>
+          {o.related && (
+            <div className="sl-related">
+              {o.related.text}<Link href={o.related.href}>{o.related.cta} →</Link>
+            </div>
+          )}
         </>
       ) : (
         /* ── SANS OFFRE : EN CONSTRUCTION ── */
