@@ -29,6 +29,83 @@ export type Realisation = {
 
 export const REALISATIONS: Realisation[] = [
   // ─────────────────────────────────────────────────────────────────────────
+  // 4. Plan Libre Choix — Carrossiers non agréés (SPECS v1.2 §3)
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    slug: "plan-libre-choix-carrosserie-mystere",
+    titre: "Carrosserie « Mystère » : 13 sinistres par mois partis chez un garage agréé",
+    sousTitre: "Plan Libre Choix — les sinistres qui passent devant l'atelier, et comment les faire entrer",
+    offre: "Plan Libre Choix",
+    segment: "Carrossiers non agréés",
+    segmentSlug: "garagiste-carrossier-non-agree",
+    date: "2026-09-29",
+    lecture: "6 min",
+    resume:
+      "Une carrosserie indépendante du Val-d'Oise, 4 personnes, sans aucun agrément. Sur 26 contacts liés à un sinistre chaque mois, 13 repartent ailleurs : 6 parce que le client croit devoir aller chez le garage de son assurance, 4 parce qu'il ne veut pas avancer les frais. Le diagnostic note la maturité libre choix de l'atelier sur six leviers (2,5 sur 10 aujourd'hui) et construit un plan de 90 jours : script d'accueil, cession de créance, dossier expert sans litige, fiche Google, avis, prescripteurs. Scénario prudent : +2,1 dossiers par mois, environ 16 k€ de marge brute par an.",
+    chiffres: [
+      { value: "13 / mois", label: "sinistres partis ailleurs" },
+      { value: "2,5 / 10", label: "maturité libre choix" },
+      { value: "16,4 k€", label: "de marge en plus par an (prudent)" },
+    ],
+    apercu: {
+      t: "bars", title: "Sinistres partis ailleurs, par raison (par mois)", unit: "",
+      categories: ["Orientés par l'assureur", "Avance de frais", "Devis non relancé", "Délai"],
+      series: [{ name: "Départs / mois", values: [6, 4, 2, 1] }],
+    },
+    pdf: "PLAN_LIBRE_CHOIX_EXEMPLE.pdf",
+    blocs: [
+      { t: "h2", c: "Le client" },
+      { t: "table", head: ["", ""], rows: [
+        ["Entreprise", "Carrosserie « Mystère » — carrosserie indépendante, Val-d'Oise (95)"],
+        ["Équipe", "4 personnes : le gérant, 2 carrossiers-peintres, 1 préparateur"],
+        ["Activité", "2 600 heures vendues sur 3 600 possibles (72 % d'occupation) · taux affiché 68 € HT"],
+        ["Sinistres", "13 dossiers réparés par mois · dossier moyen 1 480 € HT · marge brute 651 € par dossier"],
+        ["Assureurs", "Aucun agrément : l'atelier travaille en libre choix avec toutes les compagnies"],
+      ]},
+      { t: "note", c: "Données fictives, construites pour illustrer la méthode. Aucune carrosserie ni aucun assureur réel n'est visé." },
+      { t: "h2", c: "Ce que le diagnostic a montré" },
+      { t: "stats", items: [
+        { value: "13 / mois", label: "sinistres partis ailleurs après un appel ou un passage" },
+        { value: "0", label: "cession de créance : chaque client avance les frais" },
+        { value: "72 %", label: "d'occupation : l'atelier a de la place" },
+        { value: "1 180 €", label: "refusés par les assureurs en 2026 : facture au-dessus de l'accord de l'expert" },
+      ]},
+      { t: "h2", c: "Ce que dit la loi, en clair" },
+      { t: "table", head: ["Le texte", "Au comptoir"], rows: [
+        ["**Libre choix du réparateur** — art. L211-5-1 du Code des assurances (loi Hamon, 2014)", "« Votre assurance vous propose un garage. Elle ne peut pas vous l'imposer. »"],
+        ["**Cession de créance** — art. L211-5-2 (loi n° 2020-1508 du 3 décembre 2020)", "« Vous n'avancez pas les frais : votre assureur nous paie directement, hors franchise. »"],
+        ["**Limite du paiement** — Cour de cassation, 22 janvier 2026, n° 24-19.267", "Pas de travaux sans l'accord de l'expert ; la facture colle à l'accord."],
+        ["**Publicité** — art. L121-4 du Code de la consommation", "Jamais « agréé toutes assurances » : « Nous travaillons avec votre assurance, quelle qu'elle soit. »"],
+      ]},
+      { t: "note", c: "Informations générales, pas un avis juridique." },
+      { t: "h2", c: "Où partent les sinistres" },
+      { t: "bars", title: "Pourquoi 13 sinistres sur 26 sont partis (par mois)", unit: "",
+        categories: ["« Mon assurance m'envoie chez un agréé »", "« Je ne veux pas avancer les frais »", "Devis jamais relancé", "Délai trop long"],
+        series: [{ name: "Départs / mois", values: [6, 4, 2, 1] }] },
+      { t: "p", c: "10 départs sur 13 tiennent à deux phrases que l'accueil ne sait pas contrer. Ce n'est ni un problème de prix, ni un problème de qualité : c'est un problème d'information." },
+      { t: "h2", c: "La maturité libre choix de l'atelier" },
+      { t: "radar", title: "Six leviers notés sur 10 : aujourd'hui et objectif à 90 jours", max: 10,
+        axes: ["Accueil du sinistré", "Sans avance de frais", "Dossier expert", "Fiche Google", "Avis clients", "Prescripteurs"],
+        series: [
+          { name: "Aujourd'hui (2,5 / 10)", values: [3, 0, 4, 4, 3, 1] },
+          { name: "Objectif à 90 jours (7,3 / 10)", values: [8, 8, 8, 7, 7, 6] },
+        ]},
+      { t: "h2", c: "Le plan sur 90 jours" },
+      { t: "ul", items: [
+        "**Jours 1 à 7** — script d'accueil et carte « Vos droits » ; cession de créance ; check-list du dossier expert.",
+        "**Jour 7** — visite à l'atelier : répétition du script, QR code des avis, photos.",
+        "**Jours 7 à 30** — fiche Google remise à niveau, SMS d'avis à chaque restitution.",
+        "**Jours 15 à 60** — 30 prescripteurs locaux contactés : dépanneurs, garages mécaniques, auto-écoles, flottes, courtiers.",
+        "**J30, J60, J90** — point sur le tableau de bord : contacts, dossiers, cessions, avis.",
+      ]},
+      { t: "h2", c: "Ce que ça peut rapporter" },
+      { t: "bars", title: "Marge brute en plus par an, selon le scénario", unit: "€",
+        categories: ["Bas", "Prudent", "Central"],
+        series: [{ name: "Marge / an", values: [7033, 16410, 27741] }] },
+      { t: "p", c: "Hypothèses : entre 5 et 15 % des clients orientés par leur assureur, 15 à 35 % de ceux qui refusaient d'avancer les frais, et jusqu'à la moitié des devis non relancés. L'atelier a 1 000 heures libres par an : le scénario prudent en demande 277. Un seul dossier en plus paie le Plan." },
+    ],
+  },
+  // ─────────────────────────────────────────────────────────────────────────
   {
     slug: "bilan-agrements-carrosserie-mystere",
     titre: "Carrosserie « Mystère » : 40 % de l'activité payée au prix coûtant",
