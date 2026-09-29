@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import ChampAdresse, { type Adresse } from "./ChampAdresse";
 import EtapeActivite from "./EtapeActivite";
 import { FORM_SECTEURS } from "../data/segments";
-import { type Reponses, type PieceJointe, SOURCE_REGEX, nettoyer, lienCalendly } from "../lib/branche";
+import { type Reponses, type PieceJointe, SOURCE_REGEX, nettoyer, lienCalendly, offreDe } from "../lib/branche";
 import { BRANCHES, branchePour, branchePourOffre } from "../lib/branches";
 
 type EtapeId = "identite" | "secteur" | "activite" | "attentes" | "rdv";
@@ -19,10 +19,13 @@ export default function ContactForm({
   tag = "Passons à l'action",
   title = "Demandez votre audit gratuit",
   defaultSecteur,
+  defaultActivite,
 }: {
   tag?: string;
   title?: string;
   defaultSecteur?: string;
+  /** Réponses de l'étape « Activité » préremplies (landing d'une sous-offre) ; le visiteur peut les changer */
+  defaultActivite?: Record<string, string>;
 }) {
   // ─── Formulaire multi-étapes ─────────────────────────────────────────────
   const [etape, setEtape] = useState<EtapeId>("identite");
@@ -36,7 +39,10 @@ export default function ContactForm({
 
   // ─── Branches « Activité » (SPECS v1.0 §3, §5, §7, généralisées) ─────────
   // Les réponses sont gardées par branche : changer de secteur puis revenir ne les perd pas.
-  const [reponses, setReponses] = useState<Record<string, Reponses>>({});
+  const [reponses, setReponses] = useState<Record<string, Reponses>>(() => {
+    const b = branchePour(defaultSecteur);
+    return b && defaultActivite ? { [b.id]: nettoyer(b, defaultActivite) } : {};
+  });
   const [pieceJointe, setPieceJointe] = useState<PieceJointe | null>(null);
   const [source, setSource] = useState("");
   const branche = branchePour(formData.secteur);
@@ -53,8 +59,11 @@ export default function ContactForm({
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     const offre = branchePourOffre(q.get("offre"));
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (offre && !defaultSecteur) setFormData((f) => ({ ...f, secteur: offre.secteur }));
+    if (offre && !defaultSecteur) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFormData((f) => ({ ...f, secteur: offre.branche.secteur }));
+      setReponses((all) => ({ ...all, [offre.branche.id]: nettoyer(offre.branche, offre.activite) }));
+    }
     const src = q.get("src") ?? "";
     if (SOURCE_REGEX.test(src)) setSource(src);
   }, [defaultSecteur]);
@@ -111,7 +120,7 @@ export default function ContactForm({
     "Autre",
   ];
   const attentesList = branche ? [...branche.attentes, ...attentesBase] : attentesBase;
-  const urlCalendly = lienCalendly({ name: formData.name, email: formData.email, company: formData.company, source, offre: branche?.offre });
+  const urlCalendly = lienCalendly({ name: formData.name, email: formData.email, company: formData.company, source, offre: branche ? offreDe(branche, activite).offre : undefined });
   const prenom = formData.name ? formData.name.split(" ")[0] : "";
 
   return (
@@ -349,7 +358,7 @@ export default function ContactForm({
                   <h3>Votre demande est enregistrée !</h3>
                   {branche ? (
                     <>
-                      <p>{branche.rdv.texte.replace("{prenom}", prenom)}</p>
+                      <p>{branche.rdv.texte.replace("{prenom}", prenom).replace("{offre}", offreDe(branche, activite).cible ? offreDe(branche, activite).nomOffre : "accompagnement").replace("si le accompagnement", "si un accompagnement")}</p>
                       <a href={urlCalendly} target="_blank" rel="noopener noreferrer" className="btn-calendly">{branche.rdv.bouton}</a>
                     </>
                   ) : (

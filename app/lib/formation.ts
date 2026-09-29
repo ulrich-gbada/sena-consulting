@@ -72,7 +72,7 @@ export const BRANCHE_FORMATION: Branche = {
   ],
   mailInterne: { titre: "Organisme", objet: "Pré-diagnostic formation", erreur: "Informations sur l'organisme incomplètes." },
   rdv: {
-    texte: "Merci {prenom}. Réservez maintenant votre pré-diagnostic : 20 minutes au téléphone avec Ulrich. À la fin de l'appel, vous saurez si un Bilan Financements vaut le coup pour vous.",
+    texte: "Merci {prenom}. Réservez maintenant votre pré-diagnostic : 20 minutes au téléphone avec Ulrich. À la fin de l'appel, vous saurez si le {offre} vaut le coup pour vous.",
     bouton: "📅 Réserver mon pré-diagnostic (20 min)",
   },
 };

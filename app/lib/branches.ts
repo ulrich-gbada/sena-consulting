@@ -8,8 +8,8 @@
 // modèle de formation.ts, l'inscrire dans BRANCHES et dans CAS ci-dessous.
 // -----------------------------------------------------------------------------
 
-import { type Branche, type Reponses } from "./branche";
-import { BRANCHE_CARROSSERIE, SECTEUR_CARROSSERIE, estAgree } from "./carrosserie";
+import { type Branche, type Reponses, offreDe } from "./branche";
+import { BRANCHE_CARROSSERIE, SECTEUR_CARROSSERIE, OFFRE_BILAN, OFFRE_LIBRE_CHOIX } from "./carrosserie";
 import { BRANCHE_FORMATION, SECTEUR_FORMATION } from "./formation";
 
 export const BRANCHES: Branche[] = [BRANCHE_CARROSSERIE, BRANCHE_FORMATION];
@@ -18,15 +18,24 @@ export const BRANCHES: Branche[] = [BRANCHE_CARROSSERIE, BRANCHE_FORMATION];
 export const branchePour = (secteur: string | undefined | null): Branche | null =>
   BRANCHES.find((b) => b.secteur === secteur) ?? null;
 
-/** Branche associée à une valeur de ?offre= (liens e-mail, QR code de plaquette). */
-export const branchePourOffre = (offre: string | null): Branche | null =>
-  BRANCHES.find((b) => b.offre === offre) ?? null;
+/** Branche (et réponses préremplies) associée à une valeur de ?offre= (liens e-mail, QR code de plaquette). */
+export function branchePourOffre(offre: string | null): { branche: Branche; activite: Reponses } | null {
+  if (!offre) return null;
+  for (const b of BRANCHES) {
+    const so = b.sousOffres?.find((o) => o.offre === offre);
+    if (so) return { branche: b, activite: so.activite ?? {} };
+    if (b.offre === offre) return { branche: b, activite: {} };
+  }
+  return null;
+}
 
 // ── Cas concret joint au mail de confirmation (SPECS v1.1 §2) ───────────────
 const SITE = "https://www.sena-consulting.fr";
-const CAS: Record<"agrements" | "formation" | "audit", { slug: string; phrase: string }> = {
+const CAS: Record<"agrements" | "libreChoix" | "formation" | "audit", { slug: string; phrase: string }> = {
   agrements: { slug: "bilan-agrements-carrosserie-mystere",
     phrase: "Pour voir à quoi ressemble un Bilan, voici un exemple complet sur une carrosserie fictive :" },
+  libreChoix: { slug: "plan-libre-choix-carrosserie-mystere",
+    phrase: "Pour voir à quoi ressemble un Plan Libre Choix, voici un exemple complet sur une carrosserie fictive :" },
   formation: { slug: "bilan-financements-linea-formation",
     phrase: "Pour voir à quoi ressemble un Bilan Financements, voici un exemple complet sur un organisme de formation fictif :" },
   audit: { slug: "audit-strategique-pizzeria-bella-nocta",
@@ -35,8 +44,8 @@ const CAS: Record<"agrements" | "formation" | "audit", { slug: string; phrase: s
 
 /**
  * Cas concret à citer dans le mail de confirmation, ou null (aucun lien).
- * - Garagiste / Carrossier : lien UNIQUEMENT si l'atelier fait de la carrosserie et est agréé (direct ou réseau).
- *   Non agréé, mécanique seule ou réponses absentes : null.
+ * - Garagiste / Carrossier : agréé (direct ou réseau) → Bilan Agréments ; non agréé → Plan Libre Choix (depuis le 29/09/2026,
+ *   publication de la plaquette et du cas concret) ; mécanique seule ou réponses absentes → null.
  * - Organisme de formation : Bilan Financements (quelles que soient les réponses — décision v1.1 §2.1).
  * - Tout autre secteur (y compris « Autre : … ») : audit stratégique.
  * `existe` permet de vérifier que le slug est bien publié (getRealisation) ; sinon null.
@@ -48,8 +57,11 @@ export function casConcretPour(
 ): { url: string; phrase: string } | null {
   let cle: keyof typeof CAS;
   if (secteur === SECTEUR_CARROSSERIE) {
-    if (!r || r.carrosserie !== "oui" || !estAgree(r)) return null;
-    cle = "agrements";
+    const o = offreDe(BRANCHE_CARROSSERIE, r).offre;
+    if (!r || r.carrosserie !== "oui") return null;
+    if (o === OFFRE_BILAN) cle = "agrements";
+    else if (o === OFFRE_LIBRE_CHOIX) cle = "libreChoix";
+    else return null;
   } else if (secteur === SECTEUR_FORMATION) {
     cle = "formation";
   } else {

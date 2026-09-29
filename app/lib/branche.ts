@@ -42,7 +42,27 @@ export type Branche = {
   aMain: string[];                           // puces du bloc « ayez sous la main »
   mailInterne: { titre: string; objet: string; erreur: string }; // titre de section, préfixe d'objet, message 400
   rdv: { texte: string; bouton: string };    // étape RDV côté formulaire ({prenom} remplacé)
+  /** Sous-offres d'une même branche (ex. carrosserie : Bilan Agréments / Plan Libre Choix), selon les réponses.
+   *  Absent : la branche ne porte qu'une offre (offre, nomOffre, aMain, cible ci-dessus). */
+  sousOffres?: SousOffre[];
 };
+
+export type SousOffre = {
+  offre: string;                             // slug (?offre=, utm_campaign)
+  nomOffre: string;
+  activite?: Reponses;                       // réponses préremplies quand ?offre=<slug> est utilisé
+  concerne: (r: Reponses) => boolean;        // l'offre s'applique à ces réponses
+  aMain: string[];
+};
+
+/** Offre effectivement visée par un jeu de réponses : sous-offre concernée, sinon l'offre principale de la branche. */
+export function offreDe(b: Branche, r: Reponses | null): { offre: string; nomOffre: string; aMain: string[]; cible: boolean } {
+  if (r && b.sousOffres) {
+    const so = b.sousOffres.find((o) => o.concerne(r));
+    if (so) return { offre: so.offre, nomOffre: so.nomOffre, aMain: so.aMain, cible: true };
+  }
+  return { offre: b.offre, nomOffre: b.nomOffre, aMain: b.aMain, cible: Boolean(r && b.cible(r)) };
+}
 
 export const vide = (b: Branche): Reponses =>
   Object.fromEntries(b.champs.map((c) => [c.cle, ""]));

@@ -10,23 +10,34 @@ import { type Branche, type Reponses, type Etiquette } from "./branche";
 
 export const SECTEUR_CARROSSERIE = "Garagiste / Carrossier"; // libellé de FORM_SECTEURS (app/data/segments.ts)
 export const OFFRE_BILAN = "bilan-agrements";
+export const OFFRE_LIBRE_CHOIX = "plan-libre-choix";
 
 export const estAgree = (r: Reponses) => r.agrement === "direct" || r.agrement === "reseau";
 const carrosserie = (r: Reponses) => r.carrosserie === "oui";
 const agree = (r: Reponses) => carrosserie(r) && estAgree(r);
+export const estLibreChoix = (r: Reponses) => carrosserie(r) && r.agrement === "non";
 
 const NOTE_MECANIQUE = "Le Bilan Agréments concerne la carrosserie. Continuez : l'audit gratuit porte aussi sur le reste de votre activité.";
-const NOTE_NON_AGREE = "Le Bilan Agréments concerne les ateliers agréés. Continuez : nous parlerons de la façon d'attirer plus de clients en direct.";
+const NOTE_NON_AGREE = "Pas d'agrément : parlons du Plan Libre Choix. Quelques questions sur les sinistres qui passent chez vous.";
 
 export const ATTENTES_CARROSSERIE = [
   "Renégocier mes barèmes assureurs",
   "Attirer plus de clients en direct (hors assureurs)",
 ];
 
-/** Score de priorité sur 10 (null hors Bilan). CHAUD ≥ 6, TIÈDE 3 à 5, FROID ≤ 2. */
+/** Score de priorité sur 10 (null hors cible). CHAUD ≥ 6, TIÈDE 3 à 5, FROID ≤ 2.
+ *  Agréé → Bilan Agréments (SPECS v1.0) ; non agréé → Plan Libre Choix (SPECS Libre Choix v1.0). */
 export function scoreCarrosserie(c: Reponses): { points: number | null; etiquette: Etiquette } {
   if (c.carrosserie !== "oui") return { points: null, etiquette: "HORS CIBLE" };
-  if (!estAgree(c)) return { points: null, etiquette: "LIBRE CHOIX" };
+  if (!estAgree(c)) {
+    if (c.agrement !== "non") return { points: null, etiquette: "LIBRE CHOIX" };
+    let q = c.sinistresMois === "11-20" || c.sinistresMois === "gt20" ? 2 : c.sinistresMois === "5-10" ? 1 : 0;
+    q += c.departs === "souvent" ? 2 : c.departs === "parfois" || c.departs === "nsp" ? 1 : 0;
+    q += c.cession === "non" ? 2 : c.cession === "parfois" || c.cession === "nsp" ? 1 : 0;
+    q += c.ficheGoogle === "aucune" ? 2 : c.ficheGoogle === "peu" ? 1 : 0;
+    q += c.prescripteurs === "non" ? 2 : c.prescripteurs === "quelques" ? 1 : 0;
+    return { points: q, etiquette: q >= 6 ? "CHAUD" : q >= 3 ? "TIÈDE" : "FROID" };
+  }
   let p = c.agrement === "direct" ? 2 : 1;
   p += c.nbAssureurs === "2" ? 1 : c.nbAssureurs === "3" || c.nbAssureurs === "4+" ? 2 : 0;
   p += c.partAssureurs === "50-75" || c.partAssureurs === "gt75" ? 1 : 0;
@@ -68,6 +79,19 @@ export const BRANCHE_CARROSSERIE: Branche = {
       options: [["lt30", "Moins de 30 jours"], ["30-45", "30 à 45 jours"], ["45-60", "45 à 60 jours"], ["gt60", "Plus de 60 jours"], ["nsp", "Je ne sais pas"]] },
     { cle: "baremes2027", question: "Avez-vous reçu les propositions de barèmes 2027 ?", controle: "radio", obligatoire: true, visible: agree,
       options: [["oui", "Oui"], ["pasEncore", "Pas encore"], ["nsp", "Je ne sais pas"]] },
+    // ── Non agréés : Plan Libre Choix ──
+    { cle: "sinistresMois", question: "Combien de sinistres réparez-vous par mois ?", controle: "radio", obligatoire: true, visible: estLibreChoix,
+      options: [["lt5", "Moins de 5"], ["5-10", "5 à 10"], ["11-20", "11 à 20"], ["gt20", "Plus de 20"]] },
+    { cle: "departs", question: "Des sinistrés vous appellent ou passent, puis repartent chez le garage agréé de leur assurance ?", controle: "radio", obligatoire: true, visible: estLibreChoix,
+      options: [["souvent", "Oui, plusieurs fois par mois"], ["parfois", "Parfois"], ["rarement", "Rarement ou jamais"], ["nsp", "Je ne sais pas"]] },
+    { cle: "cession", question: "Proposez-vous la cession de créance (le client n'avance pas les frais) ?", controle: "radio", obligatoire: true, visible: estLibreChoix,
+      options: [["non", "Non"], ["parfois", "Parfois, à la demande"], ["oui", "Oui, systématiquement"], ["nsp", "Je ne sais pas ce que c'est"]] },
+    { cle: "ficheGoogle", question: "Votre fiche Google et vos avis clients", controle: "radio", obligatoire: true, visible: estLibreChoix,
+      options: [["active", "Fiche à jour, avis réguliers"], ["peu", "Fiche existante, peu d'avis récents"], ["aucune", "Pas de fiche ou fiche inactive"]] },
+    { cle: "prescripteurs", question: "Travaillez-vous avec des apporteurs (dépanneurs, garages mécaniques, auto-écoles, flottes, courtiers) ?", controle: "radio", obligatoire: true, visible: estLibreChoix,
+      options: [["non", "Non"], ["quelques", "Quelques-uns, sans suivi"], ["reseau", "Oui, un réseau actif"]] },
+    { cle: "refus", question: "Avez-vous eu des factures refusées ou réduites par un assureur depuis 2025 ?", controle: "radio", obligatoire: false, visible: estLibreChoix,
+      options: [["oui", "Oui"], ["non", "Non"], ["nsp", "Je ne sais pas"]] },
   ],
   fichier: { libelle: "Une page de barème ou de convention (photo ou PDF) — facultatif", visible: agree },
   attentes: ATTENTES_CARROSSERIE,
@@ -79,8 +103,22 @@ export const BRANCHE_CARROSSERIE: Branche = {
     "vos délais de paiement, assureur par assureur, si vous les connaissez.",
   ],
   mailInterne: { titre: "Atelier", objet: "Pré-diagnostic carrosserie", erreur: "Informations sur l'atelier incomplètes." },
+  sousOffres: [
+    { offre: OFFRE_BILAN, nomOffre: "Bilan Agréments", concerne: agree, activite: { carrosserie: "oui" },
+      aMain: [
+        "un barème d'un de vos assureurs (taux horaires et ingrédients peinture) ;",
+        "votre nombre d'heures facturées sur les 12 derniers mois, ou à défaut votre nombre de compagnons ;",
+        "vos délais de paiement, assureur par assureur, si vous les connaissez.",
+      ] },
+    { offre: OFFRE_LIBRE_CHOIX, nomOffre: "Plan Libre Choix", concerne: estLibreChoix, activite: { carrosserie: "oui", agrement: "non" },
+      aMain: [
+        "votre nombre de sinistres réparés par mois, et ceux qui repartent ailleurs après un appel ou un passage ;",
+        "votre dossier moyen (montant HT) ;",
+        "l'accès à votre fiche Google, si vous l'avez.",
+      ] },
+  ],
   rdv: {
-    texte: "Merci {prenom}. Réservez maintenant votre pré-diagnostic : 20 minutes au téléphone avec Ulrich. À la fin de l'appel, vous saurez si un Bilan vaut le coup pour vous.",
+    texte: "Merci {prenom}. Réservez maintenant votre pré-diagnostic : 20 minutes au téléphone avec Ulrich. À la fin de l'appel, vous saurez si le {offre} vaut le coup pour vous.",
     bouton: "📅 Réserver mon pré-diagnostic (20 min)",
   },
 };

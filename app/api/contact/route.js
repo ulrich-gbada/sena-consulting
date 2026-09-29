@@ -3,7 +3,7 @@ import { versionTexte } from '../../lib/email';
 import { getRealisation } from '../../data/realisations';
 import {
   SOURCE_REGEX, PJ_TYPES, PJ_MAX_BASE64, COULEUR_ETIQUETTE,
-  erreurs, nettoyer, libelle, lienCalendly,
+  erreurs, nettoyer, libelle, lienCalendly, offreDe,
 } from '../../lib/branche';
 import { branchePour, casConcretPour } from '../../lib/branches';
 
@@ -51,7 +51,7 @@ export async function POST(request) {
     // ── Branches « Activité » (SPECS v1.0 §8.1, généralisées) ──
     const src = typeof source === 'string' && SOURCE_REGEX.test(source) ? source : '';
     const branche = branchePour(secteur);
-    let c = null, points = null, etiquette = null;
+    let c = null, points = null, etiquette = null, offre = null;
     if (branche) {
       const brut = activite ?? carrosserie; // « carrosserie » : nom du champ dans les SPECS v1.0
       if (erreurs(branche, brut).length) {
@@ -59,6 +59,7 @@ export async function POST(request) {
       }
       c = nettoyer(branche, brut);
       ({ points, etiquette } = branche.score(c));
+      offre = offreDe(branche, c);
     }
     let pj = null, pjRefusee = false;
     if (branche && branche.fichier && branche.fichier.visible(c) && pieceJointe && typeof pieceJointe === 'object') {
@@ -68,7 +69,7 @@ export async function POST(request) {
         pj = { nom: nom.replace(/[^\w.\- ]/g, '_').slice(0, 80), type, base64 };
       } else pjRefusee = true;
     }
-    const urlCalendly = lienCalendly({ name, email, company, source: src, offre: branche?.offre });
+    const urlCalendly = lienCalendly({ name, email, company, source: src, offre: offre?.offre });
     const cas = casConcretPour(secteur, c, (slug) => Boolean(getRealisation(slug)));
     const blocCas = cas
       ? `<p style="color: #2E4A6B; line-height: 1.7;">${esc(cas.phrase)} <a href="${cas.url}" style="color: #C9A84C; font-weight: bold;">lire le cas concret</a>.</p>`
@@ -76,7 +77,7 @@ export async function POST(request) {
     const blocAtelier = branche ? `
             <h2 style="color: #1B2A3E; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; margin: 28px 0 8px;">${esc(branche.mailInterne.titre)}</h2>
             <div style="margin: 0 0 10px;">
-              <span style="display:inline-block;background:${COULEUR_ETIQUETTE[etiquette]};color:#fff;font-weight:bold;font-size:13px;padding:6px 12px;border-radius:4px;letter-spacing:1px;">${etiquette}</span>${points !== null ? ` <span style="color:#1B2A3E;font-size:14px;margin-left:8px;">Score : ${points} / 10</span>` : ''}
+              <span style="display:inline-block;background:${COULEUR_ETIQUETTE[etiquette]};color:#fff;font-weight:bold;font-size:13px;padding:6px 12px;border-radius:4px;letter-spacing:1px;">${etiquette}</span>${points !== null ? ` <span style="color:#1B2A3E;font-size:14px;margin-left:8px;">Score : ${points} / 10</span>` : ''}${offre.cible ? ` <span style="color:#8A9BB0;font-size:13px;margin-left:8px;">Offre : ${esc(offre.nomOffre)}</span>` : ''}
             </div>
             <table style="width: 100%; border-collapse: collapse;">
               ${branche.champs.map((ch) => row(esc(ch.question), libelle(branche, ch.cle, c[ch.cle]))).join('')}
@@ -155,12 +156,12 @@ export async function POST(request) {
               <a href="${urlCalendly}" style="background: #C9A84C; color: #1B2A3E; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px;">Réserver mon créneau</a>
             </div>
             ${blocCas}
-            ${branche.cible(c) ? `
+            ${offre.cible ? `
             <p style="color: #2E4A6B; line-height: 1.7; margin-bottom: 6px;">Pour que 20 minutes suffisent, ayez sous la main :</p>
             <ul style="color: #2E4A6B; line-height: 1.7; margin: 0 0 16px; padding-left: 20px;">
-              ${branche.aMain.map((l) => `<li>${esc(l)}</li>`).join('')}
+              ${offre.aMain.map((l) => `<li>${esc(l)}</li>`).join('')}
             </ul>` : ''}
-            <p style="color: #2E4A6B; line-height: 1.7;">À la fin de l'appel, je vous dis franchement si un Bilan vaut le coup pour vous, ou non.</p>
+            <p style="color: #2E4A6B; line-height: 1.7;">À la fin de l'appel, je vous dis franchement si ${offre.cible ? `le ${esc(offre.nomOffre)}` : 'un accompagnement'} vaut le coup pour vous, ou non.</p>
             <p style="color: #2E4A6B; line-height: 1.7;">Sans réservation de votre part, je reviendrai vers vous sous <strong>24 à 48 heures</strong> ouvrées.</p>` : `
             <p style="color: #1B2A3E; font-size: 16px; margin-top: 0;">Bonjour ${esc(name)},</p>
             <p style="color: #2E4A6B; line-height: 1.7;">Merci pour votre demande d'audit gratuit. Je l'ai bien reçue.</p>
@@ -192,7 +193,7 @@ export async function POST(request) {
       from: 'Ulrich GBADA — SENA CONSULTING <contact@sena-consulting.fr>',
       replyTo: 'contact@sena-consulting.fr',
       to: [email],
-      subject: branche ? `Votre pré-diagnostic ${branche.nomOffre} — SENA CONSULTING` : "Votre demande d'audit gratuit — SENA CONSULTING",
+      subject: branche ? `Votre pré-diagnostic ${offre.nomOffre} — SENA CONSULTING` : "Votre demande d'audit gratuit — SENA CONSULTING",
       html: htmlConfirmation,
       text: versionTexte(htmlConfirmation),
     });
