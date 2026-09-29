@@ -78,6 +78,8 @@ export type Offer = {
   formSecteur: string;
   /** Titre du bloc formulaire */
   formTitle: string;
+  /** Réponses de l'étape « Activité » préremplies dans le formulaire (landings à branche) */
+  formActivite?: Record<string, string>;
 };
 
 export type SegmentPage = {
@@ -134,6 +136,62 @@ const OFFER_EVENEMENTIEL: Offer = {
   cta: "Demander mon pré-diagnostic offert",
   formSecteur: "Professionnels de l'Événementiel",
   formTitle: "Parlons de vos devis : pré-diagnostic offert",
+};
+
+const OFFER_CARROSSIERS_NON_AGREES: Offer = {
+  brand: "Plan Libre Choix",
+  brandLine: "Une offre Sena Consulting · pour les carrossiers non agréés · 90 jours · garantie",
+  headline: "Vos clients ont le droit de venir chez vous. Aidez-les à le faire.",
+  sub: "Chaque mois, des automobilistes appellent votre atelier après un sinistre, puis partent chez le garage agréé de leur assurance. La loi leur laisse pourtant le choix du réparateur, sans avancer les frais. Le Plan Libre Choix installe chez vous ce qui les fait rester.",
+  changedTitle: "Ce que la loi permet, et que vos clients ignorent",
+  stats: [
+    { value: "Loi Hamon", label: "le client choisit son réparateur : l'assureur propose, il n'impose pas (art. L211-5-1 du Code des assurances)" },
+    { value: "0 € avancé", label: "avec la cession de créance, l'assureur vous paie directement (art. L211-5-2), hors franchise" },
+    { value: "Janv. 2026", label: "la Cour de cassation limite votre paiement à l'accord de l'expert : pas de travaux sans accord" },
+  ],
+  pains: [
+    { title: "« Mon assurance m'envoie ailleurs »", text: "Le client croit qu'il est obligé. Il ne l'est pas. Encore faut-il le lui dire, au bon moment, avec les bons mots." },
+    { title: "« Je ne veux pas avancer les frais »", text: "Avec la cession de créance, il n'avance rien. Si personne ne la lui propose, il part chez l'agréé." },
+    { title: "Des factures refusées", text: "Travaux lancés avant l'accord de l'expert, facture au-dessus de l'accord : l'assureur ne paie que ce qu'il a validé." },
+  ],
+  steps: [
+    { when: "Étape 1", title: "Pré-diagnostic offert, 20 min au téléphone", text: "Combien de sinistres repartent de chez vous, pourquoi, et ce que vaut de les récupérer." },
+    { when: "Jours 1 à 7", title: "Installation", text: "Script d'accueil, cession de créance, check-list du dossier expert." },
+    { when: "Jour 7", title: "Visite à l'atelier", text: "Répétition du script avec l'accueil, QR code des avis, photos de la fiche Google." },
+    { when: "J30 · J60 · J90", title: "Suivi", text: "Fiche Google, avis, prescripteurs du quartier, tableau de bord mensuel." },
+  ],
+  deliverables: [
+    "Le script d'accueil du sinistré, au téléphone et au comptoir, avec la carte « Vos droits » à remettre au client.",
+    "La cession de créance mise en place avec le modèle de votre organisation professionnelle, et son mode opératoire.",
+    "La check-list du dossier expert : photos, expertise à distance, accord avant travaux, facture égale à l'accord.",
+    "Votre fiche Google remise à niveau, et la routine des avis : QR code et SMS à la restitution du véhicule.",
+    "30 prescripteurs près de chez vous (dépanneurs, garages mécaniques, auto-écoles, flottes, courtiers), le courrier et le suivi.",
+    "Le tableau de bord mensuel et trois points de suivi, à 30, 60 et 90 jours.",
+  ],
+  pricing: [
+    { label: "Pré-diagnostic", value: "Offert", note: "20 minutes au téléphone, sans engagement" },
+    { label: "Plan Libre Choix", value: "600 €", note: "3 prélèvements de 200 € : à la signature, à 30 et à 60 jours" },
+    { label: "Garantie 90 jours", value: "300 € remboursés", note: "si moins de 3 dossiers en cession de créance, kit appliqué" },
+  ],
+  pricingNotes: ["TVA non applicable, art. 293 B du CGI.", "Un seul dossier en plus suffit, en général, à payer le Plan."],
+  commitments: [
+    "Nous ne parlons jamais à vos clients ni à leurs assureurs à votre place.",
+    "Rien de trompeur : jamais « agréé », jamais de promesse de franchise offerte. Seulement ce que la loi permet.",
+    "Aucun volume n'est promis. La garantie dit ce qui se passe si ça ne marche pas.",
+    "Vos chiffres restent confidentiels. Ils ne sont jamais transmis à un tiers.",
+  ],
+  example: {
+    intro: "Exemple sur une carrosserie fictive du Val-d'Oise, 4 personnes, sans agrément :",
+    stats: [
+      { value: "13 / mois", label: "sinistres partis ailleurs après un appel ou un passage" },
+      { value: "+2,1 / mois", label: "dossiers récupérés dans le scénario prudent" },
+      { value: "16,4 k€", label: "de marge brute en plus par an (scénario prudent)" },
+    ],
+  },
+  cta: "Demander mon pré-diagnostic offert",
+  formSecteur: "Garagiste / Carrossier",
+  formTitle: "Pré-diagnostic offert : combien de sinistres repartent de chez vous ?",
+  formActivite: { carrosserie: "oui", agrement: "non" },
 };
 
 const OFFER_CARROSSIERS_AGREES: Offer = {
@@ -339,11 +397,11 @@ export const SEGMENT_PAGES: SegmentPage[] = [
     audience: "Garages et carrosseries indépendants",
     subpages: [
       { slug: "garagiste-carrossier-agree", label: "Carrossiers agréés — Bilan Agréments Assureurs", status: "ready" },
-      { slug: "garagiste-carrossier-non-agree", label: "Carrossiers non agréés", status: "building" },
+      { slug: "garagiste-carrossier-non-agree", label: "Carrossiers non agréés — Plan Libre Choix", status: "ready" },
     ],
   },
   { slug: "garagiste-carrossier-agree", label: "Carrossiers agréés", parent: "Garagiste / Carrossier", formSecteur: "Garagiste / Carrossier", offer: OFFER_CARROSSIERS_AGREES },
-  { slug: "garagiste-carrossier-non-agree", label: "Carrossiers non agréés", parent: "Garagiste / Carrossier", audience: "Carrosseries indépendantes travaillant en libre choix", formSecteur: "Garagiste / Carrossier" },
+  { slug: "garagiste-carrossier-non-agree", label: "Carrossiers non agréés", parent: "Garagiste / Carrossier", formSecteur: "Garagiste / Carrossier", offer: OFFER_CARROSSIERS_NON_AGREES },
   { slug: "hotellerie-restauration", label: "Hôtellerie / Restauration", audience: "Hôtels, restaurants et établissements de bouche", formSecteur: "Hôtellerie / Tourisme" },
   { slug: "tourisme", label: "Tourisme", audience: "Professionnels du tourisme et des loisirs", formSecteur: "Hôtellerie / Tourisme" },
   { slug: "ecole-de-conduite", label: "École de conduite", formSecteur: "École de conduite", offer: OFFER_AUTO_ECOLES },

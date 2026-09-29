@@ -380,6 +380,7 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
         tag="Passons à l'action"
         title={o?.formTitle ?? "Demandez votre pré-diagnostic offert"}
         defaultSecteur={page.formSecteur}
+        defaultActivite={o?.formActivite}
       />
 
       <Footer />
