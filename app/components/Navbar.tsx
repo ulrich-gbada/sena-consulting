@@ -133,7 +133,9 @@ export default function Navbar() {
         /* Burger + menu mobile */
         .burger { display: none; flex-direction: column; cursor: pointer; gap: 6px; background: none; border: none; padding: 4px; }
         .burger span { display: block; width: 30px; height: 3px; background: #F4F5F7; }
-        .mobile-menu { display: none; flex-direction: column; background: #1B2A3E; padding: 16px 24px 24px; gap: 16px; position: fixed; top: 96px; left: 0; right: 0; z-index: 999; box-shadow: 0 12px 24px rgba(0,0,0,0.4); }
+        .mobile-menu { display: none; flex-direction: column; background: #1B2A3E; padding: 16px 24px 24px; gap: 16px; position: fixed; top: 96px; left: 0; right: 0; z-index: 999; box-shadow: 0 12px 24px rgba(0,0,0,0.4); max-height: calc(100vh - 96px); max-height: calc(100dvh - 96px); overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding-bottom: max(24px, env(safe-area-inset-bottom)); scrollbar-width: thin; scrollbar-color: rgba(201,168,76,0.6) transparent; }
+        .mobile-menu::-webkit-scrollbar { width: 5px; }
+        .mobile-menu::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.6); border-radius: 3px; }
         .mobile-menu.open { display: flex; }
         .mobile-menu a { color: #F4F5F7; text-decoration: none; font-size: 15px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); display: block; }
         .mobile-menu a:hover { color: #C9A84C; }
