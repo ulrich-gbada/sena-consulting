@@ -325,7 +325,7 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
           <section className="sl-section sl-white" id="prix">
             <div className="sl-inner">
               <div className="sl-tag">Le prix</div>
-              <h2 className="sl-title">Deux lignes, pas de surprise</h2>
+              <h2 className="sl-title">{o.pricingTitle ?? "Deux lignes, pas de surprise"}</h2>
               <div className={`sl-price-grid ${o.pricing.length === 1 ? "one" : ""}`}>
                 {o.pricing.map((p) => (
                   <div className="sl-price" key={p.label}>

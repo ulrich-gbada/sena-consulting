@@ -30,6 +30,7 @@ export const SEGMENTS_COL_1: Segment[] = [
 
 export const SEGMENTS_COL_2: Segment[] = [
   { slug: "tourisme", label: "Tourisme" },
+  { slug: "securite-privee", label: "Société de sécurité privée" },
   { slug: "ecole-de-conduite", label: "École de conduite" },
   { slug: "evenementiel", label: "Professionnels de l'Événementiel" },
   { slug: "agences-immobilieres", label: "Agences immobilières" },
@@ -47,6 +48,7 @@ export const FORM_SECTEURS = [
   "Restauration",
   "Organisme de formation",
   "Professionnels de l'Événementiel",
+  "Société de sécurité privée",
   "Autre",
 ];
 
@@ -74,6 +76,8 @@ export type Offer = {
   deliverables: string[];
   /** Bloc prix : lignes libellé / valeur, + mentions */
   pricing: { label: string; value: string; note?: string }[];
+  /** Titre du bloc prix (défaut : « Deux lignes, pas de surprise ») */
+  pricingTitle?: string;
   pricingNotes?: string[];
   /** Bloc « Nos engagements » */
   commitments?: string[];
@@ -662,6 +666,70 @@ const OFFER_BTP: Offer = {
   formTitle: "Votre pré-diagnostic Plan Argent Dormant",
 };
 
+const OFFER_SECURITE_PRIVEE: Offer = {
+  brand: "Sécurité privée · Dracar Ultimate",
+  brandLine: "Une offre Sena Consulting en trois étapes · pour les sociétés de sécurité privée · mise en ordre en 72 h",
+  headline: "Vos agents déclarés, vos cartes vérifiées, vos contrats à jour.",
+  sub: "Depuis le 1er octobre 2026, la déclaration des agents sur Dracar relève du code de déontologie (art. R. 631-15 du CSI). Le CNAPS attend une vérification des cartes au moins une fois par mois. Vos clients, eux, attendent la preuve.",
+  changedTitle: "Trois échéances, trois risques",
+  stats: [
+    { value: "1er octobre 2026", label: "Compte Dracar et déclaration des agents obligatoires. Un oubli est un manquement, constatable pendant 3 ans." },
+    { value: "Chaque mois", label: "Vérification de la validité des cartes. Un agent sans carte valide : 2 ans et 30 000 € (art. L. 617-7)." },
+    { value: "Depuis le 1er juillet", label: "Plus aucune vacation sous 6 heures. Les contrats à 4 h font payer des heures non facturées." },
+  ],
+  pains: [
+    { title: "« On n'a pas encore ouvert le compte Dracar »", text: "Depuis le 1er octobre, c'est un manquement au code de déontologie, constatable pendant trois ans. Il se corrige en 72 heures, avec une preuve datée." },
+    { title: "« Les cartes ont été vérifiées à l'embauche »", text: "Une carte expirée ou suspendue entre-temps, et l'agent est sur le terrain sans titre. Le délit de l'art. L. 617-7 vise l'employeur." },
+    { title: "« Le contrat prévoit 4 heures par jour »", text: "Depuis le 1er juillet, chaque vacation est payée 6 heures. Sans avenant, ce sont deux heures par jour payées et non facturées." },
+  ],
+  legal: {
+    title: "Ce que disent les textes",
+    text: "Décret n° 2025-1344 du 26 décembre 2025 et art. R. 631-15 du Code de la sécurité intérieure (déclaration des agents sur Dracar) ; art. L. 617-7 du CSI (emploi d'un agent sans carte professionnelle valide : 2 ans d'emprisonnement et 30 000 € d'amende) ; avenant n° 2 du 3 septembre 2025 à l'accord du 1er avril 2021, étendu par arrêté du 27 mai 2026 (vacation minimale de 6 heures, IDCC 1351). Sena Consulting n'est pas un organisme agréé par le CNAPS ; le rapport remis n'est pas une attestation officielle.",
+  },
+  steps: [
+    { when: "Offert · 20 min", title: "Pré-diagnostic au téléphone", text: "Où vous en êtes sur Dracar, combien de cartes sont à risque, quels contrats méritent un avenant. Vous repartez avec une décision, même si vous ne commandez rien." },
+    { when: "Jour 0", title: "Liste des agents", text: "Vous envoyez noms et NUB (7 chiffres). Nous préparons l'import." },
+    { when: "1 h 30 à 2 h", title: "Visio guidée", text: "Vous tapez vos identifiants, nous vous guidons. Vous gardez la main sur votre compte." },
+    { when: "Sous 72 h", title: "Registre et rapport", text: "Registre de preuves, rapport d'une page, liste des cartes à traiter." },
+  ],
+  deliverables: [
+    "Étape 1 · Pack Dracar Express — compte, établissements, gestionnaires ; import de vos agents ; contrôle de chaque carte ; registre de preuves et rapport d'une page.",
+    "Étape 2 · Veille Titres — vérification mensuelle tracée ; alerte 6 mois avant chaque échéance ; entrées et sorties préparées ; rapport d'une page à transmettre à vos clients.",
+    "Étape 3 · Bilan Vacations 6 h — écart coût / prix, site par site ; argumentaire et projet d'avenant ; préparation du rendez-vous client.",
+    "Une rémunération qui suit votre intérêt : prix fixe pour la mise en ordre, sur résultat pour la marge.",
+  ],
+  pricing: [
+    { label: "Pré-diagnostic", value: "Offert", note: "20 minutes au téléphone, sans engagement." },
+    { label: "Étape 1 · Pack Dracar Express", value: "290 €", note: "10 premières sociétés, puis 490 €. Jusqu'à 30 agents, +8 € par agent au-delà. Payé à la commande. Livré en 72 h ou remboursé." },
+    { label: "Étape 2 · Veille Titres", value: "79 € / mois", note: "Jusqu'à 30 agents (149 € jusqu'à 80). 6 mois, prélèvement SEPA. 1er mois inclus avec l'étape 1." },
+    { label: "Étape 3 · Bilan Vacations 6 h", value: "190 € + 30 %", note: "190 € à la remise du dossier, puis 30 % du gain de la 1re année (190 € déduits), seulement si l'avenant est signé." },
+  ],
+  pricingNotes: [
+    "Prix nets, TVA non applicable, art. 293 B du CGI.",
+    "Sur un site où le client refuse l'avenant, aucun honoraire variable n'est dû.",
+  ],
+  pricingTitle: "Trois étapes, un prix annoncé pour chacune",
+  audience: "Pour les sociétés de sécurité privée en Île-de-France, surveillance humaine et SSIAP, de 5 à 80 agents.",
+  commitments: [
+    "Livré en 72 h ou remboursé.",
+    "Vous gardez vos identifiants Dracar : nous vous guidons, nous ne prenons pas la main.",
+    "Confidentialité et interdiction de solliciter vos clients et vos agents pendant 24 mois, écrites dans la lettre de mission.",
+    "Dix ans en cabinets de conseil (Wavestone, Sopra Steria) et une connaissance du secteur de l'intérieur : Dracar, CNAPS, convention IDCC 1351.",
+  ],
+  example: {
+    intro: "Atlas Gardiennage (fictive), 25 agents en Île-de-France, sans compte Dracar au 1er octobre. Cas complet disponible dans nos réalisations :",
+    stats: [
+      { value: "6 jours", label: "pour être en règle sur Dracar, avec la preuve datée (du 1er au 6 octobre)" },
+      { value: "2 agents", label: "sur 25 travaillaient avec une carte non valide : retirés du planning le jour même" },
+      { value: "+1 493 € / mois", label: "de marge retrouvée avec 2 avenants signés sur 3, soit 17 911 € la 1re année" },
+    ],
+    article: "securite-privee-atlas-gardiennage",
+  },
+  cta: "Réserver mon pré-diagnostic (20 min)",
+  formSecteur: "Société de sécurité privée",
+  formTitle: "Votre pré-diagnostic Dracar Ultimate",
+};
+
 export const SEGMENT_PAGES: SegmentPage[] = [
   { slug: "btp", label: "BTP", formSecteur: "BTP", offer: OFFER_BTP },
   { slug: "organisme-de-formation", label: "Organisme de formation", formSecteur: "Organisme de formation", offer: OFFER_ORGANISMES_FORMATION },
@@ -678,6 +746,7 @@ export const SEGMENT_PAGES: SegmentPage[] = [
   { slug: "hotellerie-restauration", label: "Hôtellerie / Restauration", formSecteur: "Hôtellerie / Tourisme", offer: OFFER_HOTELLERIE },
   { slug: "restauration", label: "Restaurants", parent: "Hôtellerie / Restauration", formSecteur: "Restauration", offer: OFFER_RESTAURATION },
   { slug: "tourisme", label: "Tourisme", formSecteur: "Hôtellerie / Tourisme", offer: OFFER_TOURISME_ACTIVITES },
+  { slug: "securite-privee", label: "Société de sécurité privée", formSecteur: "Société de sécurité privée", offer: OFFER_SECURITE_PRIVEE },
   { slug: "ecole-de-conduite", label: "École de conduite", formSecteur: "École de conduite", offer: OFFER_AUTO_ECOLES },
   { slug: "evenementiel", label: "Professionnels de l'Événementiel", formSecteur: "Professionnels de l'Événementiel", offer: OFFER_EVENEMENTIEL },
   { slug: "agences-immobilieres", label: "Agences immobilières", formSecteur: "Agences immobilières", offer: OFFER_AGENCES_IMMO },

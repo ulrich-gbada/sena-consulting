@@ -29,6 +29,113 @@ export type Realisation = {
 
 export const REALISATIONS: Realisation[] = [
   // ─────────────────────────────────────────────────────────────────────────
+  // 9. Sécurité privée · Dracar Ultimate — Atlas Gardiennage (30/09/2026)
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    slug: "securite-privee-atlas-gardiennage",
+    titre: "Atlas Gardiennage : 25 agents, 2 cartes non valides, 17 911 € de marge retrouvée",
+    sousTitre: "Sécurité privée · Dracar Ultimate — une société de 25 agents, du 1er octobre à la signature des avenants",
+    offre: "Pack Dracar Express",
+    segment: "Société de sécurité privée",
+    segmentSlug: "securite-privee",
+    date: "2026-09-30",
+    lecture: "5 min",
+    resume:
+      "Une société de sécurité privée fictive des Hauts-de-Seine, 25 agents (21 en surveillance humaine, 4 SSIAP 1), 9 sites clients, aucun compte Dracar Ultimate au 1er octobre 2026 et un suivi des cartes sur un tableau papier. En six jours, la société est en règle sur Dracar avec une preuve datée ; le contrôle des cartes révèle un agent avec une carte expirée et un autre avec une carte suspendue, tous deux retirés du planning le jour même. La Veille Titres prend le relais chaque mois, et le Bilan Vacations 6 h chiffre trois contrats : deux avenants signés, 1 493 € de marge par mois, 17 911 € la première année.",
+    chiffres: [
+      { value: "6 jours", label: "pour être en règle sur Dracar" },
+      { value: "2 sur 25", label: "agents avec une carte non valide" },
+      { value: "+1 493 € / mois", label: "de marge, 2 avenants signés sur 3" },
+    ],
+    apercu: {
+      t: "bars", title: "Gain mensuel par site après le Bilan Vacations 6 h", unit: "€",
+      categories: ["A · Supérette (6 h facturées)", "B · Cabinet médical (refusé)", "C · Résidence (indexation)"],
+      series: [{ name: "Gain / mois", values: [1248, 0, 245] }],
+    },
+    pdf: "CAS_CLIENT_MYSTERE_SECURITE_PRIVEE.pdf",
+    blocs: [
+      { t: "h2", c: "La société" },
+      { t: "table", head: ["", ""], rows: [
+        ["Société", "Atlas Gardiennage (fictive), SARL, Hauts-de-Seine"],
+        ["Effectif", "25 agents (21 surveillance humaine, 4 SSIAP 1)"],
+        ["Clients", "9 sites : commerces, cabinet médical, résidences, bureaux"],
+        ["Situation au 1er octobre 2026", "Aucun compte Dracar Ultimate ; suivi des cartes sur un tableau papier"],
+        ["Premier contact", "Réponse au mail du 1er octobre à 8 h 12 : « On n'a rien fait, on peut en parler ? »"],
+      ]},
+      { t: "note", c: "Cas fictif. La société, ses sites et ses chiffres sont inventés pour illustrer la méthode. Les taux horaires (facturé 24,00 €, coût complet 21,00 €) sont des hypothèses : dans un vrai dossier, ils viennent des factures et de la paie du client." },
+
+      { t: "h2", c: "Le pré-diagnostic (2 octobre, 20 minutes)" },
+      { t: "table", head: ["Question", "Réponse du dirigeant", "Conclusion"], rows: [
+        ["Compte Dracar ouvert ?", "Non", "Manquement depuis le 1er octobre"],
+        ["NUB de tous les agents ?", "21 sur 25", "Message aux 4 agents envoyé pendant l'appel"],
+        ["Dernière vérification des cartes ?", "« À l'embauche »", "Risque d'agent affecté sans carte valide"],
+        ["Contrats avec vacations de moins de 6 h ?", "2 sites", "Candidats au Bilan Vacations"],
+        ["Prix révisés en janvier ?", "« Pas tous »", "Au moins 1 contrat à vérifier"],
+      ]},
+      { t: "p", c: "Décision en fin d'appel : Pack Dracar Express commandé (290 €, payé par virement le jour même), mandat SEPA signé pour la Veille Titres, Bilan Vacations proposé après la mise en ordre." },
+
+      { t: "h2", c: "Étape 1 — Pack Dracar Express" },
+      { t: "table", head: ["Date", "Action", "Preuve"], rows: [
+        ["02/10", "Commande, paiement, vérification Pappers", "Lettre de mission signée"],
+        ["03/10", "4 NUB manquants reçus ; fichier d'import préparé (2 activités : surveillance, SSIAP)", "2 fichiers CSV"],
+        ["05/10", "Visio de 1 h 45 : compte administrateur, établissement, gestionnaire, import des 25 agents", "Captures datées"],
+        ["05/10", "Validation du compte par le CNAPS", "E-mail de validation"],
+        ["06/10", "Contrôle des cartes, registre de preuves et rapport remis", "Rapport d'une page"],
+      ]},
+      { t: "h3", c: "Ce que le contrôle des cartes a révélé" },
+      { t: "table", head: ["Agent", "Constat", "Action immédiate"], rows: [
+        ["Agent n° 7", "Carte expirée depuis le 12 août 2026", "Retiré du planning le jour même ; renouvellement déposé"],
+        ["Agent n° 18", "Carte suspendue", "Retiré du planning ; échange avec le CNAPS"],
+        ["Agents n° 3, 11, 22", "Échéance sous 6 mois", "Formations de recyclage (MAC) planifiées"],
+      ]},
+      { t: "p", c: "Deux agents travaillaient avec une carte non valide. L'employeur s'exposait au délit de l'article L. 617-7 du CSI (2 ans d'emprisonnement et 30 000 € d'amende), indépendamment de Dracar. **C'est l'argument qui a fait signer la Veille.**" },
+
+      { t: "h2", c: "Étape 2 — Veille Titres" },
+      { t: "p", c: "79 € par mois (25 agents), 6 mois, premier mois inclus. Chaque début de mois, le dirigeant envoie l'export de son tableau de bord Dracar ; Sena Consulting renvoie sous 48 h un rapport d'une page : cartes valides, échéances à venir, entrées et sorties à déclarer. Le dirigeant transmet ce rapport à ses deux plus gros clients, qui l'avaient demandé en septembre." },
+
+      { t: "h2", c: "Étape 3 — Bilan Vacations 6 h" },
+      { t: "p", c: "Dossier remis le 14 octobre (190 €). Hypothèses communes : taux facturé 24,00 € de l'heure, coût complet employeur 21,00 € de l'heure, 4,33 semaines par mois." },
+      { t: "table", head: ["Site", "Situation", "Proposition au client", "Issue", "Gain mensuel"], rows: [
+        ["A · Supérette", "4 h par jour, 6 jours sur 7 : 52,0 h payées et non facturées par mois", "Passer à 6 h facturées au même taux", "Avenant signé le 3 novembre", "**1 248 €**"],
+        ["B · Cabinet médical", "4 h par jour, 5 jours sur 7 : 43,3 h non facturées par mois", "Garder 4 h, taux porté à 32 € de l'heure", "Refusé par le client", "0 €"],
+        ["C · Résidence", "12 h de nuit, 7 jours sur 7 (8 736 € facturés par mois), clause d'indexation jamais appliquée", "Appliquer la clause : +2,8 %", "Accepté le 28 octobre", "**245 €**"],
+      ]},
+      { t: "bars", title: "Gain mensuel par site", unit: "€",
+        categories: ["A · Supérette", "B · Cabinet médical", "C · Résidence"],
+        series: [{ name: "Gain / mois", values: [1248, 0, 245] }] },
+      { t: "table", head: ["Calcul des honoraires", "Montant"], rows: [
+        ["Gain mensuel retenu (sites A et C)", "1 493 €"],
+        ["Gain de la 1re année", "17 911 €"],
+        ["30 % du gain", "5 373 €"],
+        ["Moins le fixe déjà payé", "− 190 €"],
+        ["**Solde dû, en 3 prélèvements SEPA**", "**5 183 € (3 × 1 727,80 €)**"],
+      ]},
+      { t: "p", c: "Sur le site B, le client a refusé : aucun honoraire variable. Le dirigeant a choisi de garder le contrat pour conserver la relation ; c'est sa décision, le dossier lui a donné le coût exact de ce choix : 43,3 h par mois payées sans être facturées, soit environ 910 € de coût." },
+
+      { t: "h2", c: "Bilan pour la société" },
+      { t: "bars", title: "Première année : ce que la société paie, ce qu'elle gagne", unit: "€",
+        categories: ["Pack Dracar Express", "Veille Titres (5 mois)", "Bilan Vacations (fixe + solde)", "Gain de marge"],
+        series: [{ name: "Montant", values: [290, 395, 5373, 17911] }] },
+      { t: "table", head: ["Poste", "Montant"], rows: [
+        ["Coût : Pack Dracar Express", "290 €"],
+        ["Coût : Veille Titres (5 mois payants sur 6)", "395 €"],
+        ["Coût : Bilan Vacations (fixe + solde)", "5 373 €"],
+        ["**Total payé à Sena Consulting la 1re année**", "**6 058 €**"],
+        ["**Gain de marge la 1re année**", "**17 911 €**"],
+        ["Risques évités", "Manquement Dracar ; 2 agents sans carte valide sur le terrain"],
+      ]},
+
+      { t: "h2", c: "Ce que ce cas montre" },
+      { t: "ul", items: [
+        "La mise en ordre Dracar est rapide ; ce qu'elle révèle (les cartes) est ce qui compte vraiment.",
+        "La Veille se vend d'elle-même quand le rapport sert au dirigeant face à ses clients.",
+        "Le Bilan Vacations n'est payé que sur les avenants signés : le client ne prend aucun risque sur la partie variable.",
+      ]},
+      { t: "note", c: "Sources réglementaires : décret n° 2025-1344 ; art. R. 631-15 et L. 617-7 du CSI ; avenant n° 2 du 3/09/2025 étendu le 27/05/2026 ; revalorisation de 2,8 % au 1/01/2026 (IDCC 1351). Sena Consulting n'est pas un organisme agréé par le CNAPS ; le rapport remis n'est pas une attestation officielle." },
+    ],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
   // 8. Plan Argent Dormant — BTP (SPECS BTP v1.0 §4 et §6)
   // ─────────────────────────────────────────────────────────────────────────
   {

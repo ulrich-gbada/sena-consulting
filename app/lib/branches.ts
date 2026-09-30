@@ -14,8 +14,9 @@ import { BRANCHE_FORMATION, SECTEUR_FORMATION } from "./formation";
 import { BRANCHE_HOTELLERIE, SECTEUR_HOTELLERIE, OFFRE_ACTIVITES, estRestaurant } from "./hotellerie";
 import { BRANCHE_RESTAURATION, SECTEUR_RESTAURATION } from "./restauration";
 import { BRANCHE_BTP, SECTEUR_BTP } from "./btp";
+import { BRANCHE_SECURITE, SECTEUR_SECURITE } from "./securite";
 
-export const BRANCHES: Branche[] = [BRANCHE_CARROSSERIE, BRANCHE_FORMATION, BRANCHE_HOTELLERIE, BRANCHE_RESTAURATION, BRANCHE_BTP];
+export const BRANCHES: Branche[] = [BRANCHE_CARROSSERIE, BRANCHE_FORMATION, BRANCHE_HOTELLERIE, BRANCHE_RESTAURATION, BRANCHE_BTP, BRANCHE_SECURITE];
 
 /** Branche associée à un secteur du formulaire, ou null (parcours standard). */
 export const branchePour = (secteur: string | undefined | null): Branche | null =>
@@ -34,7 +35,7 @@ export function branchePourOffre(offre: string | null): { branche: Branche; acti
 
 // ── Cas concret joint au mail de confirmation (SPECS v1.1 §2) ───────────────
 const SITE = "https://www.sena-consulting.fr";
-type CleCas = "agrements" | "libreChoix" | "formation" | "hotel" | "activites" | "restauration" | "btp" | "audit";
+type CleCas = "agrements" | "libreChoix" | "formation" | "hotel" | "activites" | "restauration" | "btp" | "securite" | "audit";
 const CAS: Record<CleCas, { slug: string; phrase: string }> = {
   agrements: { slug: "bilan-agrements-carrosserie-mystere",
     phrase: "Pour voir à quoi ressemble un Bilan, voici un exemple complet sur une carrosserie fictive :" },
@@ -50,6 +51,8 @@ const CAS: Record<CleCas, { slug: string; phrase: string }> = {
     phrase: "Pour voir à quoi ressemble un Bilan Commissions · Restauration, voici un exemple complet sur un restaurant fictif :" },
   btp: { slug: "plan-argent-dormant-mystere-plomberie-chauffage",
     phrase: "Pour voir à quoi ressemble un Plan Argent Dormant, voici un exemple complet sur une entreprise fictive :" },
+  securite: { slug: "securite-privee-atlas-gardiennage",
+    phrase: "Pour voir ce que donnent les trois étapes, voici un cas complet sur une société de sécurité fictive :" },
   audit: { slug: "audit-strategique-pizzeria-bella-nocta",
     phrase: "Pour voir à quoi ressemble un audit, voici un exemple complet sur une entreprise fictive :" },
 };
@@ -61,7 +64,7 @@ const CAS: Record<CleCas, { slug: string; phrase: string }> = {
  * - Organisme de formation : Bilan Financements (quelles que soient les réponses — décision v1.1 §2.1).
  * - Hôtellerie / Tourisme : opérateur d'activités → Lumière Tours ; restaurant seul → Pizzeria Il Forno ; sinon Hôtel des Tilleuls
  *   (tout répondant, y compris HORS CIBLE — SPECS Hôtellerie H-D5).
- * - Restauration : Pizzeria Il Forno. BTP : Mystère Plomberie Chauffage.
+ * - Restauration : Pizzeria Il Forno. BTP : Mystère Plomberie Chauffage. Société de sécurité privée : Atlas Gardiennage.
  * - Tout autre secteur (y compris « Autre : … ») : audit stratégique.
  * `existe` permet de vérifier que le slug est bien publié (getRealisation) ; sinon null.
  */
@@ -87,6 +90,8 @@ export function casConcretPour(
     cle = "restauration";
   } else if (secteur === SECTEUR_BTP) {
     cle = "btp";
+  } else if (secteur === SECTEUR_SECURITE) {
+    cle = "securite";
   } else {
     cle = "audit";
   }

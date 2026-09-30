@@ -30,7 +30,9 @@ export default function ConfidentialitePage() {
         promotions des plateformes, prix en livraison, commande directe…) et, si vous en joignez un, un relevé de versement
         de plateforme. Pour les entreprises du bâtiment : informations sur l&apos;entreprise (effectif, type de clients,
         retards de paiement, retenues de garantie, devis sans réponse) et, le cas échéant, l&apos;identifiant de prospection
-        figurant dans le lien que vous avez suivi. Ces pièces ne sont pas stockées sur le site : elles sont
+        figurant dans le lien que vous avez suivi. Pour les sociétés de sécurité privée : informations sur la société (effectif,
+        compte Dracar, vérification des cartes professionnelles, contrats de vacation…) ; aucune donnée nominative d&apos;agent
+        n&apos;est demandée. Ces pièces ne sont pas stockées sur le site : elles sont
         transmises par e-mail à SENA CONSULTING uniquement.
       </p>
 
