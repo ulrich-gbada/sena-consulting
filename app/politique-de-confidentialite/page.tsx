@@ -11,12 +11,14 @@ export default function ConfidentialitePage() {
     <PageShell tag="Protection des données" title="Politique de confidentialité">
       <h2>Responsable du traitement</h2>
       <p>
-        SENA CONSULTING — <a href="mailto:contact@sena-consulting.fr">contact@sena-consulting.fr</a>
+        SENA CONSULTING, entreprise individuelle de M. Ulrich GBADA, 25 rue Jeanne Gleuzer, 92700 Colombes — SIREN 883 493 702 —{" "}
+        <a href="mailto:contact@sena-consulting.fr">contact@sena-consulting.fr</a>. Aucun délégué à la protection des données n&apos;est désigné ;
+        toute demande est traitée par le responsable du traitement.
       </p>
 
       <h2>Données collectées</h2>
       <p>
-        Via le formulaire de demande d&apos;audit : nom, adresse e-mail, société, téléphone, adresse, taille de l&apos;entreprise,
+        <strong>Formulaire de demande d&apos;audit.</strong> Nom, nom, adresse e-mail, société, téléphone, adresse, taille de l&apos;entreprise,
         chiffre d&apos;affaires, secteur d&apos;activité et attentes exprimées. Pour les carrossiers et garagistes : informations
         sur l&apos;activité de l&apos;atelier (agréments, nombre d&apos;assureurs, délais de paiement, sinistres, cession de créance, avis clients…) et, si vous en joignez une,
         une page de barème ou de convention. Pour les organismes de formation : informations sur l&apos;activité de
@@ -35,25 +37,72 @@ export default function ConfidentialitePage() {
         n&apos;est demandée. Ces pièces ne sont pas stockées sur le site : elles sont
         transmises par e-mail à SENA CONSULTING uniquement.
       </p>
+      <p>
+        <strong>Adresse d&apos;exercice.</strong> Pour vous aider à saisir votre adresse, le formulaire interroge la Base Adresse
+        Nationale (api-adresse.data.gouv.fr, service public français) avec le texte que vous tapez ; seules les coordonnées
+        géographiques de l&apos;adresse retenue sont transmises à SENA CONSULTING.
+      </p>
+      <p>
+        <strong>Liens de campagne.</strong> Les liens que nous diffusons (e-mail, courrier, QR code de plaquette) peuvent contenir
+        une source (<code>src</code>), une offre et un identifiant de prospection (<code>id</code>) : ils servent uniquement à savoir par
+        quel canal vous nous avez trouvés et sont repris dans le lien de prise de rendez-vous.
+      </p>
+      <p>
+        <strong>Newsletter.</strong> Prénom, nom et adresse e-mail, avec votre consentement, pour vous annoncer nos nouveaux cas
+        concrets. Chaque envoi contient un lien de désinscription.
+      </p>
+      <p>
+        <strong>Prise de rendez-vous.</strong> Le pré-diagnostic se réserve sur Calendly, service tiers soumis à sa propre politique de
+        confidentialité ; le lien est prérempli avec votre nom, votre e-mail et votre société pour vous éviter de les ressaisir.
+      </p>
 
       <h2>Finalité et base légale</h2>
       <p>
-        Ces données servent exclusivement à traiter votre demande d&apos;audit et à vous recontacter.
-        Le traitement repose sur votre consentement et sur l&apos;exécution de mesures précontractuelles.
+        Les données du formulaire servent exclusivement à traiter votre demande d&apos;audit, à préparer le pré-diagnostic et à vous
+        recontacter : le traitement repose sur l&apos;exécution de mesures précontractuelles prises à votre demande (art. 6.1.b du RGPD).
+        La newsletter repose sur votre consentement (art. 6.1.a), que vous pouvez retirer à tout moment. Aucune décision automatisée
+        n&apos;est prise : le score de priorité calculé à partir de vos réponses sert uniquement à préparer l&apos;appel.
       </p>
 
       <h2>Durée de conservation</h2>
-      <p>Les données sont conservées pendant la durée nécessaire au traitement de la demande, puis au maximum 3 ans sans contact de votre part.</p>
+      <p>
+        Les données d&apos;une demande d&apos;audit sont conservées pendant la durée nécessaire à son traitement, puis au maximum 3 ans
+        après votre dernier contact. Les abonnés à la newsletter sont conservés jusqu&apos;à leur désinscription. Les pièces jointes
+        transmises par e-mail sont supprimées à la fin de la mission ou, sans mission, dans les 3 mois suivant la demande.
+      </p>
+
+      <h2>Destinataires et sous-traitants</h2>
+      <p>
+        Vos données sont destinées à SENA CONSULTING uniquement ; elles ne sont ni vendues ni transmises à des tiers à des fins
+        commerciales. Pour fonctionner, le site s&apos;appuie sur des prestataires qui traitent les données pour notre compte :
+      </p>
+      <ul>
+        <li><strong>Vercel Inc.</strong> (États-Unis) — hébergement du site et exécution du formulaire ; transferts hors Union européenne
+          encadrés par les clauses contractuelles types de la Commission européenne.</li>
+        <li><strong>Resend</strong> — envoi des e-mails (notification interne, confirmation, newsletter) ; données traitées dans la région
+          Union européenne.</li>
+        <li><strong>O2switch</strong> (France) — boîtes e-mail de SENA CONSULTING, où arrivent les demandes.</li>
+        <li><strong>Base Adresse Nationale</strong> (service public français) — aide à la saisie de l&apos;adresse.</li>
+        <li><strong>Calendly</strong> — prise de rendez-vous, sur son propre site, selon sa propre politique.</li>
+      </ul>
+
+      <h2>Cookies et mesure d&apos;audience</h2>
+      <p>
+        Ce site ne dépose aucun cookie de suivi ou de mesure d&apos;audience et n&apos;utilise aucun service publicitaire. Aucun
+        bandeau de consentement n&apos;est donc nécessaire. Les seuls éléments techniques stockés dans votre navigateur sont ceux
+        indispensables au fonctionnement des pages.
+      </p>
 
       <h2>Vos droits</h2>
       <p>
         Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de rectification, d&apos;effacement, de limitation et d&apos;opposition.
-        Pour l&apos;exercer : <a href="mailto:contact@sena-consulting.fr">contact@sena-consulting.fr</a>.
+        Pour l&apos;exercer : <a href="mailto:contact@sena-consulting.fr">contact@sena-consulting.fr</a> ou par courrier à l&apos;adresse
+        du siège. Nous répondons sous un mois. Vous pouvez également introduire une réclamation auprès de la CNIL
+        (<a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">cnil.fr</a>).
       </p>
 
-      <div className="placeholder">
-        À compléter : sous-traitants (hébergeur, service d&apos;envoi d&apos;e-mails), cookies et outils de mesure d&apos;audience éventuels.
-      </div>
+      <h2>Mise à jour</h2>
+      <p>Dernière mise à jour : 30 septembre 2026. Cette politique évolue avec les offres du site ; la version en ligne fait foi.</p>
     </PageShell>
   );
 }
