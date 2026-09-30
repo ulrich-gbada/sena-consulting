@@ -88,9 +88,11 @@ export default function ConfidentialitePage() {
 
       <h2>Cookies et mesure d&apos;audience</h2>
       <p>
-        Ce site ne dépose aucun cookie de suivi ou de mesure d&apos;audience et n&apos;utilise aucun service publicitaire. Aucun
-        bandeau de consentement n&apos;est donc nécessaire. Les seuls éléments techniques stockés dans votre navigateur sont ceux
-        indispensables au fonctionnement des pages.
+        Un bandeau vous permet, à votre première visite, d&apos;accepter, de refuser ou de paramétrer les cookies. Votre choix est
+        mémorisé dans votre navigateur (clé <code>sena-consulting-cookies</code>, sans donnée personnelle) et peut être modifié en
+        effaçant les données du site. Les cookies essentiels, nécessaires au fonctionnement des pages, ne peuvent pas être désactivés.
+        Les cookies d&apos;analyse ne sont déposés qu&apos;avec votre accord ; à ce jour, aucun outil de mesure d&apos;audience ni aucun
+        service publicitaire n&apos;est installé sur le site.
       </p>
 
       <h2>Vos droits</h2>
