@@ -81,6 +81,7 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
 
         /* Étapes */
         .sl-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+        .sl-steps.three { grid-template-columns: repeat(3, 1fr); }
         .sl-step { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px 22px; position: relative; }
         .sl-step-when { font-size: 16.5px; letter-spacing: 2.5px; text-transform: uppercase; color: #C9A84C; font-weight: 700; margin-bottom: 10px; }
         .sl-step h3 { color: #F4F5F7; font-size: 17px; margin: 0 0 8px; }
@@ -164,7 +165,7 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
         .sl-who p { margin: 0; font-size: 15px; line-height: 1.7; color: #2E4A6B; }
 
         @media (max-width: 900px) {
-          .sl-stats, .sl-stats.four, .sl-pains, .sl-steps { grid-template-columns: 1fr 1fr; }
+          .sl-stats, .sl-stats.four, .sl-pains, .sl-steps, .sl-steps.three { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 768px) {
           .sl-hero { padding: 130px 20px 56px; }
@@ -174,7 +175,7 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
           .sl-hero-btns a { width: 100%; max-width: 320px; text-align: center; }
           .sl-section { padding: 56px 20px; }
           .sl-title { font-size: 25px; }
-          .sl-stats, .sl-stats.four, .sl-pains, .sl-steps, .sl-deliv, .sl-price-grid, .sl-commit { grid-template-columns: 1fr; }
+          .sl-stats, .sl-stats.four, .sl-pains, .sl-steps, .sl-steps.three, .sl-deliv, .sl-price-grid, .sl-commit { grid-template-columns: 1fr; }
           .sl-cta { padding: 36px 20px; }
           .sl-who { grid-template-columns: 1fr; text-align: center; justify-items: center; }
         }
@@ -265,7 +266,7 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
             <div className="sl-inner">
               <div className="sl-tag">Comment ça se passe</div>
               <h2 className="sl-title">Simple, cadré, sans vous mobiliser</h2>
-              <div className="sl-steps">
+              <div className={`sl-steps ${o.steps.length === 3 ? "three" : ""}`}>
                 {o.steps.map((s) => (
                   <div className="sl-step" key={s.title}>
                     <div className="sl-step-when">{s.when}</div>
@@ -349,7 +350,7 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
             <section className="sl-section sl-dark" id="engagements">
               <div className="sl-inner">
                 <div className="sl-tag">Nos engagements, en clair</div>
-                <h2 className="sl-title">Ce que vous pouvez attendre de nous</h2>
+                <h2 className="sl-title">{o.commitmentsTitle ?? "Ce que vous pouvez attendre de nous"}</h2>
                 <ul className="sl-commit">
                   {o.commitments.map((c) => (
                     <li key={c}><IconCheck />{c}</li>
