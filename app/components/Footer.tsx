@@ -20,7 +20,7 @@ export default function Footer() {
           <a href="mailto:contact@sena-consulting.fr">contact@sena-consulting.fr</a> · 07 68 93 48 37
         </p>
         <p className="footer-links">
-          <Link href="/mentions-legales">Mentions légales</Link> · <Link href="/politique-de-confidentialite">Politique de confidentialité</Link>
+          <Link href="/mentions-legales">Mentions légales</Link> · <Link href="/cgv">CGV</Link> · <Link href="/politique-de-confidentialite">Politique de confidentialité</Link>
         </p>
       </footer>
     </>
