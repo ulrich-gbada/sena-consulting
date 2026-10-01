@@ -2,32 +2,21 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { BRANCHES } from "../lib/branches";
+import { piecesMission } from "../data/pieces";
 
 // ─── /merci — page de retour après paiement Stripe ───────────────────────────
 // Stripe redirige ici (after_completion) avec ?offre=<nom interne>&palier=<…>.
-// La page confirme la commande et liste les pièces à envoyer, reprises du
-// descripteur de branche (aMain) pour ne pas dupliquer les listes.
+// La page confirme la commande et liste les pièces qui font courir le délai
+// (app/data/pieces.ts — même source que le mail « Commande reçue »).
 
 export const metadata: Metadata = {
   title: "Commande reçue — SENA CONSULTING",
   robots: { index: false, follow: false },
 };
 
-/** Branche et sous-offre correspondant à un nom interne Stripe (veille-titres-30 → veille-titres). */
-function piecesPour(offre: string): { nom: string; pieces: string[]; delai?: string } | null {
-  const slug = offre.replace(/-(30|80)$/, "");
-  for (const b of BRANCHES) {
-    const so = b.sousOffres?.find((o) => o.offre === slug);
-    if (so) return { nom: so.nomOffre, pieces: so.aMain };
-    if (b.offre === slug) return { nom: b.nomOffre, pieces: b.aMain };
-  }
-  return null;
-}
-
 export default async function MerciPage({ searchParams }: { searchParams: Promise<{ offre?: string; palier?: string }> }) {
   const { offre = "" } = await searchParams;
-  const info = piecesPour(offre);
+  const info = piecesMission(offre);
 
   return (
     <>
@@ -60,8 +49,7 @@ export default async function MerciPage({ searchParams }: { searchParams: Promis
         <span className="mc-tag">Commande reçue</span>
         <h1>Merci. {info ? `Votre commande « ${info.nom} » est enregistrée.` : "Votre commande est enregistrée."}</h1>
         <p>
-          Stripe vous envoie le reçu et la facture par e-mail dans les minutes qui viennent. Le délai de livraison annoncé court à partir de la
-          réception des pièces ci-dessous.
+          Stripe vous envoie le reçu et la facture par e-mail dans les minutes qui viennent. {info ? `Délai de livraison : ${info.delai}.` : "Le délai de livraison annoncé court à partir de la réception des pièces ci-dessous."}
         </p>
       </header>
 
@@ -72,7 +60,7 @@ export default async function MerciPage({ searchParams }: { searchParams: Promis
             <>
               <p>Rien à mettre en forme : des exports ou des photos lisibles suffisent. Si une pièce vous manque, envoyez le reste, on s&apos;en occupe.</p>
               <ul className="mc-list">
-                {info.pieces.map((p) => <li key={p}>{p.charAt(0).toUpperCase() + p.slice(1).replace(/\s*[;.]$/, "")}</li>)}
+                {info.pieces.map((p) => <li key={p}>{p}</li>)}
               </ul>
             </>
           ) : (
