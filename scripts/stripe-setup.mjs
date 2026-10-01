@@ -50,7 +50,7 @@ function encode(obj, prefix = "") {
 async function stripe(method, path, body) {
   const res = await fetch(`https://api.stripe.com/v1${path}`, {
     method,
-    headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/x-www-form-urlencoded" },
+    headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/x-www-form-urlencoded", "Stripe-Version": "2024-06-20" }, // version fixée : la recherche exige ≥ 2020-08-27
     body: body ? encode(body) : undefined,
   });
   const json = await res.json();
