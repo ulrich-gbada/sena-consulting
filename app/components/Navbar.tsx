@@ -108,13 +108,14 @@ export default function Navbar() {
           position: absolute; top: calc(100% + 22px); left: 50%; transform: translateX(-50%);
           background: #1B2A3E; border: 1px solid rgba(201,168,76,0.35); border-top: 3px solid #C9A84C;
           border-radius: 0 0 10px 10px; box-shadow: 0 18px 40px rgba(0,0,0,0.45);
-          padding: 22px 28px 24px; display: none; grid-template-columns: 1fr 1fr; gap: 0 44px; min-width: 560px;
+          padding: 22px 28px 24px; display: none; grid-template-columns: 1fr 1fr; gap: 0 44px; min-width: 680px;
         }
         .mega.open { display: grid; }
         .mega::before { content: ""; position: absolute; top: -22px; left: 0; right: 0; height: 22px; } /* pont : pas de fermeture entre le bouton et le panneau */
-        .mega-title a { color: inherit; text-decoration: none; letter-spacing: inherit; font-size: inherit !important; padding: 0 !important; border: none !important; display: inline !important; }
+        .mega-title { grid-column: 1 / -1; margin: 0 0 14px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .mega-title a { display: flex !important; justify-content: space-between; align-items: baseline; gap: 10px 24px; flex-wrap: wrap; white-space: normal; color: #C9A84C; text-decoration: none; font-size: 11px !important; letter-spacing: 2px; text-transform: uppercase; padding: 0 !important; border: none !important; line-height: 1.5; }
         .mega-title a:hover { color: #F4F5F7; }
-        .mega-title { grid-column: 1 / -1; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #C9A84C; margin: 0 0 14px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .mega-title a span:last-child { white-space: nowrap; }
         .mega-col { list-style: none; margin: 0; padding: 0; }
         .mega-col > li { padding: 0; }
         .mega-col > li > a { display: block; font-size: 15px !important; padding: 9px 0; letter-spacing: 0 !important; border-bottom: 1px solid rgba(255,255,255,0.06); }
@@ -240,7 +241,7 @@ export default function Navbar() {
               Sur mesure <IconChevron open={megaOpen} />
             </button>
             <div className={`mega ${megaOpen ? "open" : ""}`} role="menu">
-              <p className="mega-title"><Link href="/sur-mesure" onClick={closeAll}>Un accompagnement adapté à votre métier — voir toutes les offres →</Link></p>
+              <p className="mega-title"><Link href="/sur-mesure" onClick={closeAll}><span>Un accompagnement adapté à votre métier</span><span>Voir toutes les offres →</span></Link></p>
               <MegaCol items={SEGMENTS_COL_1} onClick={closeAll} />
               <MegaCol items={SEGMENTS_COL_2} onClick={closeAll} />
             </div>
