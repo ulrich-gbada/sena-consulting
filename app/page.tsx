@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useState, useRef, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -210,6 +212,11 @@ export default function Home() {
         .offre-card h3 { color: #F4F5F7; font-size: 20px; font-weight: 700; margin: 0 0 14px; }
         .offre-card p { color: #8A9BB0; font-size: 14px; line-height: 1.7; margin: 0 0 24px; flex: 1; }
         .offre-price { font-size: 12px; color: #C9A84C; font-weight: 600; letter-spacing: 0.5px; border-top: 1px solid rgba(201,168,76,0.2); padding-top: 16px; width: 100%; }
+        .offre-num { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #C9A84C; margin-bottom: 8px; }
+        .offre-cta { margin-top: 40px; background: #1B2A3E; border-radius: 14px; padding: 32px 36px; display: flex; align-items: center; justify-content: space-between; gap: 28px; box-shadow: 0 4px 24px rgba(27,42,62,0.15); }
+        .offre-cta p { margin: 0; color: rgba(244,245,247,0.78); font-size: 15px; line-height: 1.65; max-width: 560px; }
+        .offre-cta-btn { background: #C9A84C; color: #1B2A3E; padding: 15px 26px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 15px; white-space: nowrap; transition: background 0.2s; }
+        .offre-cta-btn:hover { background: #e8c96a; }
 
 
 
@@ -233,6 +240,8 @@ export default function Home() {
           .cred-photo-block { flex-direction: row; align-items: center; gap: 20px; }
           .cred-photo { width: 100px; height: 130px; margin-bottom: 0; }
           .offre-grid { grid-template-columns: 1fr; }
+          .offre-cta { flex-direction: column; align-items: stretch; text-align: center; padding: 26px 22px; }
+          .offre-cta-btn { white-space: normal; text-align: center; }
           section { padding: 60px 20px; }
           .kpis { flex-direction: column; align-items: center; }
           .kpi { width: 100%; max-width: 280px; }
@@ -404,22 +413,29 @@ export default function Home() {
           <div className="offre-grid">
             <div className="offre-card">
               <div className="offre-icon-wrap"><IconAudit /></div>
-              <h3>Audit Business</h3>
-              <p>Un diagnostic complet de votre entreprise pour identifier les leviers de croissance et les axes de transformation prioritaires.</p>
-              <div className="offre-price">Offre d'entrée — Audit gratuit</div>
+              <div className="offre-num">01 · Pour commencer</div>
+              <h3>Audit business</h3>
+              <p>20 minutes au téléphone, puis un diagnostic qui dit où est la marge, ce qui la bloque et ce qui mérite d'être traité en premier. Vous repartez avec une décision, même si vous ne commandez rien.</p>
+              <div className="offre-price">Offert · sans engagement</div>
             </div>
             <div className="offre-card">
               <div className="offre-icon-wrap"><IconData /></div>
-              <h3>Performance & Data</h3>
-              <p>Tableaux de bord décisionnels pour piloter votre activité avec des indicateurs qui parlent vraiment à un dirigeant.</p>
-              <div className="offre-price">Sur devis — selon périmètre</div>
+              <div className="offre-num">02 · Pour agir vite</div>
+              <h3>Quick Win</h3>
+              <p>Une douleur précise de votre métier, une solution livrée en quelques jours : bilan chiffré, plan d'action, campagne d'acquisition clients. Prix annoncé d'avance, souvent garanti, parfois payé au résultat.</p>
+              <div className="offre-price">De 290 € à 890 € · ou au résultat</div>
             </div>
             <div className="offre-card">
               <div className="offre-icon-wrap"><IconTransform /></div>
-              <h3>Transformation & Croissance</h3>
-              <p>Accompagnement complet pour structurer, digitaliser et accélérer votre business. Du conseil à l'exécution.</p>
-              <div className="offre-price">Forfait mensuel ou mission ponctuelle</div>
+              <div className="offre-num">03 · Pour durer</div>
+              <h3>Accompagnement long terme</h3>
+              <p>Transformation en profondeur et croissance stable : nous restons à vos côtés mois après mois, du conseil à l'exécution, avec un indicateur suivi en continu.</p>
+              <div className="offre-price">Forfait mensuel · ou facturation à la performance si mesurable</div>
             </div>
+          </div>
+          <div className="offre-cta">
+            <p>3 prestations qui se déclinent métier par métier : carrossiers, hôtels, restaurants, bâtiment, sécurité privée, formation, auto-écoles, événementiel, immobilier.</p>
+            <Link href="/sur-mesure" className="offre-cta-btn">Découvrez l'offre sur mesure correspondant à votre business →</Link>
           </div>
         </div>
       </section>

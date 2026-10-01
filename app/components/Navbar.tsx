@@ -112,6 +112,8 @@ export default function Navbar() {
         }
         .mega.open { display: grid; }
         .mega::before { content: ""; position: absolute; top: -22px; left: 0; right: 0; height: 22px; } /* pont : pas de fermeture entre le bouton et le panneau */
+        .mega-title a { color: inherit; text-decoration: none; letter-spacing: inherit; font-size: inherit !important; padding: 0 !important; border: none !important; display: inline !important; }
+        .mega-title a:hover { color: #F4F5F7; }
         .mega-title { grid-column: 1 / -1; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #C9A84C; margin: 0 0 14px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); }
         .mega-col { list-style: none; margin: 0; padding: 0; }
         .mega-col > li { padding: 0; }
@@ -238,7 +240,7 @@ export default function Navbar() {
               Sur mesure <IconChevron open={megaOpen} />
             </button>
             <div className={`mega ${megaOpen ? "open" : ""}`} role="menu">
-              <p className="mega-title">Un accompagnement adapté à votre métier</p>
+              <p className="mega-title"><Link href="/sur-mesure" onClick={closeAll}>Un accompagnement adapté à votre métier — voir toutes les offres →</Link></p>
               <MegaCol items={SEGMENTS_COL_1} onClick={closeAll} />
               <MegaCol items={SEGMENTS_COL_2} onClick={closeAll} />
             </div>
@@ -269,6 +271,7 @@ export default function Navbar() {
             Sur mesure <IconChevron open={mobileSubOpen} />
           </button>
           <div className={`mobile-acc ${mobileSubOpen ? "open" : ""}`}>
+            <Link href="/sur-mesure" onClick={closeAll} style={{ color: "#C9A84C", fontWeight: 600 }}>Toutes nos offres, métier par métier →</Link>
             {[...SEGMENTS_COL_1, ...SEGMENTS_COL_2].map((s) => (
               <div key={s.slug}>
                 <Link href={`/sur-mesure/${s.slug}`} onClick={closeAll}>{s.label}</Link>

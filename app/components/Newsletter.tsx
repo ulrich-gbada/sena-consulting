@@ -8,6 +8,7 @@ import { useState } from "react";
 export default function Newsletter() {
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
+  const [site, setSite] = useState(""); // pot de miel
   const [etat, setEtat] = useState<"repos" | "envoi" | "ok" | "erreur">("repos");
 
   const valide = nom.trim().length >= 2 && /^\S+@\S+\.\S+$/.test(email);
@@ -20,7 +21,7 @@ export default function Newsletter() {
       const r = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nom: nom.trim(), email: email.trim().toLowerCase() }),
+        body: JSON.stringify({ nom: nom.trim(), email: email.trim().toLowerCase(), site }),
       });
       const j = await r.json();
       setEtat(j.success ? "ok" : "erreur");
@@ -59,6 +60,7 @@ export default function Newsletter() {
           </div>
         ) : (
           <form className="nl-form" onSubmit={envoyer}>
+            <input type="text" name="site" value={site} onChange={(e) => setSite(e.target.value)} tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: "absolute", left: -10000, width: 1, height: 1, opacity: 0 }} />
             <input type="text" value={nom} onChange={(e) => setNom(e.target.value)} placeholder="Prénom – Nom" autoComplete="name" aria-label="Prénom et nom" />
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="votre@email.fr" autoComplete="email" aria-label="E-mail" />
             <button type="submit" disabled={!valide || etat === "envoi"}>{etat === "envoi" ? "Envoi…" : "Je m'abonne"}</button>

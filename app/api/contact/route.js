@@ -6,6 +6,7 @@ import {
   erreurs, nettoyer, libelle, lienCalendly, offreDe,
 } from '../../lib/branche';
 import { branchePour, casConcretPour } from '../../lib/branches';
+import { tropDeRequetes, potDeMiel } from '../../lib/antispam';
 
 // Formulaire de demande d'audit en 4 étapes (5 pour les secteurs à offre validée) :
 //   1. Identité (name, email, company, phone, address, codePostal, ville, taille, ca)
@@ -33,6 +34,10 @@ export async function POST(request) {
   const resend = new Resend(process.env.RESEND_API_KEY);
   try {
     const body = await request.json();
+    if (potDeMiel(body)) return Response.json({ success: true }); // robot : on fait semblant
+    if (tropDeRequetes(request)) {
+      return Response.json({ error: 'Trop de demandes en quelques minutes. Réessayez un peu plus tard ou appelez-nous.' }, { status: 429 });
+    }
     const {
       name, email, company, phone,
       address, codePostal, ville, latitude, longitude,

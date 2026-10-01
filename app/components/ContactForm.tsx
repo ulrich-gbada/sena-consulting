@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { track } from "@vercel/analytics";
 import ChampAdresse, { type Adresse } from "./ChampAdresse";
 import EtapeActivite from "./EtapeActivite";
 import { FORM_SECTEURS } from "../data/segments";
@@ -45,6 +46,7 @@ export default function ContactForm({
   });
   const [pieceJointe, setPieceJointe] = useState<PieceJointe | null>(null);
   const [source, setSource] = useState("");
+  const [site, setSite] = useState(""); // pot de miel : champ invisible, laissé vide par les humains
   const [prospectId, setProspectId] = useState(""); // ?id= (identifiant de la liste de chasse, SPECS BTP §1)
   const branche = branchePour(formData.secteur);
   const activite: Reponses = branche ? (reponses[branche.id] ?? nettoyer(branche, {})) : {};
@@ -65,7 +67,7 @@ export default function ContactForm({
       setFormData((f) => ({ ...f, secteur: offre.branche.secteur }));
       setReponses((all) => ({ ...all, [offre.branche.id]: nettoyer(offre.branche, offre.activite) }));
     }
-    const src = q.get("src") ?? "";
+    const src = (q.get("src") ?? q.get("utm_source") ?? "").toLowerCase(); // utm_source accepté comme synonyme (Vercel Analytics le lit aussi)
     if (SOURCE_REGEX.test(src)) setSource(src);
     const id = q.get("id") ?? "";
     if (ID_REGEX.test(id)) setProspectId(id);
@@ -100,6 +102,7 @@ export default function ContactForm({
         secteur: formData.secteur === "Autre" ? `Autre : ${formData.secteurAutre}` : formData.secteur,
         source,                                                         // "" si absent
         prospectId,
+        site,
         activite: branche ? nettoyer(branche, activite) : null,
         pieceJointe: branche && branche.fichier && branche.fichier.visible(activite) ? pieceJointe : null,
       };
@@ -109,7 +112,10 @@ export default function ContactForm({
         body: JSON.stringify(body),
       });
       const data = await res.json();
-      if (data.success) { setFormStatus("success"); setEtape("rdv"); }
+      if (data.success) {
+        setFormStatus("success"); setEtape("rdv");
+        try { track("demande_audit", { secteur: formData.secteur, source: source || "direct", offre: branche ? offreDe(branche, activite).offre : "audit" }); } catch { /* analytics indisponible */ }
+      }
       else { setFormStatus("error"); }
     } catch { setFormStatus("error"); }
   };
@@ -289,6 +295,10 @@ export default function ContactForm({
                         <option>Plus de 10 000 000 €</option>
                       </select>
                     </div>
+                  </div>
+                  <div style={{ position: "absolute", left: -10000, top: "auto", width: 1, height: 1, overflow: "hidden" }} aria-hidden="true">
+                    <label htmlFor="site">Site web (ne pas remplir)</label>
+                    <input type="text" id="site" name="site" tabIndex={-1} autoComplete="off" value={site} onChange={(e) => setSite(e.target.value)} />
                   </div>
                   <div className="form-nav">
                     <button className="btn-next" onClick={suivante} disabled={!formData.name || !formData.email || !formData.ca}>Étape suivante →</button>

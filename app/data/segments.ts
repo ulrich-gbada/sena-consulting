@@ -95,6 +95,8 @@ export type Offer = {
   related?: { text: string; href: string; cta: string };
   /** Texte du bouton principal */
   cta: string;
+  /** Modèle économique en une ligne (page /sur-mesure) : « Prix fixe », « Au résultat », « Abonnement »… */
+  modele?: string;
   /** Secteur présélectionné dans le formulaire */
   formSecteur: string;
   /** Titre du bloc formulaire */
@@ -109,6 +111,8 @@ export type SegmentPage = {
   parent?: string;
   /** Décrit le public de la page, sous le titre, quand il n'y a pas d'offre */
   audience?: string;
+  /** Famille de métiers sur la page /sur-mesure (les pages d'une même famille sont regroupées) */
+  famille?: string;
   formSecteur?: string;
   offer?: Offer;
   /** Pour une page parent : sous-pages à mettre en avant */
@@ -154,6 +158,7 @@ const OFFER_EVENEMENTIEL: Offer = {
     "Sans commission sur vos encaissements : l'argent va directement sur votre compte bancaire.",
     "Encaissements opérés via un prestataire de paiement agréé. Les fonds sont versés directement au commerçant.",
   ],
+  modele: "Abonnement mensuel · sans commission",
   cta: "Demander mon pré-diagnostic offert",
   formSecteur: "Professionnels de l'Événementiel",
   formTitle: "Parlons de vos devis : pré-diagnostic offert",
@@ -209,6 +214,7 @@ const OFFER_CARROSSIERS_NON_AGREES: Offer = {
       { value: "16,4 k€", label: "de marge brute en plus par an (scénario prudent)" },
     ],
   },
+  modele: "Prix fixe · garantie 90 jours",
   cta: "Demander mon pré-diagnostic offert",
   formSecteur: "Garagiste / Carrossier",
   formTitle: "Pré-diagnostic offert : combien de sinistres repartent de chez vous ?",
@@ -265,6 +271,7 @@ const OFFER_CARROSSIERS_AGREES: Offer = {
       { value: "34 k€", label: "de trésorerie immobilisée par les délais de paiement" },
     ],
   },
+  modele: "Payé au résultat",
   cta: "Demander mon pré-diagnostic offert",
   formSecteur: "Garagiste / Carrossier",
   formTitle: "Pré-diagnostic offert : vos agréments passés au crible",
@@ -317,6 +324,7 @@ const OFFER_ORGANISMES_FORMATION: Offer = {
       { value: "+72 341 €", label: "préservés par an en appliquant notre plan" },
     ],
   },
+  modele: "Prix fixe · livré en 5 jours ouvrés",
   cta: "Demander mon pré-diagnostic offert",
   formSecteur: "Organisme de formation",
   formTitle: "Pré-diagnostic offert : le calcul sur vos propres formations",
@@ -362,6 +370,7 @@ const OFFER_AUTO_ECOLES: Offer = {
     "Combien de temps ça me prend ? 45 minutes au départ, une heure à la remise, tri des contacts compris.",
     "Et mes fichiers de contacts ? Ils ne sortent jamais de votre agence : on fait le tri ensemble, sur votre ordinateur.",
   ],
+  modele: "Prix fixe · livré en 5 jours ou remboursé",
   cta: "Demander mon pré-diagnostic offert",
   formSecteur: "École de conduite",
   formTitle: "On en parle 20 minutes au téléphone ?",
@@ -405,6 +414,7 @@ const OFFER_AGENCES_IMMO: Offer = {
     "Opérationnel sous 7 jours ouvrés. TVA non applicable, article 293 B du CGI.",
     "Le cadre, écrit noir sur blanc : vous restez responsable de traitement, nous sommes votre sous-traitant au sens de l'article 28 du RGPD, avec un contrat signé avant toute extraction. La relance s'appuie sur l'exception « client existant » de l'article L.34-5 du CPCE : seuls vos anciens clients sont sollicités, jamais un fichier acheté, jamais une annonce de particulier. Hébergement en Union européenne, suppression des données en fin de contrat.",
   ],
+  modele: "Abonnement mensuel · sans engagement",
   cta: "Demander ma démonstration sur mes chiffres",
   formSecteur: "Agences immobilières",
   formTitle: "Démonstration sur vos propres chiffres : pré-diagnostic offert",
@@ -474,6 +484,7 @@ const OFFER_HOTELLERIE: Offer = {
     href: "/sur-mesure/restauration",
     cta: "Voir le Bilan Commissions · Restauration",
   },
+  modele: "Prix fixe · livré en 5 jours ouvrés",
   cta: "Réserver mon pré-diagnostic (20 min)",
   formSecteur: "Hôtellerie / Tourisme",
   formTitle: "Votre pré-diagnostic Bilan Commissions",
@@ -533,6 +544,7 @@ const OFFER_TOURISME_ACTIVITES: Offer = {
     ],
     article: "bilan-commissions-activites-lumiere-tours",
   },
+  modele: "Prix fixe · livré en 5 jours ouvrés",
   cta: "Réserver mon pré-diagnostic (20 min)",
   formSecteur: "Hôtellerie / Tourisme",
   formTitle: "Votre pré-diagnostic Bilan Commissions · Activités",
@@ -598,6 +610,7 @@ const OFFER_RESTAURATION: Offer = {
     href: "/sur-mesure/hotellerie-restauration",
     cta: "Voir le Bilan Commissions pour les hôtels",
   },
+  modele: "Prix fixe · livré en 72 h",
   cta: "Réserver mon pré-diagnostic (20 min)",
   formSecteur: "Restauration",
   formTitle: "Votre pré-diagnostic Bilan Commissions · Restauration",
@@ -659,6 +672,7 @@ const OFFER_BTP: Offer = {
     ],
     article: "plan-argent-dormant-mystere-plomberie-chauffage",
   },
+  modele: "Prix fixe · garantie 5 000 €",
   cta: "Réserver le pré-diagnostic (20 min, offert)",
   formSecteur: "BTP",
   formTitle: "Votre pré-diagnostic Plan Argent Dormant",
@@ -723,14 +737,15 @@ const OFFER_SECURITE_PRIVEE: Offer = {
     ],
     article: "securite-privee-atlas-gardiennage",
   },
+  modele: "Prix fixe, abonnement, puis au résultat",
   cta: "Réserver mon pré-diagnostic (20 min)",
   formSecteur: "Société de sécurité privée",
   formTitle: "Votre pré-diagnostic Dracar Ultimate",
 };
 
 export const SEGMENT_PAGES: SegmentPage[] = [
-  { slug: "btp", label: "BTP", formSecteur: "BTP", offer: OFFER_BTP },
-  { slug: "organisme-de-formation", label: "Organisme de formation", formSecteur: "Organisme de formation", offer: OFFER_ORGANISMES_FORMATION },
+  { slug: "btp", label: "BTP", famille: "Bâtiment", formSecteur: "BTP", offer: OFFER_BTP },
+  { slug: "organisme-de-formation", label: "Organisme de formation", famille: "Formation et écoles", formSecteur: "Organisme de formation", offer: OFFER_ORGANISMES_FORMATION },
   {
     slug: "garagiste-carrossier", label: "Garagiste / Carrossier", formSecteur: "Garagiste / Carrossier",
     audience: "Garages et carrosseries indépendants",
@@ -739,13 +754,13 @@ export const SEGMENT_PAGES: SegmentPage[] = [
       { slug: "garagiste-carrossier-non-agree", label: "Carrossiers non agréés — Plan Libre Choix", status: "ready" },
     ],
   },
-  { slug: "garagiste-carrossier-agree", label: "Carrossiers agréés", parent: "Garagiste / Carrossier", formSecteur: "Garagiste / Carrossier", offer: OFFER_CARROSSIERS_AGREES },
-  { slug: "garagiste-carrossier-non-agree", label: "Carrossiers non agréés", parent: "Garagiste / Carrossier", formSecteur: "Garagiste / Carrossier", offer: OFFER_CARROSSIERS_NON_AGREES },
-  { slug: "hotellerie-restauration", label: "Hôtellerie / Restauration", formSecteur: "Hôtellerie / Tourisme", offer: OFFER_HOTELLERIE },
-  { slug: "restauration", label: "Restaurants", parent: "Hôtellerie / Restauration", formSecteur: "Restauration", offer: OFFER_RESTAURATION },
-  { slug: "tourisme", label: "Tourisme", formSecteur: "Hôtellerie / Tourisme", offer: OFFER_TOURISME_ACTIVITES },
-  { slug: "securite-privee", label: "Société de sécurité privée", formSecteur: "Société de sécurité privée", offer: OFFER_SECURITE_PRIVEE },
-  { slug: "ecole-de-conduite", label: "École de conduite", formSecteur: "École de conduite", offer: OFFER_AUTO_ECOLES },
-  { slug: "evenementiel", label: "Professionnels de l'Événementiel", formSecteur: "Professionnels de l'Événementiel", offer: OFFER_EVENEMENTIEL },
-  { slug: "agences-immobilieres", label: "Agences immobilières", formSecteur: "Agences immobilières", offer: OFFER_AGENCES_IMMO },
+  { slug: "garagiste-carrossier-agree", label: "Carrossiers agréés", parent: "Garagiste / Carrossier", famille: "Automobile", formSecteur: "Garagiste / Carrossier", offer: OFFER_CARROSSIERS_AGREES },
+  { slug: "garagiste-carrossier-non-agree", label: "Carrossiers non agréés", parent: "Garagiste / Carrossier", famille: "Automobile", formSecteur: "Garagiste / Carrossier", offer: OFFER_CARROSSIERS_NON_AGREES },
+  { slug: "hotellerie-restauration", label: "Hôtels indépendants", famille: "Hôtellerie, restauration et tourisme", formSecteur: "Hôtellerie / Tourisme", offer: OFFER_HOTELLERIE },
+  { slug: "restauration", label: "Restaurants livrés", parent: "Hôtellerie / Restauration", famille: "Hôtellerie, restauration et tourisme", formSecteur: "Restauration", offer: OFFER_RESTAURATION },
+  { slug: "tourisme", label: "Activités, visites et excursions", famille: "Hôtellerie, restauration et tourisme", formSecteur: "Hôtellerie / Tourisme", offer: OFFER_TOURISME_ACTIVITES },
+  { slug: "securite-privee", label: "Sociétés de sécurité privée", famille: "Sécurité privée", formSecteur: "Société de sécurité privée", offer: OFFER_SECURITE_PRIVEE },
+  { slug: "ecole-de-conduite", label: "Auto-écoles", famille: "Formation et écoles", formSecteur: "École de conduite", offer: OFFER_AUTO_ECOLES },
+  { slug: "evenementiel", label: "Traiteurs, photographes, wedding planners", famille: "Événementiel", formSecteur: "Professionnels de l'Événementiel", offer: OFFER_EVENEMENTIEL },
+  { slug: "agences-immobilieres", label: "Agences immobilières", famille: "Immobilier", formSecteur: "Agences immobilières", offer: OFFER_AGENCES_IMMO },
 ];

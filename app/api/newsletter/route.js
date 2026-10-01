@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import { gabaritEmail, getSegmentId, SEGMENT_NAME, versionTexte } from '../../lib/email';
+import { tropDeRequetes, potDeMiel } from '../../lib/antispam';
 
 // ─── Inscription à la newsletter Réalisations ───────────────────────────────
 // 1. L'abonné est créé dans les contacts Resend et rattaché au segment
@@ -20,7 +21,10 @@ const splitNom = (nom) => {
 export async function POST(request) {
   const resend = new Resend(process.env.RESEND_API_KEY);
   try {
-    const { nom, email } = await request.json();
+    const body = await request.json();
+    if (potDeMiel(body)) return Response.json({ success: true });
+    if (tropDeRequetes(request)) return Response.json({ error: 'Trop de demandes en quelques minutes. Réessayez plus tard.' }, { status: 429 });
+    const { nom, email } = body;
     if (typeof nom !== 'string' || nom.trim().length < 2) {
       return Response.json({ error: 'Nom invalide.' }, { status: 400 });
     }

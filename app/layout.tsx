@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import CookieBanner from "./components/CookieBanner";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -40,7 +41,7 @@ export default function RootLayout({
         {/* Préchargement de l'image du banner : démarre avant le parsing du JS */}
         <link rel="preload" as="image" href="/banner-sena-consulting.avif" type="image/avif" fetchPriority="high" />
       </head>
-      <body style={{ margin: 0, padding: 0 }}>{children}<CookieBanner /></body>
+      <body style={{ margin: 0, padding: 0 }}>{children}<CookieBanner /><Analytics /></body>
     </html>
   );
 }
