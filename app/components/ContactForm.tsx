@@ -268,7 +268,7 @@ export default function ContactForm({
                     <div className="form-group"><label htmlFor="email">Email professionnel *</label><input type="email" id="email" name="email" value={formData.email} onChange={handleChange} placeholder="jean@entreprise.fr" /></div>
                   </div>
                   <div className="form-row">
-                    <div className="form-group"><label htmlFor="company">Nom de la société</label><input type="text" id="company" name="company" value={formData.company} onChange={handleChange} placeholder="Nom de votre société" /></div>
+                    <div className="form-group"><label htmlFor="company">Nom de la société *</label><input type="text" id="company" name="company" value={formData.company} onChange={handleChange} placeholder="Nom de votre société" /></div>
                     <div className="form-group"><label htmlFor="phone">Téléphone</label><input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="06 00 00 00 00" /></div>
                   </div>
                   <div className="form-group"><label htmlFor="address">Adresse d'exercice</label><ChampAdresse valeur={adresse} onChange={setAdresse} /></div>
@@ -301,7 +301,7 @@ export default function ContactForm({
                     <input type="text" id="site" name="site" tabIndex={-1} autoComplete="off" value={site} onChange={(e) => setSite(e.target.value)} />
                   </div>
                   <div className="form-nav">
-                    <button className="btn-next" onClick={suivante} disabled={!formData.name || !formData.email || !formData.ca}>Étape suivante →</button>
+                    <button className="btn-next" onClick={suivante} disabled={!formData.name || !formData.email || !formData.company || !formData.ca}>Étape suivante →</button>
                   </div>
                 </div>
               )}

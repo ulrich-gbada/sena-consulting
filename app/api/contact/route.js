@@ -45,8 +45,8 @@ export async function POST(request) {
       source, prospectId, activite, carrosserie, pieceJointe,
     } = body;
 
-    if (!name || !email) {
-      return Response.json({ error: 'Nom et email sont obligatoires.' }, { status: 400 });
+    if (!name || !email || !company) {
+      return Response.json({ error: 'Nom, email et nom de la société sont obligatoires.' }, { status: 400 });
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
