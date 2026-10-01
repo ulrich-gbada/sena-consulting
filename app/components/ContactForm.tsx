@@ -114,7 +114,7 @@ export default function ContactForm({
       const data = await res.json();
       if (data.success) {
         setFormStatus("success"); setEtape("rdv");
-        try { track("demande_audit", { secteur: formData.secteur, source: source || "direct", offre: branche ? offreDe(branche, activite).offre : "audit" }); } catch { /* analytics indisponible */ }
+        try { track("demande_audit", { offre: branche ? offreDe(branche, activite).offre : `audit-${formData.secteur.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`, source: source || "direct" }); } catch { /* analytics indisponible */ } // 2 propriétés max (plan inclus)
       }
       else { setFormStatus("error"); }
     } catch { setFormStatus("error"); }
