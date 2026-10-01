@@ -97,6 +97,8 @@ export type Offer = {
   cta: string;
   /** Modèle économique en une ligne (page /sur-mesure) : « Prix fixe », « Au résultat », « Abonnement »… */
   modele?: string;
+  /** Offres commandables en ligne (bouton Stripe sous le prix) : nom interne, libellé, prix affiché */
+  commande?: { offre: string; libelle: string; prix: string; precision?: string }[];
   /** Secteur présélectionné dans le formulaire */
   formSecteur: string;
   /** Titre du bloc formulaire */
@@ -327,6 +329,7 @@ const OFFER_ORGANISMES_FORMATION: Offer = {
   modele: "Prix fixe · livré en 5 jours ouvrés",
   cta: "Demander mon pré-diagnostic offert",
   formSecteur: "Organisme de formation",
+  commande: [{ offre: "bilan-financements", libelle: "Bilan Financements", prix: "790 €", precision: "Tarif de lancement · 5 premiers organismes, puis 1 290 €" }],
   formTitle: "Pré-diagnostic offert : le calcul sur vos propres formations",
 };
 
@@ -487,6 +490,7 @@ const OFFER_HOTELLERIE: Offer = {
   modele: "Prix fixe · livré en 5 jours ouvrés",
   cta: "Réserver mon pré-diagnostic (20 min)",
   formSecteur: "Hôtellerie / Tourisme",
+  commande: [{ offre: "bilan-commissions", libelle: "Bilan Commissions", prix: "890 €", precision: "Tarif de lancement · 5 premiers hôtels, puis 1 490 €" }],
   formTitle: "Votre pré-diagnostic Bilan Commissions",
 };
 
@@ -547,6 +551,7 @@ const OFFER_TOURISME_ACTIVITES: Offer = {
   modele: "Prix fixe · livré en 5 jours ouvrés",
   cta: "Réserver mon pré-diagnostic (20 min)",
   formSecteur: "Hôtellerie / Tourisme",
+  commande: [{ offre: "bilan-commissions-activites", libelle: "Bilan Commissions · Activités", prix: "690 €", precision: "Tarif de lancement · 5 premiers opérateurs, puis 990 €" }],
   formTitle: "Votre pré-diagnostic Bilan Commissions · Activités",
   formActivite: { typeEtab: "activite" },
 };
@@ -613,6 +618,7 @@ const OFFER_RESTAURATION: Offer = {
   modele: "Prix fixe · livré en 72 h",
   cta: "Réserver mon pré-diagnostic (20 min)",
   formSecteur: "Restauration",
+  commande: [{ offre: "bilan-commissions-restauration", libelle: "Bilan Commissions · Restauration · Express 72 h", prix: "490 €", precision: "Tarif de lancement, puis 790 €" }],
   formTitle: "Votre pré-diagnostic Bilan Commissions · Restauration",
 };
 
@@ -675,6 +681,7 @@ const OFFER_BTP: Offer = {
   modele: "Prix fixe · garantie 5 000 €",
   cta: "Réserver le pré-diagnostic (20 min, offert)",
   formSecteur: "BTP",
+  commande: [{ offre: "plan-argent-dormant", libelle: "Plan Argent Dormant", prix: "490 €", precision: "Tarif de lancement · 10 premières entreprises, puis 790 €" }],
   formTitle: "Votre pré-diagnostic Plan Argent Dormant",
 };
 
@@ -740,6 +747,11 @@ const OFFER_SECURITE_PRIVEE: Offer = {
   modele: "Prix fixe, abonnement, puis au résultat",
   cta: "Réserver mon pré-diagnostic (20 min)",
   formSecteur: "Société de sécurité privée",
+  commande: [
+    { offre: "pack-dracar-express", libelle: "Étape 1 · Pack Dracar Express", prix: "290 €", precision: "Jusqu'à 30 agents · 10 premières sociétés, puis 490 €" },
+    { offre: "veille-titres-30", libelle: "Étape 2 · Veille Titres", prix: "79 € / mois", precision: "Jusqu'à 30 agents · engagement 6 mois" },
+    { offre: "veille-titres-80", libelle: "Étape 2 · Veille Titres", prix: "149 € / mois", precision: "31 à 80 agents · engagement 6 mois" },
+  ],
   formTitle: "Votre pré-diagnostic Dracar Ultimate",
 };
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ContactForm from "./ContactForm";
+import BoutonCommande from "./BoutonCommande";
 import type { SegmentPage } from "../data/segments";
 
 // ─── Landing « Sur mesure » ─────────────────────────────────────────────────
@@ -342,6 +343,7 @@ export default function SegmentLanding({ page }: { page: SegmentPage }) {
                 </ul>
               )}
               {o.audience && <p className="sl-audience">{o.audience}</p>}
+              {o.commande && <BoutonCommande items={o.commande} />}
             </div>
           </section>
 
