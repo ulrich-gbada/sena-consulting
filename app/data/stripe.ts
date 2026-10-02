@@ -26,8 +26,17 @@ export const LIENS_TEST: Liens = {
   "veille-titres-80":               { mensuel: "https://buy.stripe.com/test_cNidR859J3q10nC2idaEE0d" },
 };
 
-/** À remplir avec la sortie du script lancé avec la clé live. */
-export const LIENS_LIVE: Liens = {};
+/** Sortie du script lancé avec la clé live le 02/10/2026 (14 liens). */
+export const LIENS_LIVE: Liens = {
+  "bilan-financements":              { lancement: "https://buy.stripe.com/cNifZgcCbd0Bfiw6ytaEE00", standard: "https://buy.stripe.com/dRm6oGdGfe4F2vKe0VaEE01" },
+  "bilan-commissions":               { lancement: "https://buy.stripe.com/eVq9AS8lV4u5fiwf4ZaEE02", standard: "https://buy.stripe.com/3cIbJ059J2lXees0a5aEE03" },
+  "bilan-commissions-activites":     { lancement: "https://buy.stripe.com/5kQcN4cCbbWx8U8aOJaEE04", standard: "https://buy.stripe.com/9B6fZg45FgcN7Q47CxaEE05" },
+  "bilan-commissions-restauration":  { lancement: "https://buy.stripe.com/9B66oGby7gcN1rGaOJaEE06", standard: "https://buy.stripe.com/fZu4gydGf0dPfiwbSNaEE07" },
+  "plan-argent-dormant":             { lancement: "https://buy.stripe.com/6oU8wOau31hT5HWg93aEE08", standard: "https://buy.stripe.com/3cI4gycCbbWxgmA6ytaEE09" },
+  "pack-dracar-express":             { lancement: "https://buy.stripe.com/8x2cN4gSr7Gh7Q4f4ZaEE0a", standard: "https://buy.stripe.com/dRm3cu1XxaSt4DS4qlaEE0b" },
+  "veille-titres-30":                { mensuel: "https://buy.stripe.com/fZu8wO0Tt2lXc6kbSNaEE0c" },
+  "veille-titres-80":                { mensuel: "https://buy.stripe.com/cNidR859J3q10nC2idaEE0d" },
+};
 
 export const PALIER_ACTIF: Record<string, Palier> = {
   "bilan-financements": "lancement",
