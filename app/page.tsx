@@ -137,6 +137,13 @@ export default function Home() {
         .btn-secondary { background: transparent; color: #F4F5F7; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 15px; border: 1px solid rgba(255,255,255,0.25); transition: all 0.2s; display: inline-block; }
         .btn-secondary:hover { border-color: #C9A84C; color: #C9A84C; }
 
+        /* Desktop (02/10) : paragraphe du banner ×1,2 ; boutons ×2 (surface) */
+        @media (min-width: 1101px) {
+          .banner-subtitle { font-size: 21.6px; max-width: 1240px; }
+          .banner-btns { gap: 24px; }
+          .banner-btns .btn-primary, .banner-btns .btn-secondary { font-size: 21px; padding: 24px 48px; border-radius: 8px; }
+        }
+
         /* ── SECTIONS ── */
         section { padding: 80px 40px; }
         .section-inner { max-width: 1100px; margin: 0 auto; }
